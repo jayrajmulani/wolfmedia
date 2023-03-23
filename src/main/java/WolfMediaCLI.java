@@ -14,7 +14,6 @@ public class WolfMediaCLI {
     private static DB db = new DB();
     private static Create create = new Create();
     private static Read read = new Read();
-//    private static Create.Type type;
     public static void main(String args[]) throws SQLException, ClassNotFoundException {
         Scanner sc = new Scanner(System.in);
         int choice;
