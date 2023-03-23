@@ -1,12 +1,10 @@
 package info;
 
 import models.Guest;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 public class Read {
@@ -23,7 +21,4 @@ public class Read {
             return guest !=null ? Optional.of(guest) : Optional.empty();
         }
     }
-//    public List<Guest> getGuest(long id){
-//
-//    }
 }

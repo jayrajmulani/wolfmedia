@@ -2,6 +2,7 @@ package info;
 
 import models.Guest;
 import models.Song;
+import utils.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,14 +20,7 @@ public class Create {
             System.out.println("Guest created successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
-            if (connection != null) {
-                try {
-                    System.err.print("Transaction is being rolled back");
-                    connection.rollback();
-                } catch (SQLException sql) {
-                    sql.printStackTrace();
-                }
-            }
+            DB.rollBackTransaction(connection);
         }
     }
 }

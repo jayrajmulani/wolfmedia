@@ -19,5 +19,13 @@ public class DB {
             }
         }
     }
+    public static void rollBackTransaction(Connection connection){
+        try {
+            System.err.print("Transaction is being rolled back");
+            connection.rollback();
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+        }
+    }
 
 }
