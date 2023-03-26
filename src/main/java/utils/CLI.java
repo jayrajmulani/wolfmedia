@@ -3,9 +3,13 @@ package utils;
 import info.Create;
 import info.Read;
 import models.Guest;
+import models.Song;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -14,7 +18,7 @@ public class CLI {
     private static final Create create = new Create();
     private static final Read read = new Read();
 
-    public void run() throws SQLException, ClassNotFoundException{
+    public void run() throws SQLException, ClassNotFoundException, ParseException {
         Scanner sc = new Scanner(System.in);
         int choice;
         while(true){
@@ -35,6 +39,56 @@ public class CLI {
                             case 0 -> {
                                 menu.displayMainMenu();
                                 goBack = true;
+                            }
+                            case 1 -> {
+                                quit = false;
+                                while(true){
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            System.out.println("Enter the title of the song:");
+                                            String title = sc.next();
+                                            System.out.println("Enter the release country of the song:");
+                                            String releaseCountry = sc.next();
+                                            System.out.println("Enter the language of the song:");
+                                            String language = sc.next();
+                                            System.out.println("Enter the duration of the song:");
+                                            float duration = sc.nextFloat();
+                                            System.out.println("Enter the royalty rate of the song:");
+                                            float royaltyRate = sc.nextFloat();
+                                            System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
+                                            Date releaseDate = (Date) new SimpleDateFormat("MM/dd/yyyy").parse(sc.next());
+                                            Song song = new Song(title,releaseCountry, language, duration, royaltyRate, releaseDate, false);
+                                            create.createSong(connection, song);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println,()->System.out.println("Song not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if(goBackInner || quit){
+                                        break;
+                                    }
+                                }
                             }
                             case 2 -> {
                                 quit =false;
@@ -63,11 +117,7 @@ public class CLI {
                                             System.out.println("Enter the id of the guest:");
                                             Long id = sc.nextLong();
                                             Optional<Guest> resultGuest = read.getGuest(id, connection);
-                                            if (resultGuest.isPresent()) {
-                                                System.out.println(resultGuest.get());
-                                            } else {
-                                                System.out.println("Guest not found!");
-                                            }
+                                            resultGuest.ifPresentOrElse(System.out::println,()->System.out.println("Guest not found!"));
                                             DB.closeConnection(connection);
                                         }
                                         default -> {
