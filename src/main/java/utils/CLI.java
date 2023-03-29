@@ -6,10 +6,8 @@ import models.Guest;
 import models.Song;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -17,6 +15,7 @@ public class CLI {
     private static final Menu menu = new Menu();
     private static final Create create = new Create();
     private static final Read read = new Read();
+    private static final InputData inputData = new InputData();
 
     public void run() throws SQLException, ClassNotFoundException, ParseException {
         Scanner sc = new Scanner(System.in);
@@ -28,6 +27,7 @@ public class CLI {
             switch (choice) {
                 case -1 -> quit = true;
                 case 1 -> {
+                    // Information processing menu
                     int crudChoice;
                     while (true) {
                         quit =false;
@@ -41,6 +41,7 @@ public class CLI {
                                 goBack = true;
                             }
                             case 1 -> {
+                                // Song Menu
                                 quit = false;
                                 while(true){
                                     boolean goBackInner = false;
@@ -55,24 +56,14 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            // Create Song
                                             connection = DB.getConnection();
-                                            System.out.println("Enter the title of the song:");
-                                            String title = sc.next();
-                                            System.out.println("Enter the release country of the song:");
-                                            String releaseCountry = sc.next();
-                                            System.out.println("Enter the language of the song:");
-                                            String language = sc.next();
-                                            System.out.println("Enter the duration of the song:");
-                                            float duration = sc.nextFloat();
-                                            System.out.println("Enter the royalty rate of the song:");
-                                            float royaltyRate = sc.nextFloat();
-                                            System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
-                                            Date releaseDate = (Date) new SimpleDateFormat("MM/dd/yyyy").parse(sc.next());
-                                            Song song = new Song(title,releaseCountry, language, duration, royaltyRate, releaseDate, false);
-                                            create.createSong(connection, song);
+                                            long id = create.createSong(connection,inputData.getSongInput(sc));
+                                            System.out.println("Song created successfully with id " + id);
                                             DB.closeConnection(connection);
                                         }
                                         case 2 -> {
+                                            // Get Song
                                             connection = DB.getConnection();
                                             System.out.println("Enter the id of the song:");
                                             Long id = sc.nextLong();
@@ -106,10 +97,8 @@ public class CLI {
                                         }
                                         case 1 -> {
                                             connection = DB.getConnection();
-                                            System.out.println("Enter the name of the guest:");
-                                            String name = sc.next();
-                                            Guest guest = new Guest(name);
-                                            create.createGuest(connection, guest);
+                                            long id = create.createGuest(connection, inputData.getGuestInput(sc));
+                                            System.out.println("Guest created successfully with id " + id);
                                             DB.closeConnection(connection);
                                         }
                                         case 2 -> {
@@ -148,6 +137,7 @@ public class CLI {
                 }
             }
             if(quit){
+                sc.close();
                 System.out.println("Hope you had a great experience..");
                 break;
             }

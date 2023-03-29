@@ -1,17 +1,19 @@
 package info;
 
-import models.Guest;
-import models.Song;
+import models.*;
 import utils.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class Create {
-    public void createSong(Connection connection, Song song) throws SQLException {
-        String query = "insert into SONG (title, release_country, language, duration, royalty_rate, release_date, royalty_paid) values (?, ?, ?, ?, ?, ?, ?)";
+    private static Read read = new Read();
+    public long createSong(Connection connection, Song song) throws SQLException {
+        String query = "insert into SONG (title, release_country, language, duration, royalty_rate, release_date, royalty_paid) " +
+                       "values (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, song.getTitle());
             statement.setString(2, song.getReleaseCountry());
@@ -20,28 +22,62 @@ public class Create {
             statement.setFloat(5, song.getRoyaltyRate());
             statement.setDate(6, song.getReleaseDate());
             statement.setBoolean(7,song.isRoyaltyPaid());
-            if(statement.executeUpdate() > 0 ){
+            long songId;
+            if(statement.executeUpdate() > 0 ) {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
-                System.out.println("Song created successfully with id " + rs.getInt(1));
+                songId = rs.getInt(1);
+                song.getGenres().forEach(inputGenre -> {
+                    try {
+                        Optional<Genre> genre = read.getGenreByName(connection, inputGenre.getName());
+                        long genreId = genre.isPresent() ? genre.get().getId() : createGenre(connection, inputGenre);
+                        String mapSongGenreQuery = "INSERT INTO SONG_GENRE(song_id, genre_id) values (?,?)";
+                        PreparedStatement mapSongGenreStatement = connection.prepareStatement(mapSongGenreQuery);
+                        mapSongGenreStatement.setLong(1, songId);
+                        mapSongGenreStatement.setLong(2, genreId);
+                        mapSongGenreStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } else {
+                songId = 0L;
             }
+            return songId;
         } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
+        return 0L;
     }
-    public void createGuest(Connection connection, Guest guest) throws SQLException {
+    public long createGuest(Connection connection, Guest guest) throws SQLException {
         String query = "INSERT INTO GUEST(name) VALUES (?)";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, guest.getName());
+    }
+    public long createGenre(Connection connection, Genre genre) throws SQLException {
+        String query = "INSERT INTO GENRE(name) VALUES (?)";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, genre.getName());
+    }
+    public long createSponsor(Connection connection, Sponsor sponsor) throws SQLException {
+        String query = "INSERT INTO SPONSOR(name) VALUES (?)";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, sponsor.getName());
+    }
+    public long createArtistType(Connection connection, ArtistType artistType) throws SQLException {
+        String query = "INSERT INTO SPONSOR(name) VALUES (?)";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, artistType.getName());
+    }
+    private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, guest.getName());
+            statement.setString(1, name);
             if(statement.executeUpdate() > 0 ){
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
-                System.out.println("Guest created successfully with id " + rs.getInt(1));
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
+        return 0L;
     }
 }

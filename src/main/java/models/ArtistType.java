@@ -8,11 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Guest {
+public class ArtistType {
     private long id;
     private String name;
-
-    public Guest(String name) {
+    public ArtistType(String name) {
         this.name = name;
     }
 }
