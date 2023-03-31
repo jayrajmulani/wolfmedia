@@ -13,18 +13,20 @@ import java.util.Scanner;
 
 public class InputData {
     public Song getSongInput(Scanner sc) throws ParseException {
+
+        Scanner myObj = new Scanner(System.in);
+
         System.out.println("Enter the title of the song:");
-        String title = sc.nextLine();
-        System.out.println("TITLE " + title);
-        sc.nextLine();
-        System.out.println("Enter the release country of the song:");
-        String releaseCountry = sc.next();
+        String title = myObj.nextLine();
         System.out.println("Enter the language of the song:");
-        String language = sc.next();
+        String language = myObj.nextLine();
+        System.out.println("Enter the release country of the song:");
+        String releaseCountry = myObj.nextLine();
         System.out.println("Enter the duration of the song:");
-        float duration = sc.nextFloat();
+        double duration = myObj.nextDouble();
+        System.out.println(duration);
         System.out.println("Enter the royalty rate of the song:");
-        float royaltyRate = sc.nextFloat();
+        double royaltyRate = myObj.nextDouble();
         System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
         Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         sc.nextLine();

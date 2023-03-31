@@ -18,8 +18,8 @@ public class Create {
             statement.setString(1, song.getTitle());
             statement.setString(2, song.getReleaseCountry());
             statement.setString(3, song.getLanguage());
-            statement.setFloat(4, song.getDuration());
-            statement.setFloat(5, song.getRoyaltyRate());
+            statement.setDouble(4, song.getDuration());
+            statement.setDouble(5, song.getRoyaltyRate());
             statement.setDate(6, song.getReleaseDate());
             statement.setBoolean(7,song.isRoyaltyPaid());
             long songId;

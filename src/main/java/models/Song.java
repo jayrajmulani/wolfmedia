@@ -16,12 +16,12 @@ public class Song {
     String title;
     String releaseCountry;
     String language;
-    float duration;
-    float royaltyRate;
+    double duration;
+    double royaltyRate;
     Date releaseDate;
     boolean royaltyPaid;
     List<Genre> genres;
-    public Song(String title, String releaseCountry, String language, float duration, float royaltyRate, Date releaseDate, boolean royaltyPaid, List<Genre> genres) {
+    public Song(String title, String releaseCountry, String language, double duration, double royaltyRate, Date releaseDate, boolean royaltyPaid, List<Genre> genres) {
         this.title = title;
         this.releaseCountry = releaseCountry;
         this.language = language;
