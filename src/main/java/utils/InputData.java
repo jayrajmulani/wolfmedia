@@ -44,15 +44,15 @@ public class InputData {
         Scanner myObj = new Scanner(System.in);
 
         System.out.println("Enter the first name of the host:");
-        String first_name = myObj.nextLine();
+        String firstName = myObj.nextLine();
         System.out.println("Enter the last name of the host:");
-        String last_name = myObj.nextLine();
+        String lastName = myObj.nextLine();
         System.out.println("Enter the city of the host:");
         String city = myObj.nextLine();
         System.out.println("Enter the email of the host:");
         String email = myObj.nextLine();
         System.out.println("Enter the phone of the host:");
         String phone = myObj.nextLine();
-        return new Host(first_name, last_name, city, email, phone);
+        return new Host(firstName, lastName, city, email, phone);
     }
 }

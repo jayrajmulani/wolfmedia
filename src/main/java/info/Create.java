@@ -70,8 +70,8 @@ public class Create {
     public long createHost(Connection connection, Host host) throws SQLException {
         String query = "INSERT INTO HOST(first_name, last_name, city, email, phone) VALUES (?,?,?,?,?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, host.getFirst_name());
-            statement.setString(2, host.getLast_name());
+            statement.setString(1, host.getFirstName());
+            statement.setString(2, host.getLastName());
             statement.setString(3, host.getCity());
             statement.setString(4, host.getEmail());
             statement.setString(5, host.getPhone());
