@@ -1,8 +1,6 @@
 package utils;
 
-import models.Genre;
-import models.Guest;
-import models.Song;
+import models.*;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -40,5 +38,21 @@ public class InputData {
         System.out.println("Enter the name of the guest:");
         String name = sc.next();
         return new Guest(name);
+    }
+
+    public Host getHostInput(Scanner sc){
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the first name of the host:");
+        String first_name = myObj.nextLine();
+        System.out.println("Enter the last name of the host:");
+        String last_name = myObj.nextLine();
+        System.out.println("Enter the city of the host:");
+        String city = myObj.nextLine();
+        System.out.println("Enter the email of the host:");
+        String email = myObj.nextLine();
+        System.out.println("Enter the phone of the host:");
+        String phone = myObj.nextLine();
+        return new Host(first_name, last_name, city, email, phone);
     }
 }

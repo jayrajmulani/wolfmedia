@@ -3,6 +3,7 @@ package utils;
 import info.Create;
 import info.Read;
 import models.Guest;
+import models.Host;
 import models.Song;
 
 import java.sql.Connection;
@@ -107,6 +108,44 @@ public class CLI {
                                             Long id = sc.nextLong();
                                             Optional<Guest> resultGuest = read.getGuest(id, connection);
                                             resultGuest.ifPresentOrElse(System.out::println,()->System.out.println("Guest not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if(goBackInner || quit){
+                                        break;
+                                    }
+                                }
+                            }
+                            case 5 -> {
+                                quit = false;
+                                while(true){
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createHost(connection, inputData.getHostInput(sc));
+                                            System.out.println("Host created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            System.out.println("Enter the id of the host:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println,()->System.out.println("Host not found!"));
                                             DB.closeConnection(connection);
                                         }
                                         default -> {
