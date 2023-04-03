@@ -1,9 +1,6 @@
 package info;
 
-import models.Genre;
-import models.Guest;
-import models.Host;
-import models.Song;
+import models.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -77,6 +74,48 @@ public class Read {
                         new Host(resultSet.getLong("id"), resultSet.getString("first_name"),
                                 resultSet.getString("last_name"), resultSet.getString("city"),
                                 resultSet.getString("email"), resultSet.getString("phone")
+                        ));
+            }
+            return Optional.empty();
+        }
+
+    }
+
+    public Optional<Podcast> getPodcast(Long id, Connection connection) throws SQLException {
+        String query = "SELECT PODCAST.id, name, language, country, flat_fee, HOST.id, " +
+                " HOST.first_name, HOST.last_name " +
+                " FROM PODCAST " +
+                " JOIN PODCAST_HOST ON PODCAST.id = PODCAST_HOST.podcast_id" +
+                " JOIN HOST ON HOST.id = PODCAST_HOST.host_id" +
+                " WHERE PODCAST.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+            List<Host> hosts = new ArrayList<>();
+            while (resultSet.next()) {
+                hosts.add(
+                        new Host(
+                                resultSet.getLong("HOST.id"),
+                                resultSet.getString("HOST.first_name"),
+                                resultSet.getString("HOST.first_name")
+                        )
+                );
+            }
+            resultSet.beforeFirst();
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Podcast(
+                                resultSet.getLong("PODCAST.id"),
+                                resultSet.getString("name"),
+                                resultSet.getString("language"),
+                                resultSet.getString("country"),
+                                resultSet.getDouble("flat_fee"),
+                                0, // TODO rating
+                                0, // TODO sub count
+                                hosts,
+                                new ArrayList<Sponsor>(), // TODO sponsor
+                                new ArrayList<Genre>() // TODO
                         ));
             }
             return Optional.empty();
