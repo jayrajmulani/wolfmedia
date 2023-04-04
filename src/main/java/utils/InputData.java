@@ -23,7 +23,6 @@ public class InputData {
         String releaseCountry = myObj.nextLine();
         System.out.println("Enter the duration of the song:");
         double duration = myObj.nextDouble();
-        System.out.println(duration);
         System.out.println("Enter the royalty rate of the song:");
         double royaltyRate = myObj.nextDouble();
         System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
@@ -35,13 +34,6 @@ public class InputData {
         List<Genre> genres = Arrays.stream(genresPipeSeparated.split("\\|")).map(genre -> new Genre(genre.strip())).toList();
         return new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate, false, genres);
     }
-
-    public Guest getGuestInput(Scanner sc) {
-        System.out.println("Enter the name of the guest:");
-        String name = sc.next();
-        return new Guest(name);
-    }
-
     public Host getHostInput(Scanner sc) throws ParseException {
         Scanner myObj = new Scanner(System.in);
 
@@ -104,4 +96,62 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
+    public Guest getGuestInput(Scanner sc){
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the Guest name: ");
+        String name = myObj.nextLine();
+
+        return new Guest(name);
+    }
+    public Service getServiceInput (Scanner sc) {
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the Service name: ");
+        String name = myObj.nextLine();
+
+        System.out.println("Enter the current balance of the Service: ");
+        double balance = myObj.nextDouble();
+
+        return new Service(name, balance);
+    }
+    public User getUserInput (Scanner sc) throws ParseException {
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the first name of the User: ");
+        String fName = myObj.nextLine();
+
+        System.out.println("Enter the last name of the User: ");
+        String lName = myObj.nextLine();
+
+        System.out.println("Enter the registration date of the User: ");
+        Date regDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+
+        System.out.println("Enter the phone number of the User: ");
+        String phone  = myObj.nextLine();
+
+        System.out.println("Enter the email id of the User: ");
+        String email = myObj.nextLine();
+
+        System.out.println("Enter the premium status of the User: ");
+        Boolean premiumStatus = myObj.nextBoolean();
+
+        System.out.println("Enter the monthly premium fees of the User: ");
+        double premiumMonthlyStatus = myObj.nextDouble();
+
+        return new User(fName, lName, regDate, phone, email, premiumStatus, premiumMonthlyStatus);
+    }
+    public RecordLabel getRecordLabelInput (Scanner sc) {
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the name of the Record Label name: ");
+        String name = myObj.nextLine();
+
+        return new RecordLabel(name);
+    }
+
 }
