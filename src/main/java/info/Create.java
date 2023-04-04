@@ -24,7 +24,7 @@ public class Create {
             if (statement.executeUpdate() > 0) {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
-                songId = rs.getInt(1);
+                songId = rs.getLong(1);
                 song.getGenres().forEach(inputGenre -> {
                     try {
                         Optional<Genre> genre = read.getGenreByName(connection, inputGenre.getName());
@@ -48,6 +48,34 @@ public class Create {
         }
         return 0L;
     }
+
+    public long createUser(Connection connection, User user) throws SQLException {
+        String query = "insert into USER (f_name, l_name, phone, email, reg_date, premium_status, monthly_premium_fees) values (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, user.getFName());
+            statement.setString(2, user.getLName());
+            statement.setString(3, user.getPhone());
+            statement.setString(4, user.getEmail());
+            statement.setDate(5, (Date) user.getRegDate());
+            statement.setBoolean(6, user.getPremiumStatus());
+            statement.setDouble(7, user.getMonthlyPremiumFees());
+
+            long userId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                userId = rs.getLong(1);
+            } else
+                userId = 0L;
+            return userId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 
     public long createGuest(Connection connection, Guest guest) throws SQLException {
         String query = "INSERT INTO GUEST(name) VALUES (?)";

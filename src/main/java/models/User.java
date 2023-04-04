@@ -18,6 +18,9 @@ public class User {
     private String phone;
     private String email;
 
+    private Boolean premiumStatus;
+    private double monthlyPremiumFees;
+
     public User(String fName, String lName, Date regDate, String phone, String email, Boolean premiumStatus, double monthlyPremiumFees) {
         this.fName = fName;
         this.lName = lName;
@@ -28,8 +31,7 @@ public class User {
         this.monthlyPremiumFees = monthlyPremiumFees;
     }
 
-    private Boolean premiumStatus;
-    private double monthlyPremiumFees;
+
 
 
 }

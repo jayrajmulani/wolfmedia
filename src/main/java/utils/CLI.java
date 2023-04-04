@@ -198,6 +198,46 @@ public class CLI {
                                     }
                                 }
                             }
+                            case 6 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createUser(connection, inputData.getUserInput(sc));
+                                            System.out.println("User created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for User
+                                            System.out.println("Enter the id of the User:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");
                                 menu.displayInfoProcessingMenu();
