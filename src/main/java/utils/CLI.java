@@ -237,6 +237,46 @@ public class CLI {
                                     }
                                 }
                             }
+                            case 7 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createRecordLabel(connection, inputData.getRecordLabelInput(sc));
+                                            System.out.println("Record Label created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for Record Label
+                                            System.out.println("Enter the id of the Record Label:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+
 
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");

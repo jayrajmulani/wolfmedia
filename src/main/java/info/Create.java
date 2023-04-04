@@ -92,6 +92,11 @@ public class Create {
         return insertAndGetIdForSingleNameColumnTables(connection, query, sponsor.getName());
     }
 
+    public long createRecordLabel(Connection connection, RecordLabel recordLabel) throws SQLException {
+        String query = "insert into RECORD_LABEL (name) values (?);";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, recordLabel.getName());
+    }
+
     public long createArtistType(Connection connection, ArtistType artistType) throws SQLException {
         String query = "INSERT INTO SPONSOR(name) VALUES (?)";
         return insertAndGetIdForSingleNameColumnTables(connection, query, artistType.getName());

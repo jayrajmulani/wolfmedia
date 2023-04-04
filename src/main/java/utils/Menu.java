@@ -33,9 +33,9 @@ public class Menu {
         System.out.println("4. Podcast");
         System.out.println("5. Host");
         System.out.println("6. User");
-        System.out.println("7. Sponsor");
+        System.out.println("7. Record Label");
         System.out.println("8. Episode");
-        System.out.println("9. Record Label");
+        System.out.println("9. Sponsor");
         System.out.println("10. Service");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
