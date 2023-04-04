@@ -144,6 +144,7 @@ public class InputData {
 
         return new User(fName, lName, regDate, phone, email, premiumStatus, premiumMonthlyStatus);
     }
+
     public RecordLabel getRecordLabelInput (Scanner sc) {
 
         Scanner myObj = new Scanner(System.in);

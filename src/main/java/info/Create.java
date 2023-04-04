@@ -76,7 +76,6 @@ public class Create {
         return 0L;
     }
 
-
     public long createGuest(Connection connection, Guest guest) throws SQLException {
         String query = "INSERT INTO GUEST(name) VALUES (?)";
         return insertAndGetIdForSingleNameColumnTables(connection, query, guest.getName());
@@ -96,6 +95,29 @@ public class Create {
         String query = "insert into RECORD_LABEL (name) values (?);";
         return insertAndGetIdForSingleNameColumnTables(connection, query, recordLabel.getName());
     }
+
+    public long createService(Connection connection, Service service) throws SQLException {
+        String query = "insert into SERVICE(name, balance) values (?, ?);";
+
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, service.getName());
+            statement.setDouble(2, service.getBalance());
+
+            long userId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                userId = rs.getLong(1);
+            } else
+                userId = 0L;
+            return userId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 
     public long createArtistType(Connection connection, ArtistType artistType) throws SQLException {
         String query = "INSERT INTO SPONSOR(name) VALUES (?)";
