@@ -215,6 +215,34 @@ public class Create {
         return 0L;
     }
 
+    public long createAlbum(Connection connection, Album album) throws SQLException {
+        String query = "insert into ALBUM (name, release_date, edition) values (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, album.getName());
+            statement.setDate(2, (Date) album.getRelease_date());
+            statement.setInt(3, album.getEdition());
+            long albumId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                albumId = rs.getInt(1);
+            }
+            else {
+                albumId = 0L;
+            }
+            return albumId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
+
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, name);

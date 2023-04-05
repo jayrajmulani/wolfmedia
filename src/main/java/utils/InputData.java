@@ -171,5 +171,22 @@ public class InputData {
 
         return new Artist(name, country, status);
     }
+    public Album getAlbumInput(Scanner sc) throws ParseException{
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the name of the Album: ");
+        String name = myObj.nextLine();
+
+        System.out.println("Enter the release date of the Album: ");
+        Date release_date = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+
+        System.out.println("Enter the edition of the Album: ");
+        int edition = myObj.nextInt();
+
+
+        return new Album(name, release_date, edition);
+    }
+
 
 }
