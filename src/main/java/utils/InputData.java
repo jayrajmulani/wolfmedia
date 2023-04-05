@@ -155,4 +155,21 @@ public class InputData {
         return new RecordLabel(name);
     }
 
+    public Artist getArtistInput(Scanner sc) {
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the name of the Artist: ");
+        String name = myObj.nextLine();
+
+        System.out.println("Enter the country of the Artist: ");
+        String country = myObj.nextLine();
+
+        System.out.println("Enter the status of the Artist: ");
+        Artist.ArtistStatus status = Artist.ArtistStatus.valueOf(myObj.nextLine());
+
+
+        return new Artist(name, country, status);
+    }
+
 }

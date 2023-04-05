@@ -188,6 +188,33 @@ public class Create {
         return 0L;
     }
 
+    public long createArtist(Connection connection, Artist artist) throws SQLException {
+        String query = "insert into ARTIST (name, country, status) values (?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, artist.getName());
+            statement.setString(2, artist.getCountry());
+            statement.setString(3, artist.getStatus().getStatus());
+            long artistId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                artistId = rs.getInt(1);
+            }
+            else {
+                artistId = 0L;
+            }
+            return artistId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, name);

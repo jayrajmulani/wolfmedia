@@ -35,8 +35,9 @@ public class Menu {
         System.out.println("6. User");
         System.out.println("7. Record Label");
         System.out.println("8. Service");
-        System.out.println("9. Sponsor");
-        System.out.println("10. Episode");
+        System.out.println("9. Artist");
+        System.out.println("10. Sponsor");
+        System.out.println("11. Episode");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
