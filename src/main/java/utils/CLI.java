@@ -198,6 +198,206 @@ public class CLI {
                                     }
                                 }
                             }
+                            case 6 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createUser(connection, inputData.getUserInput(sc));
+                                            System.out.println("User created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for User
+                                            System.out.println("Enter the id of the User:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 7 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createRecordLabel(connection, inputData.getRecordLabelInput(sc));
+                                            System.out.println("Record Label created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for Record Label
+                                            System.out.println("Enter the id of the Record Label:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 8 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createService(connection, inputData.getServiceInput(sc));
+                                            System.out.println("Service created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for Service
+                                            System.out.println("Enter the id of the Service:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 9 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createArtist(connection, inputData.getArtistInput(sc));
+                                            System.out.println("Artist created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for Artist
+                                            System.out.println("Enter the id of the Artist:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 10 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    Connection connection;
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            connection = DB.getConnection();
+                                            long id = create.createAlbum(connection, inputData.getAlbumInput(sc));
+                                            System.out.println("Album created successfully with id " + id);
+                                            DB.closeConnection(connection);
+                                        }
+                                        case 2 -> {
+                                            connection = DB.getConnection();
+                                            //TODO for Album
+                                            System.out.println("Enter the id of the Album:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            DB.closeConnection(connection);
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+
+
+
+
+
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");
                                 menu.displayInfoProcessingMenu();
