@@ -2,10 +2,7 @@ package info;
 
 import models.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -120,6 +117,78 @@ public class Read {
             }
             return Optional.empty();
         }
-
+    }
+    public List<Host> getAllHosts(Connection connection) throws SQLException {
+        String query = "SELECT id, first_name, last_name from HOST";
+        List<Host> hosts = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            hosts.add(new Host(
+                    resultSet.getLong("id"),
+                    resultSet.getString("first_name"),
+                    resultSet.getString("last_name")
+                )
+            );
+        }
+        return hosts;
+    }
+    public List<Song> getAllSongs(Connection connection) throws SQLException {
+        String query = "SELECT * from SONG";
+        List<Song> songs = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            songs.add(new Song(
+                            resultSet.getLong("id"),
+                            resultSet.getString("title"),
+                            resultSet.getString("release_country"),
+                            resultSet.getString("language"),
+                            resultSet.getDouble("duration"),
+                            resultSet.getDouble("royalty_rate"),
+                            resultSet.getDate("release_date"),
+                            resultSet.getBoolean("royalty_paid"),
+                            List.of()
+                    )
+            );
+        }
+        return songs;
+    }
+    public List<Podcast> getAllPodcasts(Connection connection) throws SQLException {
+        String query = "SELECT * from PODCAST";
+        List<Podcast> podcasts = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            podcasts.add(new Podcast(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("country"),
+                            resultSet.getString("language"),
+                            resultSet.getDouble("flat_fee")
+                    )
+            );
+        }
+        return podcasts;
+    }
+    public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
+        String query = "SELECT * from EPISODE WHERE podcast_id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, podcastId);
+        List<Episode> episodes = new ArrayList<>();
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            episodes.add(new Episode(
+                            resultSet.getLong("podcast_id"),
+                            resultSet.getLong("episode_num"),
+                            resultSet.getString("title"),
+                            resultSet.getDate("release_date"),
+                            resultSet.getDouble("duration"),
+                            resultSet.getInt("adv_count"),
+                            resultSet.getDouble("bonus_rate")
+                    )
+            );
+        }
+        return episodes;
     }
 }
