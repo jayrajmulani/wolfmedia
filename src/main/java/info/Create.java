@@ -24,7 +24,7 @@ public class Create {
             if (statement.executeUpdate() > 0) {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
-                songId = rs.getInt(1);
+                songId = rs.getLong(1);
                 song.getGenres().forEach(inputGenre -> {
                     try {
                         Optional<Genre> genre = read.getGenreByName(connection, inputGenre.getName());
@@ -49,6 +49,33 @@ public class Create {
         return 0L;
     }
 
+    public long createUser(Connection connection, User user) throws SQLException {
+        String query = "insert into USER (f_name, l_name, phone, email, reg_date, premium_status, monthly_premium_fees) values (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, user.getFName());
+            statement.setString(2, user.getLName());
+            statement.setString(3, user.getPhone());
+            statement.setString(4, user.getEmail());
+            statement.setDate(5, (Date) user.getRegDate());
+            statement.setBoolean(6, user.getPremiumStatus());
+            statement.setDouble(7, user.getMonthlyPremiumFees());
+
+            long userId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                userId = rs.getLong(1);
+            } else
+                userId = 0L;
+            return userId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
     public long createGuest(Connection connection, Guest guest) throws SQLException {
         String query = "INSERT INTO GUEST(name) VALUES (?)";
         return insertAndGetIdForSingleNameColumnTables(connection, query, guest.getName());
@@ -63,6 +90,34 @@ public class Create {
         String query = "INSERT INTO SPONSOR(name) VALUES (?)";
         return insertAndGetIdForSingleNameColumnTables(connection, query, sponsor.getName());
     }
+
+    public long createRecordLabel(Connection connection, RecordLabel recordLabel) throws SQLException {
+        String query = "insert into RECORD_LABEL (name) values (?);";
+        return insertAndGetIdForSingleNameColumnTables(connection, query, recordLabel.getName());
+    }
+
+    public long createService(Connection connection, Service service) throws SQLException {
+        String query = "insert into SERVICE(name, balance) values (?, ?);";
+
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, service.getName());
+            statement.setDouble(2, service.getBalance());
+
+            long userId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                userId = rs.getLong(1);
+            } else
+                userId = 0L;
+            return userId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 
     public long createArtistType(Connection connection, ArtistType artistType) throws SQLException {
         String query = "INSERT INTO SPONSOR(name) VALUES (?)";
@@ -132,6 +187,61 @@ public class Create {
         }
         return 0L;
     }
+
+    public long createArtist(Connection connection, Artist artist) throws SQLException {
+        String query = "insert into ARTIST (name, country, status) values (?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, artist.getName());
+            statement.setString(2, artist.getCountry());
+            statement.setString(3, artist.getStatus().getStatus());
+            long artistId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                artistId = rs.getInt(1);
+            }
+            else {
+                artistId = 0L;
+            }
+            return artistId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
+    public long createAlbum(Connection connection, Album album) throws SQLException {
+        String query = "insert into ALBUM (name, release_date, edition) values (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, album.getName());
+            statement.setDate(2, (Date) album.getRelease_date());
+            statement.setInt(3, album.getEdition());
+            long albumId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                albumId = rs.getInt(1);
+            }
+            else {
+                albumId = 0L;
+            }
+            return albumId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
