@@ -152,6 +152,16 @@ public class InputData {
         }
         return songId;
     }
+    public long getAlbumIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<Album> albums = read.getAllAlbums(connection);
+        albums.forEach(System.out::println);
+        System.out.println("Enter Song ID:");
+        final long albumId = sc.nextLong();
+        if(!albums.stream().anyMatch(album -> album.getId() == albumId)){
+            throw  new IllegalArgumentException("Please enter a valid Song ID.");
+        }
+        return albumId;
+    }
     public long getPodcastIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Podcast> podcasts = read.getAllPodcasts(connection);
         podcasts.forEach(System.out::println);

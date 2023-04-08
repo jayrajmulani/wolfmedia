@@ -303,4 +303,22 @@ public class Read {
         }
         return users;
     }
+    public Optional<User> getUserById(Connection connection, long id) throws SQLException {
+        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees FROM USER WHERE id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        if(resultSet.next()){
+            return Optional.of(
+                    new User(
+                            resultSet.getLong("id"),
+                            resultSet.getString("f_name"),
+                            resultSet.getString("l_name"),
+                            resultSet.getBoolean("premium_status"),
+                            resultSet.getDouble("monthly_premium_fees")
+                    )
+            );
+        }
+        return Optional.empty();
+    }
 }
