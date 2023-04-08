@@ -268,7 +268,7 @@ public class InputData {
         return new Album(name, release_date, edition);
     }
 
-    public Creates getAssignSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public Creates getSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Songs");
         List<Song> allSongs = read.getAllSongs(connection);
@@ -290,7 +290,7 @@ public class InputData {
         return new Creates(songId, artistId, isCollabarator);
     }
 
-    public Optional<Owns> getAssignSongtoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public Optional<Owns> getSongtoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Songs (Not yet assigned to a Record Label)");
         List<Song> allSongs = read.getAllSongs(connection);
@@ -331,7 +331,7 @@ public class InputData {
         return Optional.of( new Owns(recordLabelId, songId));
     }
 
-    public Compiles getAssignArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public Compiles getArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Artists");
         List<Artist> allArtists = read.getAllArtists(connection);
@@ -350,5 +350,27 @@ public class InputData {
         return new Compiles(artistId, albumId);
     }
 
+    public Signs getArtisttoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Artists");
+        List<Artist> allArtists = read.getAllArtists(connection);
+        allArtists.forEach(System.out::println);
+
+        System.out.println("Enter Artist ID:");
+        long artistId = sc.nextLong();
+
+        System.out.println("Here is the List of all Record Labels");
+        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
+        allRecordLabels.forEach(System.out::println);
+
+        System.out.println("Enter Record Label ID:");
+        long recordLabelId = sc.nextLong();
+
+        System.out.println("Enter the registration date of the User: ");
+        Date updatedAt = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+
+
+        return new Signs(artistId, recordLabelId, updatedAt);
+    }
 
 }
