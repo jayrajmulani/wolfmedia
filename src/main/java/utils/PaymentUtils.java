@@ -35,7 +35,13 @@ public class PaymentUtils {
             }
         } else if (paymentInfo.getSenderType() == Stakeholder.RECORD_LABEL) {
             if (paymentInfo.getReceiverType() == Stakeholder.ARTIST) {
-                // TODO: Make an entry in the ARTIST_PAY table
+                // Make an entry in the ARTIST_PAY table
+                String query = "INSERT INTO ARTIST_PAY(record_label_id, ARTIST_PAY.artist_id, amount) VALUES (?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setLong(1, paymentInfo.getSenderId());
+                statement.setLong(2, paymentInfo.getReceiverId());
+                statement.setDouble(3, paymentInfo.getAmount());
+                statement.executeUpdate();
             } else {
                 connection.rollback();
                 throw new IllegalArgumentException("Illegal Receiver Type. " +

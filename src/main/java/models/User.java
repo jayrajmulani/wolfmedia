@@ -32,6 +32,11 @@ public class User {
     }
 
 
-
-
+    public User(long id, String fName, String lName, Boolean premiumStatus, double monthlyPremiumFees) {
+        this.id = id;
+        this.fName = fName;
+        this.lName = lName;
+        this.premiumStatus = premiumStatus;
+        this.monthlyPremiumFees = monthlyPremiumFees;
+    }
 }

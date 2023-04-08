@@ -241,22 +241,13 @@ public class Create {
         return 0L;
     }
 
-    public long createAssignSongtoArtist(Connection connection, Album album) throws SQLException {
-        String query = "insert into ALBUM (name, release_date, edition) values (?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, album.getName());
-            statement.setDate(2, (Date) album.getRelease_date());
-            statement.setInt(3, album.getEdition());
-            long albumId;
-            if (statement.executeUpdate() > 0) {
-                ResultSet rs = statement.getGeneratedKeys();
-                rs.next();
-                albumId = rs.getInt(1);
-            }
-            else {
-                albumId = 0L;
-            }
-            return albumId;
+    public void createAssignSongtoArtist(Connection connection, Creates creates) throws SQLException {
+        String query = "INSERT INTO CREATES (song_id, artist_id, is_collaborator) VALUES (?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, creates.getSongId());
+            statement.setLong(2, creates.getArtistId());
+            statement.setBoolean(3, creates.getIsCollabarator());
+            statement.executeUpdate();
         } catch (SQLIntegrityConstraintViolationException e){
             e.printStackTrace();
             DB.rollBackTransaction(connection);
@@ -265,25 +256,14 @@ public class Create {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
-        return 0L;
     }
 
-    public long createAssignAlbumtoArtist(Connection connection, Album album) throws SQLException {
-        String query = "insert into ALBUM (name, release_date, edition) values (?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, album.getName());
-            statement.setDate(2, (Date) album.getRelease_date());
-            statement.setInt(3, album.getEdition());
-            long albumId;
-            if (statement.executeUpdate() > 0) {
-                ResultSet rs = statement.getGeneratedKeys();
-                rs.next();
-                albumId = rs.getInt(1);
-            }
-            else {
-                albumId = 0L;
-            }
-            return albumId;
+    public void createAssignArtisttoAlbum(Connection connection, Compiles compiles) throws SQLException {
+        String query = "insert into COMPILES (artist_id, album_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, compiles.getArtistId());
+            statement.setLong(2, compiles.getAlbumId());
+            statement.executeUpdate();
         } catch (SQLIntegrityConstraintViolationException e){
             e.printStackTrace();
             DB.rollBackTransaction(connection);
@@ -292,7 +272,22 @@ public class Create {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
-        return 0L;
+    }
+
+    public void createAssignSongtoRecordLabel(Connection connection, Owns owns) throws SQLException {
+        String query = "insert into OWNS (record_label_id, song_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, owns.getRecordLabelId());
+            statement.setLong(2, owns.getSongId());
+            statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
     }
 
 

@@ -8,10 +8,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class InputData {
     private static final Read read = new Read();
@@ -96,10 +93,26 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
-    public long getArtistIdInputForRoyaltyPayment(){
-        return 0L;
+    public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
+        List<Artist> artists = read.getAllArtists(connection);
+        artists.forEach(System.out::println);
+        System.out.println("Enter Artist ID:");
+        long artistId = sc.nextLong();
+        if(!artists.stream().anyMatch(artist -> artist.getId() == artistId)){
+            throw new IllegalArgumentException("Invalid Artist ID");
+        }
+        return artistId;
     }
-    public long getHostIdInputForPayment(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+    public long getRecordLabelIdInput(Connection connection, Scanner sc) throws SQLException {
+        List<RecordLabel> recordLabels = read.getAllRecordLabels(connection);
+        recordLabels.forEach(System.out::println);
+        long recordLabelId = sc.nextLong();
+        if(!recordLabels.stream().anyMatch(recordLabel -> recordLabel.getId() == recordLabelId)){
+            throw new IllegalArgumentException("Invalid Host ID");
+        }
+        return recordLabelId;
+    }
+    public long getHostIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Host> hosts = read.getAllHosts(connection);
         hosts.forEach(System.out::println);
         System.out.println("Enter Host ID:");
@@ -108,6 +121,26 @@ public class InputData {
             throw new IllegalArgumentException("Invalid Host ID");
         }
         return hostId;
+    }
+    public long getServiceIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<Service> services = read.getAllServices(connection);
+        services.forEach(System.out::println);
+        System.out.println("Enter Service ID:");
+        long serviceId = sc.nextLong();
+        if(!services.stream().anyMatch(service -> service.getId() == serviceId)){
+            throw new IllegalArgumentException("Invalid Service ID");
+        }
+        return serviceId;
+    }
+    public long getUserIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<User> users = read.getAllUsers(connection);
+        users.forEach(System.out::println);
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+        if(!users.stream().anyMatch(user -> user.getId() == userId)){
+            throw new IllegalArgumentException("Invalid User ID");
+        }
+        return userId;
     }
     public long getSongIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Song> songs = read.getAllSongs(connection);
@@ -142,6 +175,7 @@ public class InputData {
         }
         return episodeNum;
     }
+    //FIXME: Remove myObj and use the passed sc Scanner object
     public Guest getGuestInput(Scanner sc){
 
         Scanner myObj = new Scanner(System.in);
@@ -234,7 +268,7 @@ public class InputData {
         return new Album(name, release_date, edition);
     }
 
-    public SongListen getAssignSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public Creates getAssignSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Songs");
         List<Song> allSongs = read.getAllSongs(connection);
@@ -245,7 +279,7 @@ public class InputData {
 
         System.out.println("Here is the List of all Artists");
         List<Artist> allArtists = read.getAllArtists(connection);
-        allSongs.forEach(System.out::println);
+        allArtists.forEach(System.out::println);
 
         System.out.println("Enter Artist ID:");
         long artistId = sc.nextLong();
@@ -253,9 +287,68 @@ public class InputData {
         System.out.println("For this song is the artist a collabarator? ");
         boolean isCollabarator = sc.nextBoolean();
 
-        return new SongListen(songId, artistId, isCollabarator);
+        return new Creates(songId, artistId, isCollabarator);
     }
 
+    public Optional<Owns> getAssignSongtoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Songs (Not yet assigned to a Record Label)");
+        List<Song> allSongs = read.getAllSongs(connection);
+
+        List<Owns> allOwns = read.getAllOwns(connection);
+        Set<Long> songsInOwns = new HashSet<>();
+                allOwns.forEach(allOwn -> songsInOwns.add(allOwn.getSongId()));
+        if(songsInOwns.size()==allSongs.size())
+        {
+            System.out.println("All Songs already assigned to Record Label, Insert a song first");
+            return Optional.empty();
+        }
+
+        allSongs.forEach(allSong -> {
+            if (!songsInOwns.contains(allSong.getId()))
+                System.out.println(allSong);
+        });
+        if(songsInOwns.size()==allSongs.size())
+            System.out.println("All Songs already assigned to Record Label, Insert a song first");
+
+        long songId;
+        while(true)
+        {
+            System.out.println("Enter Song ID:");
+            songId = sc.nextLong();
+            if(songsInOwns.contains(songId))
+                System.out.println("Song already in owns");
+            else
+                break;
+        }
+        System.out.println("Here is the List of all Record Labels");
+        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
+        allRecordLabels.forEach(System.out::println);
+
+        System.out.println("Enter Record Label ID:");
+        long recordLabelId = sc.nextLong();
+
+        return Optional.of( new Owns(recordLabelId, songId));
+    }
+
+    public Compiles getAssignArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Artists");
+        List<Artist> allArtists = read.getAllArtists(connection);
+        allArtists.forEach(System.out::println);
+
+        System.out.println("Enter Artist ID:");
+        long artistId = sc.nextLong();
+
+        System.out.println("Here is the List of all Albums");
+        List<Album> allAlbums = read.getAllAlbums(connection);
+        allAlbums.forEach(System.out::println);
+
+        System.out.println("Enter Artist ID:");
+        long albumId = sc.nextLong();
+
+        return new Compiles(artistId, albumId);
+    }
 
 
 }

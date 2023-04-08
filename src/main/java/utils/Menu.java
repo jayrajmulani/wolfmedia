@@ -38,8 +38,10 @@ public class Menu {
         System.out.println("9. Artist");
         System.out.println("10. Album");
         System.out.println("11. Assign Song to Artist");
-        System.out.println("11. Sponsor");
-        System.out.println("12. Episode");
+        System.out.println("12. Assign Artist to Album");
+        System.out.println("13. Assign Song to Record Label");
+        System.out.println("14. Sponsor");
+        System.out.println("15. Episode");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
@@ -62,7 +64,7 @@ public class Menu {
         System.out.println("-------------------------");
         System.out.println("1. Make Royalty Payment for a song for the current month");
         System.out.println("2. Get Record Label's Payment History");
-        System.out.println("3. Make Payment to Artist for a song for the current month");
+        System.out.println("3. Make Payment to Artists for a song for the current month");
         System.out.println("4. Get Artist's Payment History");
         System.out.println("5. Make Payment to Podcast Host for current month");
         System.out.println("6. Get Payments History for Podcast Host");
