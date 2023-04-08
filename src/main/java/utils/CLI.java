@@ -9,7 +9,10 @@ import payments.SongPayments;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -465,12 +468,33 @@ public class CLI {
                                 // Record Payment received from user for current month
                                 long userId = inputData.getUserIdInput(connection, sc);
                                 long serviceId = inputData.getServiceIdInput(connection, sc);
-                                // TODO: Handle payment
-//                                PaymentInfo paymentInfo = new PaymentInfo(
-//                                        userId,
-//                                        serviceId,
-//
-//                                )
+                                User user = read.getUserById(connection, userId).orElseThrow();
+                                if(!user.getPremiumStatus()){
+                                    System.out.println("This user is not a premium member. Can't process payment");
+                                    break;
+                                }
+                                PaymentInfo paymentInfo = new PaymentInfo(
+                                        userId,
+                                        serviceId,
+                                        user.getMonthlyPremiumFees(),
+                                        PaymentUtils.Stakeholder.USER,
+                                        PaymentUtils.Stakeholder.SERVICE
+                                );
+                                System.out.println("Are you sure you want to process " + user.getMonthlyPremiumFees()
+                                        + " from user " + user.getId() + "? [0/1]");
+                                int ch = sc.nextInt();
+                                while(ch > 1 || ch < 0){
+                                    System.out.println("Please enter 0 or 1");
+                                    ch = sc.nextInt();
+                                }
+                                if(ch == 0){
+                                    System.out.println("Okay, cancelling transaction.");
+                                }
+                                else{
+                                    paymentUtils.processPayment(connection, paymentInfo);
+                                    System.out.println("Payment Recorded Successfully");
+                                }
+
                             }
                             case 8 -> {
                                 // Get Balance for Service

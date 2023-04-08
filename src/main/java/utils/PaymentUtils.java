@@ -28,7 +28,20 @@ public class PaymentUtils {
                 connection.commit();
 
             } else if (paymentInfo.getReceiverType() == Stakeholder.PODCAST_HOST) {
-                // TODO: Make an entry in the HOST_PAY table
+                // Make an entry in the HOST_PAY table
+                String query = "INSERT INTO HOST_PAY(service_id, host_id, amount) VALUES (?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setLong(1, paymentInfo.getSenderId());
+                statement.setLong(2, paymentInfo.getReceiverId());
+                statement.setDouble(3, paymentInfo.getAmount());
+                statement.executeUpdate();
+
+                query = "UPDATE SERVICE set balance = balance - ? where id = ?";
+                statement = connection.prepareStatement(query);
+                statement.setDouble(1, paymentInfo.getAmount());
+                statement.setLong(2, paymentInfo.getSenderId());
+                statement.executeUpdate();
+                connection.commit();
             } else {
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
                         "Service can only make payments to Record Labels or Podcast Hosts");
@@ -49,7 +62,20 @@ public class PaymentUtils {
             }
         } else if (paymentInfo.getSenderType() == Stakeholder.USER) {
             if (paymentInfo.getReceiverType() == Stakeholder.SERVICE) {
-                // TODO: Make an entry in the EARNS table
+                // Make an entry in the EARNS table
+                String query = "INSERT INTO EARNS(service_id, user_id, amount) VALUES (?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setLong(1, paymentInfo.getSenderId());
+                statement.setLong(2, paymentInfo.getReceiverId());
+                statement.setDouble(3, paymentInfo.getAmount());
+                statement.executeUpdate();
+
+                query = "UPDATE SERVICE set balance = balance + ? where id = ?";
+                statement = connection.prepareStatement(query);
+                statement.setDouble(1, paymentInfo.getAmount());
+                statement.setLong(2, paymentInfo.getSenderId());
+                statement.executeUpdate();
+                connection.commit();
             } else {
                 connection.rollback();
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
@@ -59,6 +85,7 @@ public class PaymentUtils {
             connection.rollback();
             throw new IllegalArgumentException("Illegal Sender Type");
         }
+        // End Transaction
         connection.setAutoCommit(true);
     }
     public double getBalanceForService(Connection connection) throws SQLException {
