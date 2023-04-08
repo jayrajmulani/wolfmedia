@@ -16,4 +16,9 @@ public class Service {
     public Service(String name, double balance) {
         this.name = name; this.balance = balance;
     }
+
+    public Service(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

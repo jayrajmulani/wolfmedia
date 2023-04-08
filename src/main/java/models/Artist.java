@@ -16,6 +16,12 @@ public class Artist {
     private String country;
 
     private ArtistStatus status;
+
+    public Artist(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public enum ArtistStatus{
 
         RETIRED ("RETIRED"),
@@ -38,4 +44,5 @@ public class Artist {
         this.country = country;
         this.status = status;
     }
+
 }

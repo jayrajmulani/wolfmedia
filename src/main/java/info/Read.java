@@ -1,6 +1,7 @@
 package info;
 
 import models.*;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -190,5 +191,66 @@ public class Read {
             );
         }
         return episodes;
+    }
+    public List<RecordLabel> getAllRecordLabels(Connection connection) throws SQLException {
+        String query = "SELECT * from RECORD_LABEL";
+        List<RecordLabel> recordLabels = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            recordLabels.add(new RecordLabel(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name")
+                    )
+            );
+        }
+        return recordLabels;
+    }
+    public List<Artist> getAllArtists(Connection connection) throws SQLException {
+        String query = "SELECT id,name, country, status from ARTIST";
+        List<Artist> artists = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            artists.add(new Artist(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("country"),
+                            Artist.ArtistStatus.valueOf(resultSet.getString("status"))
+                    )
+            );
+        }
+        return artists;
+    }
+    public List<Service> getAllServices(Connection connection) throws SQLException {
+        String query = "SELECT id,name from SERVICE";
+        List<Service> services = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            services.add(new Service(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name")
+                    )
+            );
+        }
+        return services;
+    }
+    public List<User> getAllUsers(Connection connection) throws SQLException {
+        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
+        List<User> users = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            users.add(new User(
+                            resultSet.getLong("id"),
+                            resultSet.getString("f_name"),
+                            resultSet.getString("l_name"),
+                            resultSet.getBoolean("premium_status"),
+                            resultSet.getDouble("monthly_premium_fees")
+                    )
+            );
+        }
+        return users;
     }
 }

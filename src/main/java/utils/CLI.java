@@ -3,12 +3,14 @@ package utils;
 import info.Create;
 import info.Read;
 import models.*;
+import org.checkerframework.checker.units.qual.C;
 import payments.PodcastPayments;
 import payments.SongPayments;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
@@ -20,9 +22,8 @@ public class CLI {
     private static final InputData inputData = new InputData();
     private static final SongPayments songPayments = new SongPayments();
     private static final PodcastPayments podcastPayments = new PodcastPayments();
-    private static PaymentUtils paymentUtils = new PaymentUtils();
-
-
+    private static final PaymentUtils paymentUtils = new PaymentUtils();
+    private static final Constants constants = new Constants();
     public void run() throws SQLException, ClassNotFoundException, ParseException, IllegalArgumentException {
         Scanner sc = new Scanner(System.in);
         Connection connection  = DB.getConnection();
@@ -354,11 +355,6 @@ public class CLI {
                                     }
                                 }
                             }
-
-
-
-
-
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");
                                 menu.displayInfoProcessingMenu();
@@ -401,13 +397,43 @@ public class CLI {
                                 }
                             }
                             case 2 -> {
-                                // TODO: Get Record Label's Payment History
+                                // Get Record Label's Payment History
+                                long recordLabelId= inputData.getRecordLabelIdInput(connection, sc);
+                                List<PaymentHistoryItem> paymentHistory = songPayments.getRecordLabelPaymentHistory(connection, recordLabelId);
+                                paymentHistory.forEach(System.out::println);
                             }
                             case 3 -> {
-                                // TODO: Make Payment to Artist for a song for the current month
+                                //  Make Payment to Artists for a song for the current month
+                                long songId = inputData.getSongIdInput(connection, sc);
+                                List<PaymentInfo> royaltyInfoForArtists = songPayments.calculateRoyaltyAmountsForArtist(connection, songId);
+                                PaymentInfo royaltyInfo = songPayments.calculateRoyaltyAmount(connection, songId).orElseThrow();
+                                royaltyInfoForArtists.forEach(System.out::println);
+                                System.out.println("Are you sure you want to pay " + royaltyInfo.getAmount() * constants.ARTIST_ROYALTY_SHARE
+                                        + " to artists ? [0/1]");
+                                int ch = sc.nextInt();
+                                while(ch > 1 || ch < 0){
+                                    System.out.println("Please enter 0 or 1");
+                                    ch = sc.nextInt();
+                                }
+                                if(ch == 0){
+                                    System.out.println("Okay, cancelling transaction.");
+                                }
+                                else{
+                                    royaltyInfoForArtists.forEach(paymentInfo -> {
+                                        try {
+                                            paymentUtils.processPayment(connection, paymentInfo);
+                                        } catch (SQLException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
+                                    System.out.println("Payments Recorded Successfully");
+                                }
                             }
                             case 4 -> {
-                                // TODO: Get Artist's Payment History
+                                // Get Artist's Payment History
+                                long artistId = inputData.getArtistIdInput(connection, sc);
+                                List<PaymentHistoryItem> paymentHistory = songPayments.getArtistPaymentHistory(connection, artistId);
+                                paymentHistory.forEach(System.out::println);
                             }
                             case 5 -> {
                                 // Make Payment to Podcast Host for current month
@@ -430,10 +456,21 @@ public class CLI {
                                 }
                             }
                             case 6 -> {
-                                // TODO: Get Payments History for Podcast Host
+                                // Get Payments History for Podcast Host
+                                long hostId= inputData.getHostIdInput(connection, sc);
+                                List<PaymentHistoryItem> paymentHistory = podcastPayments.getHostPaymentHistory(connection, hostId);
+                                paymentHistory.forEach(System.out::println);
                             }
                             case 7 -> {
-                                // TODO: Record Payment received from user for current month
+                                // Record Payment received from user for current month
+                                long userId = inputData.getUserIdInput(connection, sc);
+                                long serviceId = inputData.getServiceIdInput(connection, sc);
+                                // TODO: Handle payment
+//                                PaymentInfo paymentInfo = new PaymentInfo(
+//                                        userId,
+//                                        serviceId,
+//
+//                                )
                             }
                             case 8 -> {
                                 // Get Balance for Service

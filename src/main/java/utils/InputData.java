@@ -96,10 +96,26 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
-    public long getArtistIdInputForRoyaltyPayment(){
-        return 0L;
+    public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
+        List<Artist> artists = read.getAllArtists(connection);
+        artists.forEach(System.out::println);
+        System.out.println("Enter Artist ID:");
+        long artistId = sc.nextLong();
+        if(!artists.stream().anyMatch(artist -> artist.getId() == artistId)){
+            throw new IllegalArgumentException("Invalid Artist ID");
+        }
+        return artistId;
     }
-    public long getHostIdInputForPayment(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+    public long getRecordLabelIdInput(Connection connection, Scanner sc) throws SQLException {
+        List<RecordLabel> recordLabels = read.getAllRecordLabels(connection);
+        recordLabels.forEach(System.out::println);
+        long recordLabelId = sc.nextLong();
+        if(!recordLabels.stream().anyMatch(recordLabel -> recordLabel.getId() == recordLabelId)){
+            throw new IllegalArgumentException("Invalid Host ID");
+        }
+        return recordLabelId;
+    }
+    public long getHostIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Host> hosts = read.getAllHosts(connection);
         hosts.forEach(System.out::println);
         System.out.println("Enter Host ID:");
@@ -108,6 +124,26 @@ public class InputData {
             throw new IllegalArgumentException("Invalid Host ID");
         }
         return hostId;
+    }
+    public long getServiceIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<Service> services = read.getAllServices(connection);
+        services.forEach(System.out::println);
+        System.out.println("Enter Service ID:");
+        long serviceId = sc.nextLong();
+        if(!services.stream().anyMatch(service -> service.getId() == serviceId)){
+            throw new IllegalArgumentException("Invalid Service ID");
+        }
+        return serviceId;
+    }
+    public long getUserIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<User> users = read.getAllUsers(connection);
+        users.forEach(System.out::println);
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+        if(!users.stream().anyMatch(user -> user.getId() == userId)){
+            throw new IllegalArgumentException("Invalid User ID");
+        }
+        return userId;
     }
     public long getSongIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Song> songs = read.getAllSongs(connection);
@@ -142,6 +178,7 @@ public class InputData {
         }
         return episodeNum;
     }
+    //FIXME: Remove myObj and use the passed sc Scanner object
     public Guest getGuestInput(Scanner sc){
 
         Scanner myObj = new Scanner(System.in);
