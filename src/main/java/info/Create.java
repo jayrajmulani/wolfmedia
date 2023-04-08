@@ -118,7 +118,6 @@ public class Create {
         return 0L;
     }
 
-
     public long createArtistType(Connection connection, ArtistType artistType) throws SQLException {
         String query = "INSERT INTO SPONSOR(name) VALUES (?)";
         return insertAndGetIdForSingleNameColumnTables(connection, query, artistType.getName());
@@ -240,6 +239,55 @@ public class Create {
             DB.rollBackTransaction(connection);
         }
         return 0L;
+    }
+
+    public void createAssignSongtoArtist(Connection connection, Creates creates) throws SQLException {
+        String query = "INSERT INTO CREATES (song_id, artist_id, is_collaborator) VALUES (?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, creates.getSongId());
+            statement.setLong(2, creates.getArtistId());
+            statement.setBoolean(3, creates.getIsCollabarator());
+            statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+    public void createAssignArtisttoAlbum(Connection connection, Compiles compiles) throws SQLException {
+        String query = "insert into COMPILES (artist_id, album_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, compiles.getArtistId());
+            statement.setLong(2, compiles.getAlbumId());
+            statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+    public void createAssignSongtoRecordLabel(Connection connection, Owns owns) throws SQLException {
+        String query = "insert into OWNS (record_label_id, song_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, owns.getRecordLabelId());
+            statement.setLong(2, owns.getSongId());
+            statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
     }
 
 
