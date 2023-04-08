@@ -319,6 +319,25 @@ public class Create {
         }
     }
 
+    public void createAssignSongtoAlbum(Connection connection, SongAlbum songAlbum) throws SQLException {
+        String query = "insert into SONG_ALBUM (song_id, album_id, track_num) values (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, songAlbum.getSongId());
+            statement.setLong(2, songAlbum.getAlbumId());
+            statement.setLong(3, songAlbum.getTrackNum());
+
+            statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+
 
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {

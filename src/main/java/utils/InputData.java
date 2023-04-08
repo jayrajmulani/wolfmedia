@@ -308,8 +308,6 @@ public class InputData {
             if (!songsInOwns.contains(allSong.getId()))
                 System.out.println(allSong);
         });
-        if(songsInOwns.size()==allSongs.size())
-            System.out.println("All Songs already assigned to Record Label, Insert a song first");
 
         long songId;
         while(true)
@@ -372,5 +370,63 @@ public class InputData {
 
         return new Signs(artistId, recordLabelId, updatedAt);
     }
+
+    public Optional<SongAlbum> getSongtoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Songs (Not yet assigned to an Album)");
+        List<Song> allSongs = read.getAllSongs(connection);
+
+        List<SongAlbum> allSongAlbums = read.getAllSongAlbum(connection);
+        Set<Long> songsInSongAlbum = new HashSet<>();
+        allSongAlbums.forEach(allSongAlbum -> songsInSongAlbum.add(allSongAlbum.getSongId()));
+        if(songsInSongAlbum.size()==allSongs.size())
+        {
+            System.out.println("All Songs already assigned to Album, Insert a song first");
+            return Optional.empty();
+        }
+
+        allSongs.forEach(allSong -> {
+            if (!songsInSongAlbum.contains(allSong.getId()))
+                System.out.println(allSong);
+        });
+
+        long songId;
+        while(true)
+        {
+            System.out.println("Enter Song ID:");
+            songId = sc.nextLong();
+            if(songsInSongAlbum.contains(songId))
+                System.out.println("Song already in SongAlbum");
+            else
+                break;
+        }
+
+        System.out.println("Here is the List of all Albums");
+        List<Album> allAlbums = read.getAllAlbums(connection);
+        allAlbums.forEach(System.out::println);
+
+        System.out.println("Enter Album ID:");
+        long albumId = sc.nextLong();
+
+        Set<Long> allTracksinGivenRL = new HashSet<>();
+        allSongAlbums.forEach(allSongAlbum -> {
+            if(allSongAlbum.getAlbumId() == albumId)
+            {
+                allTracksinGivenRL.add(allSongAlbum.getTrackNum());
+            }
+        });
+        long trackNum;
+        while(true)
+        {
+            System.out.println("Enter track number within Album: ");
+            trackNum = sc.nextLong();
+            if(allTracksinGivenRL.contains(trackNum))
+                System.out.println("Song already in TrackNum");
+            else
+                break;
+        }
+        return Optional.of(new SongAlbum(songId, albumId, trackNum));
+    }
+
 
 }
