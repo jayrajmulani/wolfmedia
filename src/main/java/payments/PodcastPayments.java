@@ -1,15 +1,13 @@
 package payments;
 
-import models.PaymentInfo;
+import models.*;
 import utils.PaymentUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class PodcastPayments {
     public Optional<PaymentInfo> calculateHostPayAmount(Connection connection, long podcastId, long episodeNum) {
@@ -43,5 +41,28 @@ public class PodcastPayments {
             throw new RuntimeException(e);
         }
         return Optional.empty();
+    }
+    public List<PaymentHistoryItem> getHostPaymentHistory(Connection connection, long hostId) throws SQLException {
+        List<PaymentHistoryItem> paymentHistoryItems = new ArrayList<>();
+        String query = "SELECT HP.host_id, H.first_name, H.last_name, S.id as service_id, S.name as service_name, HP.amount, HP.timestamp " +
+                "FROM HOST_PAY HP, HOST H, SERVICE S " +
+                "WHERE HP.host_id = H.id AND HP.service_id = S.id " +
+                "AND HP.host_id = ? ";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, hostId);
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            paymentHistoryItems.add(
+                    new PaymentHistoryItem(
+                            PaymentUtils.Stakeholder.SERVICE,
+                            new Service(resultSet.getLong("service_id"), resultSet.getString("service_name")),
+                            PaymentUtils.Stakeholder.PODCAST_HOST,
+                            new Host(resultSet.getLong("host_id"), resultSet.getString("first_name"), resultSet.getString("last_name")),
+                            resultSet.getTimestamp("timestamp"),
+                            resultSet.getDouble("amount")
+                    )
+            );
+        }
+        return paymentHistoryItems;
     }
 }
