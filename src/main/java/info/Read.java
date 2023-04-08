@@ -269,6 +269,23 @@ public class Read {
         return owns;
     }
 
+    public List<SongAlbum> getAllSongAlbum(Connection connection) throws SQLException {
+        String query = "SELECT song_id, album_id, track_num from SONG_ALBUM";
+        List<SongAlbum> songAlbum = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            songAlbum.add(new SongAlbum(
+                            resultSet.getLong("song_id"),
+                            resultSet.getLong("album_id"),
+                            resultSet.getLong("track_num")
+                        )
+                    );
+        }
+        return songAlbum;
+    }
+
+
     public List<User> getAllUsers(Connection connection) throws SQLException {
         String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
         List<User> users = new ArrayList<>();
