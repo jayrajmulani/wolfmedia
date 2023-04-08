@@ -234,5 +234,28 @@ public class InputData {
         return new Album(name, release_date, edition);
     }
 
+    public SongListen getAssignSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Songs");
+        List<Song> allSongs = read.getAllSongs(connection);
+        allSongs.forEach(System.out::println);
+
+        System.out.println("Enter Song ID:");
+        long songId = sc.nextLong();
+
+        System.out.println("Here is the List of all Artists");
+        List<Artist> allArtists = read.getAllArtists(connection);
+        allSongs.forEach(System.out::println);
+
+        System.out.println("Enter Artist ID:");
+        long artistId = sc.nextLong();
+
+        System.out.println("For this song is the artist a collabarator? ");
+        boolean isCollabarator = sc.nextBoolean();
+
+        return new SongListen(songId, artistId, isCollabarator);
+    }
+
+
 
 }

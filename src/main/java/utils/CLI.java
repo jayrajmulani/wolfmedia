@@ -354,10 +354,40 @@ public class CLI {
                                     }
                                 }
                             }
-
-
-
-
+                            case 11 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            long id = create.createAlbum(connection, inputData.getAlbumInput(sc));
+                                            System.out.println("Album created successfully with id " + id);
+                                        }
+                                        case 2 -> {
+                                            //TODO for Album
+                                            System.out.println("Enter the id of the Album:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
 
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");

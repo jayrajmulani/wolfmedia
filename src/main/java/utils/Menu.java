@@ -37,6 +37,7 @@ public class Menu {
         System.out.println("8. Service");
         System.out.println("9. Artist");
         System.out.println("10. Album");
+        System.out.println("11. Assign Song to Artist");
         System.out.println("11. Sponsor");
         System.out.println("12. Episode");
         System.out.println("0. Go back!");
