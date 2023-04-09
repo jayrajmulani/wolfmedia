@@ -438,5 +438,23 @@ public class InputData {
         return Optional.of(new SongAlbum(songId, albumId, trackNum));
     }
 
+    public SongListen getSongListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Songs");
+        List<Song> allSongs = read.getAllSongs(connection);
+        allSongs.forEach(System.out::println);
+
+        System.out.println("Enter Song ID:");
+        long songId = sc.nextLong();
+
+        System.out.println("Here is the List of all Users");
+        List<User> allUsers = read.getAllUsers(connection);
+        allUsers.forEach(System.out::println);
+
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+
+        return new SongListen(songId, userId);
+    }
 
 }

@@ -48,6 +48,16 @@ public class Menu {
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
     }
+
+    public void displayMetaDataAndRecordsMenu(){
+        System.out.println("-------------------------");
+        System.out.println("Maintaining Metadata and Records");
+        System.out.println("-------------------------");
+        System.out.println("1. Enter playcount for a Song");
+        System.out.println("0. Go back!");
+        System.out.println("-1. Quit!");
+        System.out.print("Enter your choice: ");
+    }
     public void displayCrudMenu(){
         System.out.println("-------------------------");
         System.out.println("Choose Operation");

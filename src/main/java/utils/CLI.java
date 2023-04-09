@@ -538,8 +538,65 @@ public class CLI {
                     }
                 }
                 case 2 -> {
-                    //TODO: Create Menu Items and develop logic for handling operations
-                    System.out.println("Manage metadata and records");
+                    // Maintaining metadata and records
+                    int crudChoice;
+                    while (true) {
+                        quit = false;
+                        menu.displayMetaDataAndRecordsMenu();
+                        boolean goBack = false;
+                        int infoChoice = sc.nextInt();
+                        switch (infoChoice) {
+                            case -1 -> quit = true;
+                            case 0 -> {
+                                menu.displayMainMenu();
+                                goBack = true;
+                            }
+                            case 1 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            // Create Record in SongListen Table
+                                            long id = create.createSongListen(connection, inputData.getSongListenInput(connection, sc));
+                                            System.out.println("Song created successfully with id " + id);
+                                        }
+                                        case 2 -> {
+                                            // Get Song
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+
+                            default -> {
+                                System.out.println("Please choose a value between 0 and 10...");
+                                menu.displayInfoProcessingMenu();
+                                continue;
+                            }
+                        }
+                        if (goBack || quit) {
+                            break;
+                        }
+                    }
                 }
                 case 3 -> {
                     // Maintain Payments Menu

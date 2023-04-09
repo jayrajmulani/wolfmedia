@@ -337,6 +337,33 @@ public class Create {
         }
     }
 
+    public long createSongListen(Connection connection, SongListen songListen) throws SQLException {
+        String query = "insert into SONG_LISTEN (song_id, user_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, songListen.getSongId());
+            statement.setLong(2, songListen.getUserId());
+
+            long songListenId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                songListenId = rs.getInt(1);
+            }
+            else {
+                songListenId = 0L;
+            }
+            return songListenId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 
 
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
