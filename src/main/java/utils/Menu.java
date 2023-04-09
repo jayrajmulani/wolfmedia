@@ -37,8 +37,13 @@ public class Menu {
         System.out.println("8. Service");
         System.out.println("9. Artist");
         System.out.println("10. Album");
-        System.out.println("11. Sponsor");
-        System.out.println("12. Episode");
+        System.out.println("11. Assign Song to Artist");
+        System.out.println("12. Assign Artist to Album");
+        System.out.println("13. Assign Song to Record Label");
+        System.out.println("14. Assign Artist to Record Label");
+        System.out.println("15. Assign Song to Album");
+        System.out.println("16. Sponsor");
+        System.out.println("17. Episode");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
@@ -67,6 +72,25 @@ public class Menu {
         System.out.println("6. Get Payments History for Podcast Host");
         System.out.println("7. Record Payment received from user for current month");
         System.out.println("8. Get Balance for Service");
+        System.out.println("0. Go back!");
+        System.out.println("-1. Quit!");
+        System.out.print("Enter your choice: ");
+    }
+    public void displayReportsMenu(){
+        System.out.println("-------------------------");
+        System.out.println("Generate Reports");
+        System.out.println("-------------------------");
+        System.out.println("1. Monthly Play Count for Song");
+        System.out.println("2. Monthly Play Count for Album");
+        System.out.println("3. Monthly Play Count for Artist");
+        System.out.println("4. Total Payments Made to Host");
+        System.out.println("5. Total Payments Made to Artist");
+        System.out.println("6. Total Payments Made to Record Label");
+        System.out.println("7. Monthly Revenue for Service");
+        System.out.println("8. Yearly Revenue for Service");
+        System.out.println("9. Find Songs By Artist");
+        System.out.println("10. Find Songs By Album");
+        System.out.println("11. Find Episodes By Podcast");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");

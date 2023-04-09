@@ -3,7 +3,6 @@ package utils;
 import info.Create;
 import info.Read;
 import models.*;
-import org.checkerframework.checker.units.qual.C;
 import payments.PodcastPayments;
 import payments.SongPayments;
 
@@ -11,7 +10,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -24,6 +22,7 @@ public class CLI {
     private static final PodcastPayments podcastPayments = new PodcastPayments();
     private static final PaymentUtils paymentUtils = new PaymentUtils();
     private static final Constants constants = new Constants();
+    private static final ReportUtils reportUtils = new ReportUtils();
     public void run() throws SQLException, ClassNotFoundException, ParseException, IllegalArgumentException {
         Scanner sc = new Scanner(System.in);
         Connection connection  = DB.getConnection();
@@ -119,7 +118,6 @@ public class CLI {
                                 }
                             }
                             case 4 -> {
-//                              Podcast Menu
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -133,25 +131,16 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            //Create
                                             long id = create.createPodcast(connection, inputData.getPodcastInput(sc));
                                             System.out.println("Podcast created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //Read
                                             System.out.println("Enter the id of the podcast:");
                                             Long id = sc.nextLong();
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
                                             resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
                                         }
-                                        //TODO
-//                                        case 3 ->{
-//                                            //Update
-//                                            System.out.println("Enter id of the podcast:");
-//                                            Long id = sc.nextLong();
-//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
-//
-//                                        }
+//                                        TODO Update and Delete
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
                                             continue;
@@ -163,7 +152,6 @@ public class CLI {
                                 }
                             }
                             case 5 -> {
-                                //Host
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -366,7 +354,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 11 -> {
+                            case 16 -> {
                                 //Sponsor
                                 while (true) {
                                     boolean goBackInner = false;
@@ -409,7 +397,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 12 -> {
+                            case 17 -> {
                                 //Episode
                                 while (true) {
                                     boolean goBackInner = false;
@@ -453,6 +441,178 @@ public class CLI {
                                     }
                                 }
                             }
+                            case 11 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            create.createAssignSongtoArtist(connection, inputData.getSongToArtistInput(connection, sc));
+                                            System.out.println("Above selected Song is assigned to selected Artist");
+                                        }
+                                        case 2 -> {
+                                            //TODO for Song_Listen
+                                            System.out.println("Enter the id of the SongListen table:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 12 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            create.createAssignArtisttoAlbum(connection, inputData.getArtisttoAlbumInput(connection, sc));
+                                            System.out.println("Above selected Artist is assigned to selected Album");
+                                        }
+                                        case 2 -> {
+                                            //TODO for Song_Listen
+                                            System.out.println("Enter the id of the SongListen table:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 13 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            create.createAssignSongtoRecordLabel(connection, inputData.getSongtoRecordLabelInput(connection, sc).orElseThrow());
+                                            System.out.println("Above selected Song is assigned to selected Record Label");
+                                        }
+                                        case 2 -> {
+                                            //TODO for Owns
+                                            System.out.println("Enter the id of the SongListen table:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 14 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            long id = create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
+                                            System.out.println("Above selected Artist is assigned to selected Record Label with id: "+ id);
+                                        }
+                                        case 2 -> {
+                                            //TODO for Signs
+                                            System.out.println("Enter the id of the SongListen table:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 15 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            create.createAssignSongtoAlbum(connection, inputData.getSongtoAlbumInput(connection, sc).orElseThrow());
+                                            System.out.println("Above selected Song is assigned to selected Record Label");
+                                        }
+                                        case 2 -> {
+                                            //TODO for Signs
+                                            System.out.println("Enter the id of the SongListen table:");
+                                            Long id = sc.nextLong();
+                                            Optional<Host> resultHost = read.getHost(id, connection);
+                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+
+
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");
                                 menu.displayInfoProcessingMenu();
@@ -474,7 +634,11 @@ public class CLI {
                     while(true){
                         menu.displayPaymentsMenu();
                         paymentChoice = sc.nextInt();
+                        boolean goBack = false;
                         switch (paymentChoice){
+                            case -1 -> quit = true;
+                            case 0 -> goBack = true;
+
                             case 1 -> {
                                 // Make Royalty Payment for a song for the current month
                                 long songId = inputData.getSongIdInput(connection, sc);
@@ -563,21 +727,109 @@ public class CLI {
                                 // Record Payment received from user for current month
                                 long userId = inputData.getUserIdInput(connection, sc);
                                 long serviceId = inputData.getServiceIdInput(connection, sc);
-                                // TODO: Handle payment
-//                                PaymentInfo paymentInfo = new PaymentInfo(
-//                                        userId,
-//                                        serviceId,
-//
-//                                )
+                                User user = read.getUserById(connection, userId).orElseThrow();
+                                if(!user.getPremiumStatus()){
+                                    System.out.println("This user is not a premium member. Can't process payment");
+                                    break;
+                                }
+                                PaymentInfo paymentInfo = new PaymentInfo(
+                                        userId,
+                                        serviceId,
+                                        user.getMonthlyPremiumFees(),
+                                        PaymentUtils.Stakeholder.USER,
+                                        PaymentUtils.Stakeholder.SERVICE
+                                );
+                                System.out.println("Are you sure you want to process " + user.getMonthlyPremiumFees()
+                                        + " from user " + user.getId() + "? [0/1]");
+                                int ch = sc.nextInt();
+                                while(ch > 1 || ch < 0){
+                                    System.out.println("Please enter 0 or 1");
+                                    ch = sc.nextInt();
+                                }
+                                if(ch == 0){
+                                    System.out.println("Okay, cancelling transaction.");
+                                }
+                                else{
+                                    paymentUtils.processPayment(connection, paymentInfo);
+                                    System.out.println("Payment Recorded Successfully");
+                                }
                             }
                             case 8 -> {
                                 // Get Balance for Service
                                 double balance = paymentUtils.getBalanceForService(connection);
                                 System.out.println("Current available balance for WolfMedia is $" + balance);
                             }
+                            default -> {
+                                System.out.println("Please choose a valid input...");
+                                continue;
+                            }
+                        }
+                        if (goBack || quit) {
+                            break;
                         }
                     }
+                }
+                case 4 -> {
+                    int reportsChoice;
+                    while (true){
+                        boolean goBack = false;
+                        menu.displayReportsMenu();
+                        reportsChoice = sc.nextInt();
+                        switch (reportsChoice){
+                            case -1 -> quit = true;
+                            case 0 -> goBack = true;
+                            case 1 -> {
+                                // Monthly Play Count for Songs
+                                long songId = inputData.getSongIdInput(connection, sc);
+                                List<Stats> stats = reportUtils.getSongPlayCountByMonth(connection, songId);
+                                stats.forEach(System.out::println);
+                            }
+                            case 2 -> {
+                                // Monthly Play Count for Album
+                                long albumId = inputData.getAlbumIdInput(connection, sc);
+                                List<Stats> stats = reportUtils.getAlbumPlayCountByMonth(connection, albumId);
+                                stats.forEach(System.out::println);
+                            }
+                            case 3 -> {
+                                // Monthly Play Count for Artist
+                                long artistId = inputData.getArtistIdInput(connection, sc);
+                                List<Stats> stats = reportUtils.getSongPlayCountByMonth(connection, artistId);
+                                stats.forEach(System.out::println);
+                            }
+                            case 4 -> {
+                                // TODO: Total Payments Made to Host
+                            }
+                            case 5 -> {
+                                // TODO: Total Payments Made to Artist
+                            }
+                            case 6 -> {
+                                // TODO: Total Payments Made to Record Label
+                            }
+                            case 7 -> {
+                                // TODO: Monthly Revenue for Service
+                            }
+                            case 8 -> {
+                                // TODO: Yearly Revenue for Service
+                            }
+                            case 9 -> {
+                                // TODO: Find Songs By Artist
+                            }
+                            case 10 -> {
+                                // TODO: Find Songs By Album
+                            }
+                            case 11 -> {
+                                // TODO: Find Episodes By Podcast
+                            }
+                            default -> {
+                                System.out.println("Please choose a valid input...");
+                                continue;
+                            }
+                        }
+                        if (goBack || quit) {
+                            break;
+                        }
 
+                    }
                 }
                 default -> {
                     System.out.println("Please choose a value between 0 and 4..");

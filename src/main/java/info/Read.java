@@ -258,6 +258,23 @@ public class Read {
         }
         return artists;
     }
+
+    public List<Album> getAllAlbums(Connection connection) throws SQLException {
+        String query = "SELECT id,name,release_date,edition from ALBUM";
+        List<Album> albums = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            albums.add(new Album(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getDate("release_date"),
+                            resultSet.getInt("edition")
+                    )
+            );
+        }
+        return albums;
+    }
     public List<Service> getAllServices(Connection connection) throws SQLException {
         String query = "SELECT id,name from SERVICE";
         List<Service> services = new ArrayList<>();
@@ -272,6 +289,39 @@ public class Read {
         }
         return services;
     }
+
+    public List<Owns> getAllOwns(Connection connection) throws SQLException {
+        String query = "SELECT record_label_id, song_id from OWNS";
+        List<Owns> owns = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            owns.add(new Owns(
+                            resultSet.getLong("record_label_id"),
+                            resultSet.getLong("song_id")
+                    )
+            );
+        }
+        return owns;
+    }
+
+    public List<SongAlbum> getAllSongAlbum(Connection connection) throws SQLException {
+        String query = "SELECT song_id, album_id, track_num from SONG_ALBUM";
+        List<SongAlbum> songAlbum = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            songAlbum.add(new SongAlbum(
+                            resultSet.getLong("song_id"),
+                            resultSet.getLong("album_id"),
+                            resultSet.getLong("track_num")
+                        )
+                    );
+        }
+        return songAlbum;
+    }
+
+
     public List<User> getAllUsers(Connection connection) throws SQLException {
         String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
         List<User> users = new ArrayList<>();
@@ -288,5 +338,23 @@ public class Read {
             );
         }
         return users;
+    }
+    public Optional<User> getUserById(Connection connection, long id) throws SQLException {
+        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees FROM USER WHERE id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        if(resultSet.next()){
+            return Optional.of(
+                    new User(
+                            resultSet.getLong("id"),
+                            resultSet.getString("f_name"),
+                            resultSet.getString("l_name"),
+                            resultSet.getBoolean("premium_status"),
+                            resultSet.getDouble("monthly_premium_fees")
+                    )
+            );
+        }
+        return Optional.empty();
     }
 }

@@ -31,4 +31,8 @@ public class Song {
         this.royaltyPaid = royaltyPaid;
         this.genres = genres;
     }
+    public Song(long id, String title){
+        this.title = title;
+        this.id = id;
+    }
 }

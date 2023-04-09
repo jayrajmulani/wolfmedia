@@ -110,7 +110,7 @@ public class SongPayments {
     }
     public List<PaymentHistoryItem> getArtistPaymentHistory(Connection connection, long artistId) throws SQLException {
         List<PaymentHistoryItem> paymentHistoryItems = new ArrayList<>();
-        String query = "SELECT artist_id, A.name as artist_name, RL.id, RL.name as record_label_name, AP.amount, AP.timestamp " +
+        String query = "SELECT artist_id, A.name as artist_name, RL.id as record_label_id, RL.name as record_label_name, AP.amount, AP.timestamp " +
                 "FROM ARTIST_PAY AP, ARTIST A, RECORD_LABEL RL " +
                 "WHERE AP.artist_id = A.id AND AP.record_label_id = RL.id " +
                 "AND A.id = ? ";
