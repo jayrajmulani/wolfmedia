@@ -457,4 +457,41 @@ public class InputData {
         return new SongListen(songId, userId);
     }
 
+    public PodcastEpListen getPodcastEpListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Podcasts");
+        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+        allPodcasts.forEach(System.out::println);
+
+        System.out.println("Enter Podcast ID:");
+        long podcastId = sc.nextLong();
+
+        System.out.println("Here is the List of all Users");
+        List<User> allUsers = read.getAllUsers(connection);
+        allUsers.forEach(System.out::println);
+
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+
+        System.out.println("Here is the List of all Episodes (In the podcast " + podcastId + ")");
+        List<Episode> allPodcastEpisodes = read.getAllPodcastEpisodes(connection, podcastId);
+        allPodcastEpisodes.forEach(System.out::println);
+
+        long episodeId;
+
+        while(true)
+        {
+            System.out.println("Enter Episode ID:");
+            episodeId = sc.nextLong();
+
+            if(!allPodcastEpisodes.contains(episodeId))
+                System.out.println("The Episode ID does not exist with the above selected podcast");
+            else
+                break;
+        }
+
+        return new PodcastEpListen(podcastId, userId, episodeId);
+    }
+
+
 }

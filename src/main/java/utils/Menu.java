@@ -53,7 +53,9 @@ public class Menu {
         System.out.println("-------------------------");
         System.out.println("Maintaining Metadata and Records");
         System.out.println("-------------------------");
-        System.out.println("1. Enter playcount for a Song");
+        System.out.println("1. Enter Playcount for a Song");
+        System.out.println("2. Enter Playcount for Podcast");
+        System.out.println("3. Enter Rating for Podcast");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
