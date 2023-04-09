@@ -93,6 +93,24 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
+    public Episode getEpisodeInput(Scanner sc, long podcastID) throws ParseException {
+        Scanner myObj = new Scanner(System.in);
+        System.out.println("Enter the number of the episode:");
+        Long episodeNum = myObj.nextLong();
+        myObj.nextLine();
+        System.out.println("Enter the title of the episode:");
+        String title = myObj.nextLine();
+        System.out.println("Enter the release date of the episode:");
+        Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(myObj.next()).getTime());
+        System.out.println("Enter the duration of the episode in seconds:");
+        double duration = myObj.nextDouble();
+        System.out.println("Enter the number of advertisers in the episode:");
+        int advCount = myObj.nextInt();
+        System.out.println("Enter the bonus rate of the episode:");
+        double bonusRate = myObj.nextDouble();
+
+        return new Episode(podcastID, episodeNum, title, releaseDate, duration, advCount, bonusRate);
+    }
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
         List<Artist> artists = read.getAllArtists(connection);
         artists.forEach(System.out::println);
@@ -194,6 +212,15 @@ public class InputData {
         String name = myObj.nextLine();
 
         return new Guest(name);
+    }
+    public Sponsor getSponsorInput(Scanner sc){
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the Sponsor name: ");
+        String name = myObj.nextLine();
+
+        return new Sponsor(name);
     }
     public Service getServiceInput (Scanner sc) {
 
