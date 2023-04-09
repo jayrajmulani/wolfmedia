@@ -29,21 +29,21 @@ public class Menu {
         System.out.println("-------------------------");
         System.out.println("1. Song");
         System.out.println("2. Guest");
-        System.out.println("3. Artist");
+        System.out.println("3. Artist"); // TODO refactor
         System.out.println("4. Podcast");
         System.out.println("5. Host");
         System.out.println("6. User");
         System.out.println("7. Record Label");
         System.out.println("8. Service");
-        System.out.println("9. Artist");
+        System.out.println("9. Artist"); // TODO refactor
         System.out.println("10. Album");
         System.out.println("11. Assign Song to Artist");
         System.out.println("12. Assign Artist to Album");
         System.out.println("13. Assign Song to Record Label");
         System.out.println("14. Assign Artist to Record Label");
         System.out.println("15. Assign Song to Album");
-        System.out.println("16. Sponsor");
-        System.out.println("17. Episode");
+        System.out.println("16. Sponsor"); // TODO refactor
+        System.out.println("17. Episode"); // TODO refactor
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
