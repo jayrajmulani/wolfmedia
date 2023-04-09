@@ -119,6 +119,7 @@ public class CLI {
                                 }
                             }
                             case 4 -> {
+//                              Podcast Menu
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -132,16 +133,25 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create
                                             long id = create.createPodcast(connection, inputData.getPodcastInput(sc));
                                             System.out.println("Podcast created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Read
                                             System.out.println("Enter the id of the podcast:");
                                             Long id = sc.nextLong();
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
                                             resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
                                         }
-//                                        TODO Update and Delete
+                                        //TODO
+//                                        case 3 ->{
+//                                            //Update
+//                                            System.out.println("Enter id of the podcast:");
+//                                            Long id = sc.nextLong();
+//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+//
+//                                        }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
                                             continue;
@@ -153,6 +163,7 @@ public class CLI {
                                 }
                             }
                             case 5 -> {
+                                //Host
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -345,6 +356,93 @@ public class CLI {
                                             Optional<Host> resultHost = read.getHost(id, connection);
                                             resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
                                         }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 11 -> {
+                                //Sponsor
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            //Create
+                                            long id = create.createSponsor(connection, inputData.getSponsorInput(sc));
+                                            System.out.println("Sponsor created successfully with id " + id);
+                                        }
+                                        case 2 -> {
+                                            //Read
+                                            System.out.println("Enter the id of the sponsor:");
+                                            Long id = sc.nextLong();
+                                            Optional<Sponsor> relationSponsor = read.getSponsor(id, connection);
+                                            relationSponsor.ifPresentOrElse(System.out::println, () -> System.out.println("Sponsor not found!"));
+                                        }
+                                        //TODO
+//                                        case 3 ->{
+//                                            //Update
+//                                            System.out.println("Enter id of the podcast:");
+//                                            Long id = sc.nextLong();
+//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+//
+//                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 12 -> {
+                                //Episode
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            //Create
+                                            long podcastID = inputData.getPodcastIdInput(connection, sc);
+                                            long id = create.createEpisode(connection, inputData.getEpisodeInput(sc, podcastID));
+                                            System.out.println("Episode created successfully with number " + id);
+                                        }
+                                        case 2 -> {
+                                            //Read
+                                            long podcastID = inputData.getPodcastIdInput(connection, sc);
+                                            long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
+                                            Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum);
+                                            relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
+                                        }
+                                        //TODO
+//                                        case 3 ->{
+//                                            //Update
+//                                            System.out.println("Enter id of the podcast:");
+//                                            Long id = sc.nextLong();
+//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+//
+//                                        }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
                                             continue;
