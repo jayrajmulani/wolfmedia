@@ -21,4 +21,9 @@ public class Album {
         this.release_date = release_date;
         this.edition = edition;
     }
+
+    public Album(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
