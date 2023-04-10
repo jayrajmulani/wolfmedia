@@ -793,23 +793,36 @@ public class CLI {
                             case 3 -> {
                                 // Monthly Play Count for Artist
                                 long artistId = inputData.getArtistIdInput(connection, sc);
-                                List<Stats> stats = reportUtils.getSongPlayCountByMonth(connection, artistId);
+                                List<Stats> stats = reportUtils.getArtistPlayCountByMonth(connection, artistId);
                                 stats.forEach(System.out::println);
                             }
                             case 4 -> {
-                                // TODO: Total Payments Made to Host
+                                // Total Payments Made to Host
+                                PaymentReportInput input = inputData.getPaymentReportInputForHost(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Host with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 5 -> {
-                                // TODO: Total Payments Made to Artist
+                                //  Total Payments Made to Artist
+                                PaymentReportInput input = inputData.getPaymentReportInputForArtist(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Artist with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 6 -> {
-                                // TODO: Total Payments Made to Record Label
+                                // Total Payments Made to Record Label
+                                PaymentReportInput input = inputData.getPaymentReportInputForRecordLabel(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Record Label with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 7 -> {
-                                // TODO: Monthly Revenue for Service
+                                // Monthly Revenue for Service
+                                long id = inputData.getServiceIdInput(connection, sc);
+                                reportUtils.getMonthlyRevenueForService(connection, id).forEach(System.out::println);
                             }
                             case 8 -> {
-                                // TODO: Yearly Revenue for Service
+                                // Yearly Revenue for Service
+                                long id = inputData.getServiceIdInput(connection, sc);
+                                reportUtils.getYearlyRevenueForService(connection, id).forEach(System.out::println);
                             }
                             case 9 -> {
                                 // TODO: Find Songs By Artist
@@ -818,7 +831,9 @@ public class CLI {
                                 // TODO: Find Songs By Album
                             }
                             case 11 -> {
-                                // TODO: Find Episodes By Podcast
+                                // Find Episodes By Podcast
+                                long podcastId = inputData.getPodcastIdInput(connection, sc);
+                                read.getAllPodcastEpisodes(connection, podcastId).forEach(System.out::println);
                             }
                             default -> {
                                 System.out.println("Please choose a valid input...");
