@@ -43,6 +43,7 @@ public class PaymentUtils {
                 statement.executeUpdate();
                 connection.commit();
             } else {
+                connection.rollback();
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
                         "Service can only make payments to Record Labels or Podcast Hosts");
             }
@@ -55,6 +56,7 @@ public class PaymentUtils {
                 statement.setLong(2, paymentInfo.getReceiverId());
                 statement.setDouble(3, paymentInfo.getAmount());
                 statement.executeUpdate();
+                connection.commit();
             } else {
                 connection.rollback();
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
