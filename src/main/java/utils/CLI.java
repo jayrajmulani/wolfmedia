@@ -953,15 +953,29 @@ public class CLI {
                                 reportUtils.getYearlyRevenueForService(connection, id).forEach(System.out::println);
                             }
                             case 9 -> {
-                                // TODO: Find Songs By Artist
+                                // Find Songs By Artist
+                                long artistId = inputData.getArtistIdInput(connection,sc);
+                                List<Song> songs = reportUtils.getSongsByArtist(connection,artistId);
+                                songs.forEach(System.out::println);
                             }
                             case 10 -> {
-                                // TODO: Find Songs By Album
+                                // Find Songs By Album
+                                long albumId = inputData.getAlbumIdInput(connection, sc);
+                                List<Song> songs = reportUtils.getSongsByAlbum(connection,albumId);
+                                songs.forEach(System.out::println);
                             }
                             case 11 -> {
                                 // Find Episodes By Podcast
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
                                 read.getAllPodcastEpisodes(connection, podcastId).forEach(System.out::println);
+                            }
+                            case 12 -> {
+                                long songId = inputData.getSongIdInput(connection,sc);
+                                reportUtils.flushSongPlayCountForCurrentMonth(connection,songId);
+                            }
+                            case 13 -> {
+                                // TODO: Flush Play Count for Episode for current month
+                                break;
                             }
                             default -> {
                                 System.out.println("Please choose a valid input...");

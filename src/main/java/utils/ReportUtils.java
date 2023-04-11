@@ -1,6 +1,7 @@
 package utils;
 
 import models.*;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +29,7 @@ public class ReportUtils {
             UNION 
             select s.id, s.title, month, year, play_count as monthly_count
             from HISTORICAL_SONG_PLAY_COUNT , SONG s WHERE s.id = HISTORICAL_SONG_PLAY_COUNT.song_id 
-            AND s.id = ?
+            AND s.id = ? AND month(current_timestamp) <> HISTORICAL_SONG_PLAY_COUNT.month AND YEAR(CURRENT_TIMESTAMP) <> HISTORICAL_SONG_PLAY_COUNT.year
             order by year desc , month desc
             """;
         PreparedStatement statement = connection.prepareStatement(query);
@@ -73,6 +74,7 @@ public class ReportUtils {
                 SL.song_id = C.song_id
                 AND S.id = SL.song_id
                 AND C.artist_id = A.id
+                AND month(current_timestamp) <> SL.month AND YEAR(CURRENT_TIMESTAMP) <> SL.year
             group by C.artist_id , A.name, month,  year
             having artist_id = ?
             order by year desc , month desc           
@@ -118,6 +120,7 @@ public class ReportUtils {
                 SL.song_id = SA.song_id
                 AND SA.song_id = S.id
                 AND SA.album_id = A.id
+                AND month(current_timestamp) <> SL.month AND YEAR(CURRENT_TIMESTAMP) <> SL.year
             group by SA.album_id, A.name, month, year
             having album_id = ?
             order by year desc , month desc           
@@ -233,5 +236,80 @@ public class ReportUtils {
             );
         }
         return revenueStats;
+    }
+    public void flushSongPlayCountForCurrentMonth(Connection connection, long songId) throws SQLException {
+        // Get play count for current month
+        String query = "SELECT COUNT(*) play_count FROM SONG_LISTEN WHERE song_id = ? " +
+                "AND MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP) " +
+                "AND YEAR(timestamp) = YEAR(CURRENT_TIMESTAMP)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, songId);
+        long playCount = statement.executeQuery().getLong("play_count");
+        if(playCount == 0){
+            System.out.println("Nothing to flush. Play Count is 0.");
+            return;
+        }
+        statement.close();
+        // Push the value to historical play count (update if exists, else insert)
+        query = "SELECT * FROM HISTORICAL_SONG_PLAY_COUNT WHERE song_id = ? " +
+                "AND month = MONTH(CURRENT_TIMESTAMP)" +
+                "AND year = YEAR(CURRENT_TIMESTAMP)";
+        statement = connection.prepareStatement(query);
+        statement.setLong(1, songId);
+        ResultSet rs = statement.executeQuery();
+        if(rs.next()){
+            statement.close();
+            // Data was already present for current month, hence update
+            String updateQuery = "UPDATE HISTORICAL_SONG_PLAY_COUNT SET play_count = ? WHERE song_id = ? AND month = month(CURRENT_TIMESTAMP) AND year = year(CURRENT_TIMESTAMP)";
+            statement = connection.prepareStatement(updateQuery);
+            statement.setLong(1, songId);
+            statement.executeUpdate();
+        }
+        else{
+            // Data was missing, hence insert
+            String insertQuery = "INSERT INTO HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) " +
+                    " VALUES (? ,month(CURRENT_TIMESTAMP), year(CURRENT_TIMESTAMP), ?)";
+            statement = connection.prepareStatement(insertQuery);
+            statement.setLong(1, songId);
+            statement.setLong(2, playCount);
+            statement.executeUpdate();
+        }
+
+        // Flush the individual listen records
+        String deleteQuery = "DELETE FROM SONG_LISTEN SL WHERE SL.song_id = ?";
+        statement = connection.prepareStatement(deleteQuery);
+        statement.setLong(1,songId);
+        statement.executeUpdate();
+    }
+    public List<Song> getSongsByArtist(Connection connection, long artistId) throws SQLException {
+        List<Song> songs = new ArrayList<>();
+        String query = """
+        SELECT S.id, S.title
+        FROM   CREATES C, SONG S
+        WHERE  S.id = C.song_id AND C.artist_id = ?
+        """;
+        return getSongs(connection, artistId, songs, query);
+    }
+
+    private List<Song> getSongs(Connection connection, long artistId, List<Song> songs, String query) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, artistId);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()){
+            songs.add(
+                    new Song(rs.getLong("id"), rs.getString("title"))
+            );
+        }
+        return songs;
+    }
+
+    public List<Song> getSongsByAlbum(Connection connection, long albumId) throws SQLException {
+        List<Song> songs = new ArrayList<>();
+        String query = """
+        SELECT S.id, S.title
+        FROM   SONG_ALBUM SA, SONG S
+        WHERE  S.id = SA.song_id AND SA.album_id = ?
+        """;
+        return getSongs(connection, albumId, songs, query);
     }
 }

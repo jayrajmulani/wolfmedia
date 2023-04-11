@@ -7,7 +7,7 @@ public class Menu {
         System.out.println("-------------------------");
         System.out.println("1. Admin");
         System.out.println("2. Artist");
-        System.out.println("3. Podcast Host:");
+        System.out.println("3. Podcast Host");
         System.out.println("4. Record Label");
         System.out.println("-1. Quit!");
         System.out.println("Enter your choice: ");
@@ -18,7 +18,7 @@ public class Menu {
         System.out.println("-------------------------");
         System.out.println("1. Information Processing");
         System.out.println("2. Manage metadata and records");
-        System.out.println("3. Manage payments:");
+        System.out.println("3. Manage payments");
         System.out.println("4. Reports");
         System.out.println("-1. Quit!");
         System.out.println("Enter your choice: ");
@@ -103,6 +103,8 @@ public class Menu {
         System.out.println("9. Find Songs By Artist");
         System.out.println("10. Find Songs By Album");
         System.out.println("11. Find Episodes By Podcast");
+        System.out.println("12. Flush Play Count for Song for current month");
+        System.out.println("13. Flush Play Count for Episode for current month");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");
