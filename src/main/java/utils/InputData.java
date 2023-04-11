@@ -480,6 +480,94 @@ public class InputData {
         return  new PaymentReportInput(startDate, endDate, hostId, PaymentUtils.Stakeholder.PODCAST_HOST);
     }
 
+    public SongListen getSongListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Songs");
+        List<Song> allSongs = read.getAllSongs(connection);
+        allSongs.forEach(System.out::println);
+
+        System.out.println("Enter Song ID:");
+        long songId = sc.nextLong();
+
+        System.out.println("Here is the List of all Users");
+        List<User> allUsers = read.getAllUsers(connection);
+        allUsers.forEach(System.out::println);
+
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+
+        return new SongListen(songId, userId);
+    }
+
+    public PodcastEpListen getPodcastEpListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Podcasts");
+        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+        allPodcasts.forEach(System.out::println);
+
+        System.out.println("Enter Podcast ID:");
+        long podcastId = sc.nextLong();
+
+        System.out.println("Here is the List of all Users");
+        List<User> allUsers = read.getAllUsers(connection);
+        allUsers.forEach(System.out::println);
+
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+
+        System.out.println("Here is the List of all Episodes (In the podcast " + podcastId + ")");
+        List<Episode> allPodcastEpisodes = read.getAllPodcastEpisodes(connection, podcastId);
+        allPodcastEpisodes.forEach(System.out::println);
+
+        long episodeId;
+
+        while(true)
+        {
+            System.out.println("Enter Episode ID:");
+            episodeId = sc.nextLong();
+
+            if(!allPodcastEpisodes.contains(episodeId))
+                System.out.println("The Episode ID does not exist with the above selected podcast");
+            else
+                break;
+        }
+
+        return new PodcastEpListen(podcastId, userId, episodeId);
+    }
+
+//    public Rates getRates(Connection connection, Scanner sc) throws ParseException, SQLException {
+//
+//        System.out.println("Here is the List of all Podcasts");
+//        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+//        allPodcasts.forEach(System.out::println);
+//
+//        System.out.println("Enter Podcast ID:");
+//        long podcastId = sc.nextLong();
+//
+//        System.out.println("Here is the List of all Users");
+//        List<User> allUsers = read.getAllUsers(connection);
+//        allUsers.forEach(System.out::println);
+//
+//        System.out.println("Enter User ID:");
+//        long userId = sc.nextLong();
+//
+//        System.out.println("Enter the rating");
+//        double rating = sc.nextDouble();
+//
+//        Double currentRating = read.getRatingByPodcastIdUserId(connection, userId, podcastId);
+//        if (currentRating == 0)
+//        {
+//            // Add a record
+//            return new PodcastEpListen(podcastId, userId,rating, java.util.);
+//        }
+//        else
+//        {
+//            //Update the record
+//        }
+//
+//
+//    }
+
     public PaymentReportInput getPaymentReportInputForArtist(Connection connection, Scanner sc) throws SQLException, ParseException {
         long artistId = getArtistIdInput(connection, sc);
         System.out.println("Enter the start date (mm/dd/yyyy):");

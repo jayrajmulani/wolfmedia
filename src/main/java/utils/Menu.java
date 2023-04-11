@@ -37,13 +37,25 @@ public class Menu {
         System.out.println("8. Service");
         System.out.println("9. Artist"); // TODO refactor
         System.out.println("10. Album");
-        System.out.println("11. Assign Song to Artist");
-        System.out.println("12. Assign Artist to Album");
-        System.out.println("13. Assign Song to Record Label");
-        System.out.println("14. Assign Artist to Record Label");
-        System.out.println("15. Assign Song to Album");
-        System.out.println("16. Sponsor"); // TODO refactor
-        System.out.println("17. Episode"); // TODO refactor
+        System.out.println("11. Sponsor"); // TODO refactor
+        System.out.println("12. Episode"); // TODO refactor
+        System.out.println("13. Assign Song to Artist");
+        System.out.println("14. Assign Artist to Album");
+        System.out.println("15. Assign Song to Record Label");
+        System.out.println("16. Assign Artist to Record Label");
+        System.out.println("17. Assign Song to Album");
+        System.out.println("0. Go back!");
+        System.out.println("-1. Quit!");
+        System.out.print("Enter your choice: ");
+    }
+
+    public void displayMetaDataAndRecordsMenu(){
+        System.out.println("-------------------------");
+        System.out.println("Maintaining Metadata and Records");
+        System.out.println("-------------------------");
+        System.out.println("1. Enter Playcount for a Song");
+        System.out.println("2. Enter Playcount for Podcast");
+        System.out.println("3. Enter Rating for Podcast");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");

@@ -353,7 +353,87 @@ public class Create {
         }
     }
 
+    public long createSongListen(Connection connection, SongListen songListen) throws SQLException {
+        String query = "insert into SONG_LISTEN (song_id, user_id) values (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, songListen.getSongId());
+            statement.setLong(2, songListen.getUserId());
 
+            long songListenId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                songListenId = rs.getInt(1);
+            }
+            else {
+                songListenId = 0L;
+            }
+            return songListenId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
+    public long createPodcastListen(Connection connection, PodcastEpListen podcastEpListen) throws SQLException {
+        String query = "insert into PODCAST_EP_LISTEN (user_id, podcast_id, episode_num) values (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, podcastEpListen.getUserId());
+            statement.setLong(2, podcastEpListen.getPodcastId());
+            statement.setLong(3, podcastEpListen.getEpisodeNum());
+
+            long podcastEpListenId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                podcastEpListenId = rs.getInt(1);
+            }
+            else {
+                podcastEpListenId = 0L;
+            }
+            return podcastEpListenId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+    public long createRates(Connection connection, PodcastEpListen podcastEpListen) throws SQLException {
+        String query = "insert into PODCAST_EP_LISTEN (user_id, podcast_id, episode_num) values (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, podcastEpListen.getUserId());
+            statement.setLong(2, podcastEpListen.getPodcastId());
+            statement.setLong(3, podcastEpListen.getEpisodeNum());
+
+            long podcastEpListenId;
+            if (statement.executeUpdate() > 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                rs.next();
+                podcastEpListenId = rs.getInt(1);
+            }
+            else {
+                podcastEpListenId = 0L;
+            }
+            return podcastEpListenId;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
 
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
