@@ -493,5 +493,39 @@ public class InputData {
         return new PodcastEpListen(podcastId, userId, episodeId);
     }
 
+//    public Rates getRates(Connection connection, Scanner sc) throws ParseException, SQLException {
+//
+//        System.out.println("Here is the List of all Podcasts");
+//        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+//        allPodcasts.forEach(System.out::println);
+//
+//        System.out.println("Enter Podcast ID:");
+//        long podcastId = sc.nextLong();
+//
+//        System.out.println("Here is the List of all Users");
+//        List<User> allUsers = read.getAllUsers(connection);
+//        allUsers.forEach(System.out::println);
+//
+//        System.out.println("Enter User ID:");
+//        long userId = sc.nextLong();
+//
+//        System.out.println("Enter the rating");
+//        double rating = sc.nextDouble();
+//
+//        Double currentRating = read.getRatingByPodcastIdUserId(connection, userId, podcastId);
+//        if (currentRating == 0)
+//        {
+//            // Add a record
+//            return new PodcastEpListen(podcastId, userId,rating, java.util.);
+//        }
+//        else
+//        {
+//            //Update the record
+//        }
+//
+//
+//    }
+
+
 
 }
