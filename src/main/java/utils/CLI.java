@@ -354,7 +354,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 16 -> {
+                            case 11 -> {
                                 //Sponsor
                                 while (true) {
                                     boolean goBackInner = false;
@@ -397,7 +397,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 17 -> {
+                            case 12 -> {
                                 //Episode
                                 while (true) {
                                     boolean goBackInner = false;
@@ -441,7 +441,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 11 -> {
+                            case 13 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -475,7 +475,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 12 -> {
+                            case 14 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -509,7 +509,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 13 -> {
+                            case 15 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -543,7 +543,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 14 -> {
+                            case 16 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -577,7 +577,7 @@ public class CLI {
                                     }
                                 }
                             }
-                            case 15 -> {
+                            case 17 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
