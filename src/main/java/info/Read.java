@@ -47,6 +47,19 @@ public class Read {
         }
     }
 
+    public Optional<Sponsor> getSponsor(long id, Connection connection) throws SQLException {
+        String query = "SELECT id, name FROM SPONSOR WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+            if (resultSet.next()) {
+                return Optional.of(new Sponsor(resultSet.getLong("id"), resultSet.getString("name")));
+            }
+            return Optional.empty();
+        }
+    }
+
     public Optional<Genre> getGenreByName(Connection connection, String name) throws SQLException {
         String query = "SELECT id, name FROM GENRE WHERE name = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -114,6 +127,29 @@ public class Read {
                                 hosts,
                                 new ArrayList<Sponsor>(), // TODO sponsor
                                 new ArrayList<Genre>() // TODO
+                        ));
+            }
+            return Optional.empty();
+        }
+    }
+    public Optional<Episode> getEpisode(Connection connection, Long podcastID, Long episodeNum) throws SQLException {
+        String query = "SELECT * from EPISODE WHERE podcast_id=? AND episode_num=?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastID);
+            statement.setLong(2, episodeNum);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Episode(
+                                resultSet.getLong("podcast_id"),
+                                resultSet.getLong("episode_num"),
+                                resultSet.getString("title"),
+                                resultSet.getDate("release_date"),
+                                resultSet.getDouble("duration"),
+                                resultSet.getInt("adv_count"),
+                                resultSet.getDouble("bonus_rate")
                         ));
             }
             return Optional.empty();

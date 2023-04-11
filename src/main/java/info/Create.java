@@ -176,11 +176,31 @@ public class Create {
                 podcastID = 0L;
             }
             return podcastID;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
-        catch (SQLException e) {
+        return 0L;
+    }
+
+    public long createEpisode(Connection connection, Episode episode) throws SQLException {
+        String query = "INSERT INTO EPISODE(podcast_id, episode_num, title, release_date, duration, adv_count, " +
+                "bonus_rate) VALUES (?,?,?,?,?,?,?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, episode.getPodcastId());
+            statement.setLong(2, episode.getEpisodeNum());
+            statement.setString(3, episode.getTitle());
+            statement.setDate(4, episode.getReleaseDate());
+            statement.setDouble(5, episode.getDuration());
+            statement.setInt(6, episode.getAdvCount());
+            statement.setDouble(7, episode.getBonusRate());
+            if (statement.executeUpdate() > 0) {
+                return episode.getEpisodeNum();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -198,16 +218,14 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 artistId = rs.getInt(1);
-            }
-            else {
+            } else {
                 artistId = 0L;
             }
             return artistId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -225,16 +243,14 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 albumId = rs.getInt(1);
-            }
-            else {
+            } else {
                 albumId = 0L;
             }
             return albumId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }

@@ -93,6 +93,24 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
+    public Episode getEpisodeInput(Scanner sc, long podcastID) throws ParseException {
+        Scanner myObj = new Scanner(System.in);
+        System.out.println("Enter the number of the episode:");
+        Long episodeNum = myObj.nextLong();
+        myObj.nextLine();
+        System.out.println("Enter the title of the episode:");
+        String title = myObj.nextLine();
+        System.out.println("Enter the release date of the episode:");
+        Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(myObj.next()).getTime());
+        System.out.println("Enter the duration of the episode in seconds:");
+        double duration = myObj.nextDouble();
+        System.out.println("Enter the number of advertisers in the episode:");
+        int advCount = myObj.nextInt();
+        System.out.println("Enter the bonus rate of the episode:");
+        double bonusRate = myObj.nextDouble();
+
+        return new Episode(podcastID, episodeNum, title, releaseDate, duration, advCount, bonusRate);
+    }
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
         List<Artist> artists = read.getAllArtists(connection);
         artists.forEach(System.out::println);
@@ -194,6 +212,15 @@ public class InputData {
         String name = myObj.nextLine();
 
         return new Guest(name);
+    }
+    public Sponsor getSponsorInput(Scanner sc){
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the Sponsor name: ");
+        String name = myObj.nextLine();
+
+        return new Sponsor(name);
     }
     public Service getServiceInput (Scanner sc) {
 
@@ -437,6 +464,21 @@ public class InputData {
         }
         return Optional.of(new SongAlbum(songId, albumId, trackNum));
     }
+    public PaymentReportInput getPaymentReportInputForHost(Connection connection, Scanner sc) throws SQLException, ParseException {
+        long hostId = getHostIdInput(connection, sc);
+        System.out.println("Enter the start date (mm/dd/yyyy):");
+        Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        System.out.println("Enter the end date (mm/dd/yyyy):");
+        Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        while(startDate.after(endDate)){
+            System.out.println("Start date must be before end date.");
+            System.out.println("Enter the start date (mm/dd/yyyy):");
+            startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+            System.out.println("Enter the end date (mm/dd/yyyy):");
+            endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        }
+        return  new PaymentReportInput(startDate, endDate, hostId, PaymentUtils.Stakeholder.PODCAST_HOST);
+    }
 
     public SongListen getSongListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
@@ -526,6 +568,35 @@ public class InputData {
 //
 //    }
 
+    public PaymentReportInput getPaymentReportInputForArtist(Connection connection, Scanner sc) throws SQLException, ParseException {
+        long artistId = getArtistIdInput(connection, sc);
+        System.out.println("Enter the start date (mm/dd/yyyy):");
+        Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        System.out.println("Enter the end date (mm/dd/yyyy):");
+        Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        while(startDate.after(endDate)){
+            System.out.println("Start date must be before end date.");
+            System.out.println("Enter the start date (mm/dd/yyyy):");
+            startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+            System.out.println("Enter the end date (mm/dd/yyyy):");
+            endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        }
+        return  new PaymentReportInput(startDate, endDate, artistId, PaymentUtils.Stakeholder.ARTIST);
+    }
 
-
+    public PaymentReportInput getPaymentReportInputForRecordLabel(Connection connection, Scanner sc) throws SQLException, ParseException {
+        long rlId = getRecordLabelIdInput(connection, sc);
+        System.out.println("Enter the start date (mm/dd/yyyy):");
+        Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        System.out.println("Enter the end date (mm/dd/yyyy):");
+        Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        while(startDate.after(endDate)){
+            System.out.println("Start date must be before end date.");
+            System.out.println("Enter the start date (mm/dd/yyyy):");
+            startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+            System.out.println("Enter the end date (mm/dd/yyyy):");
+            endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
+        }
+        return  new PaymentReportInput(startDate, endDate, rlId, PaymentUtils.Stakeholder.RECORD_LABEL);
+    }
 }

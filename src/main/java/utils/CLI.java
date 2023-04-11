@@ -354,6 +354,93 @@ public class CLI {
                                     }
                                 }
                             }
+                            case 16 -> {
+                                //Sponsor
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            //Create
+                                            long id = create.createSponsor(connection, inputData.getSponsorInput(sc));
+                                            System.out.println("Sponsor created successfully with id " + id);
+                                        }
+                                        case 2 -> {
+                                            //Read
+                                            System.out.println("Enter the id of the sponsor:");
+                                            Long id = sc.nextLong();
+                                            Optional<Sponsor> relationSponsor = read.getSponsor(id, connection);
+                                            relationSponsor.ifPresentOrElse(System.out::println, () -> System.out.println("Sponsor not found!"));
+                                        }
+                                        //TODO
+//                                        case 3 ->{
+//                                            //Update
+//                                            System.out.println("Enter id of the podcast:");
+//                                            Long id = sc.nextLong();
+//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+//
+//                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 17 -> {
+                                //Episode
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            //Create
+                                            long podcastID = inputData.getPodcastIdInput(connection, sc);
+                                            long id = create.createEpisode(connection, inputData.getEpisodeInput(sc, podcastID));
+                                            System.out.println("Episode created successfully with number " + id);
+                                        }
+                                        case 2 -> {
+                                            //Read
+                                            long podcastID = inputData.getPodcastIdInput(connection, sc);
+                                            long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
+                                            Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum);
+                                            relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
+                                        }
+                                        //TODO
+//                                        case 3 ->{
+//                                            //Update
+//                                            System.out.println("Enter id of the podcast:");
+//                                            Long id = sc.nextLong();
+//                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+//
+//                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
                             case 11 -> {
                                 quit = false;
                                 while (true) {
@@ -834,23 +921,36 @@ public class CLI {
                             case 3 -> {
                                 // Monthly Play Count for Artist
                                 long artistId = inputData.getArtistIdInput(connection, sc);
-                                List<Stats> stats = reportUtils.getSongPlayCountByMonth(connection, artistId);
+                                List<Stats> stats = reportUtils.getArtistPlayCountByMonth(connection, artistId);
                                 stats.forEach(System.out::println);
                             }
                             case 4 -> {
-                                // TODO: Total Payments Made to Host
+                                // Total Payments Made to Host
+                                PaymentReportInput input = inputData.getPaymentReportInputForHost(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Host with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 5 -> {
-                                // TODO: Total Payments Made to Artist
+                                //  Total Payments Made to Artist
+                                PaymentReportInput input = inputData.getPaymentReportInputForArtist(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Artist with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 6 -> {
-                                // TODO: Total Payments Made to Record Label
+                                // Total Payments Made to Record Label
+                                PaymentReportInput input = inputData.getPaymentReportInputForRecordLabel(connection, sc);
+                                double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
+                                System.out.println("Record Label with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 7 -> {
-                                // TODO: Monthly Revenue for Service
+                                // Monthly Revenue for Service
+                                long id = inputData.getServiceIdInput(connection, sc);
+                                reportUtils.getMonthlyRevenueForService(connection, id).forEach(System.out::println);
                             }
                             case 8 -> {
-                                // TODO: Yearly Revenue for Service
+                                // Yearly Revenue for Service
+                                long id = inputData.getServiceIdInput(connection, sc);
+                                reportUtils.getYearlyRevenueForService(connection, id).forEach(System.out::println);
                             }
                             case 9 -> {
                                 // TODO: Find Songs By Artist
@@ -859,7 +959,9 @@ public class CLI {
                                 // TODO: Find Songs By Album
                             }
                             case 11 -> {
-                                // TODO: Find Episodes By Podcast
+                                // Find Episodes By Podcast
+                                long podcastId = inputData.getPodcastIdInput(connection, sc);
+                                read.getAllPodcastEpisodes(connection, podcastId).forEach(System.out::println);
                             }
                             default -> {
                                 System.out.println("Please choose a valid input...");
