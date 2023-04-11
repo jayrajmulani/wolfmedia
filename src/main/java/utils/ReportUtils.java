@@ -25,10 +25,15 @@ public class ReportUtils {
                 S.id, S.title, month, year
             having
                     S.id = ?
+            UNION 
+            select s.id, s.title, month, year, play_count as monthly_count
+            from HISTORICAL_SONG_PLAY_COUNT , SONG s WHERE s.id = HISTORICAL_SONG_PLAY_COUNT.song_id 
+            AND s.id = ?
             order by year desc , month desc
             """;
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, songId);
+        statement.setLong(2, songId);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
             stats.add(
@@ -58,10 +63,23 @@ public class ReportUtils {
                 C.artist_id, A.name, month, year
             having
                 C.artist_id = ?   
+                
+            UNION 
+            select
+                C.artist_id  id, A.name, month,  year, sum(play_count) as monthly_count
+            from
+                HISTORICAL_SONG_PLAY_COUNT SL, CREATES C, SONG S, ARTIST A
+            where
+                SL.song_id = C.song_id
+                AND S.id = SL.song_id
+                AND C.artist_id = A.id
+            group by C.artist_id , A.name, month,  year
+            having artist_id = ?
             order by year desc , month desc           
             """;
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, artistId);
+        statement.setLong(2, artistId);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
             stats.add(
@@ -91,10 +109,22 @@ public class ReportUtils {
                 SA.album_id, A.name, month, year
             having
                 SA.album_id = ?   
+            UNION
+            select
+                SA.album_id id, A.name, month,  year, sum(play_count) as monthly_count
+            from
+                HISTORICAL_SONG_PLAY_COUNT SL, SONG_ALBUM SA, SONG S, ALBUM A
+            where
+                SL.song_id = SA.song_id
+                AND SA.song_id = S.id
+                AND SA.album_id = A.id
+            group by SA.album_id, A.name, month, year
+            having album_id = ?
             order by year desc , month desc           
             """;
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, albumId);
+        statement.setLong(2, albumId);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
             stats.add(
