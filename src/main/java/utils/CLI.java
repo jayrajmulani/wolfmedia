@@ -723,8 +723,8 @@ public class CLI {
                                         }
                                         case 1 -> {
                                             // Create Record in PodcastListen Table
-                                            long id = create.createPodcastListen(connection, inputData.getPodcastEpListenInput(connection, sc));
-                                            System.out.println("PodcastListen record created successfully with id " + id);
+                                            inputData.getRates(connection, sc);
+                                            System.out.println("Rating successfully added/updated");
                                         }
                                         case 2 -> {
                                             // Get Song

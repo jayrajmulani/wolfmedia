@@ -11,9 +11,9 @@ import java.sql.Date;
 @ToString
 @EqualsAndHashCode
 public class Rates {
-    private long user_id;
-    private long podcast_id;
+    private long userId;
+    private long podcastId;
     private double rating;
-    private Date updated_at;
+    private Date updatedAt;
 
 }

@@ -407,23 +407,33 @@ public class Create {
         }
         return 0L;
     }
-    public long createRates(Connection connection, PodcastEpListen podcastEpListen) throws SQLException {
-        String query = "insert into PODCAST_EP_LISTEN (user_id, podcast_id, episode_num) values (?, ?, ?)";
+    public void createRates(Connection connection, Rates rates) throws SQLException {
+        String query = "insert into RATES (user_id, podcast_id, updated_at, rating) values (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statement.setLong(1, podcastEpListen.getUserId());
-            statement.setLong(2, podcastEpListen.getPodcastId());
-            statement.setLong(3, podcastEpListen.getEpisodeNum());
+            statement.setLong(1, rates.getUserId());
+            statement.setLong(2, rates.getPodcastId());
+            statement.setDate(3, rates.getUpdatedAt());
+            statement.setDouble(4, rates.getRating());
 
-            long podcastEpListenId;
-            if (statement.executeUpdate() > 0) {
-                ResultSet rs = statement.getGeneratedKeys();
-                rs.next();
-                podcastEpListenId = rs.getInt(1);
-            }
-            else {
-                podcastEpListenId = 0L;
-            }
-            return podcastEpListenId;
+            statement.executeUpdate();
+        }
+        catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+    public long deleteRates(Connection connection, Rates rates) throws SQLException {
+        String query = "delete from RATES where user_id = ? and podcast_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, rates.getUserId());
+            statement.setLong(2, rates.getPodcastId());
+
+            statement.executeUpdate();
         } catch (SQLIntegrityConstraintViolationException e){
             e.printStackTrace();
             DB.rollBackTransaction(connection);

@@ -357,16 +357,16 @@ public class Read {
         return Optional.empty();
     }
 
-    public double getRatingByPodcastIdUserId(Connection connection, long user_id, long podcast_id) throws SQLException {
+    public Optional<Double> getRatingByPodcastIdUserId(Connection connection, long user_id, long podcast_id) throws SQLException {
         String query = "SELECT rating From RATES WHERE user_id = ? AND podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, user_id);
-        statement.setLong(1, podcast_id);
+        statement.setLong(2, podcast_id);
 
         ResultSet resultSet = statement.executeQuery();
         if(resultSet.next()){
+            return Optional.of(resultSet.getDouble("rating"));
         }
-        return 0L;
+        return Optional.empty();
     }
-
 }

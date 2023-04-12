@@ -1,5 +1,6 @@
 package utils;
 
+import info.Create;
 import info.Read;
 import models.*;
 
@@ -12,6 +13,7 @@ import java.util.*;
 
 public class InputData {
     private static final Read read = new Read();
+    private static final Create create = new Create();
     public Song getSongInput(Scanner sc) throws ParseException {
 
         Scanner myObj = new Scanner(System.in);
@@ -535,38 +537,33 @@ public class InputData {
         return new PodcastEpListen(podcastId, userId, episodeId);
     }
 
-//    public Rates getRates(Connection connection, Scanner sc) throws ParseException, SQLException {
-//
-//        System.out.println("Here is the List of all Podcasts");
-//        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
-//        allPodcasts.forEach(System.out::println);
-//
-//        System.out.println("Enter Podcast ID:");
-//        long podcastId = sc.nextLong();
-//
-//        System.out.println("Here is the List of all Users");
-//        List<User> allUsers = read.getAllUsers(connection);
-//        allUsers.forEach(System.out::println);
-//
-//        System.out.println("Enter User ID:");
-//        long userId = sc.nextLong();
-//
-//        System.out.println("Enter the rating");
-//        double rating = sc.nextDouble();
-//
-//        Double currentRating = read.getRatingByPodcastIdUserId(connection, userId, podcastId);
-//        if (currentRating == 0)
-//        {
-//            // Add a record
-//            return new PodcastEpListen(podcastId, userId,rating, java.util.);
-//        }
-//        else
-//        {
-//            //Update the record
-//        }
-//
-//
-//    }
+    public void getRates(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Podcasts");
+        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+        allPodcasts.forEach(System.out::println);
+
+        System.out.println("Enter Podcast ID:");
+        long podcastId = sc.nextLong();
+
+        System.out.println("Here is the List of all Users");
+        List<User> allUsers = read.getAllUsers(connection);
+        allUsers.forEach(System.out::println);
+
+        System.out.println("Enter User ID:");
+        long userId = sc.nextLong();
+
+        System.out.println("Enter the rating");
+        double rating = sc.nextDouble();
+        Date updated_at = new java.sql.Date(System.currentTimeMillis());
+        Optional<Double> currentRating = read.getRatingByPodcastIdUserId(connection, userId, podcastId);
+        if (!currentRating.isEmpty())
+        {
+            create.deleteRates(connection, new Rates(userId, podcastId, rating, updated_at));
+        }
+
+        create.createRates(connection, new Rates(userId, podcastId, rating, updated_at));
+    }
 
     public PaymentReportInput getPaymentReportInputForArtist(Connection connection, Scanner sc) throws SQLException, ParseException {
         long artistId = getArtistIdInput(connection, sc);
