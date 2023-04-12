@@ -743,7 +743,146 @@ public class CLI {
                                     }
                                 }
                             }
-
+                            case 4 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            // Get Average Rating for a Podcast
+                                            double rating = create.getAvgRating(connection, inputData.getAverageRating(connection, sc).orElseThrow());
+                                            System.out.println("Average Rating is: " + rating);
+                                        }
+                                        case 2 -> {
+                                            // Get Song
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 5 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            // Create Record in PodcastListen Table
+                                            long id = create.createSongListen(connection, inputData.getSongListenInput(connection, sc));
+                                            System.out.println("Successfully Subscribed to the Podcast");
+                                        }
+                                        case 2 -> {
+                                            // Get Song
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 6 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            // Create Record in PodcastListen Table
+                                            inputData.getRates(connection, sc);
+                                            System.out.println("Rating successfully added/updated");
+                                        }
+                                        case 2 -> {
+                                            // Get Song
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
+                            case 7 -> {
+                                quit = false;
+                                while (true) {
+                                    boolean goBackInner = false;
+                                    menu.displayCrudMenu();
+                                    crudChoice = sc.nextInt();
+                                    switch (crudChoice) {
+                                        case -1 -> {
+                                            quit = true;
+                                        }
+                                        case 0 -> {
+                                            goBackInner = true;
+                                        }
+                                        case 1 -> {
+                                            // Create Record in PodcastListen Table
+                                            inputData.getRates(connection, sc);
+                                            System.out.println("Rating successfully added/updated");
+                                        }
+                                        case 2 -> {
+                                            // Get Song
+                                            System.out.println("Enter the id of the song:");
+                                            Long id = sc.nextLong();
+                                            Optional<Song> resultSong = read.getSong(id, connection);
+                                            resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        default -> {
+                                            System.out.println("Please choose a value between 0 and 4...");
+                                            continue;
+                                        }
+                                    }
+                                    if (goBackInner || quit) {
+                                        break;
+                                    }
+                                }
+                            }
 
                             default -> {
                                 System.out.println("Please choose a value between 0 and 10...");

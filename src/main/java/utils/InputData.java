@@ -565,6 +565,38 @@ public class InputData {
         create.createRates(connection, new Rates(userId, podcastId, rating, updated_at));
     }
 
+    public Optional<Long> getAverageRating(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Podcasts (That have atleast 1 Rating)");
+        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+
+        List<Rates> allRates = read.getAllRates(connection);
+        Set<Long> podcastsInRates = new HashSet<>();
+        allRates.forEach(allRate -> podcastsInRates.add(allRate.getPodcastId()));
+        if(podcastsInRates.size()==0)
+        {
+            System.out.println("No Podcast has a Rating, Pls add a rating to any podcast");
+            return Optional.empty();
+        }
+
+        allPodcasts.forEach(allPodcast -> {
+            if (podcastsInRates.contains(allPodcast.getId()))
+                System.out.println(allPodcast);
+        });
+
+        long podcastId;
+        while(true)
+        {
+            System.out.println("Enter Podcast ID:");
+            podcastId = sc.nextLong();
+            if(!podcastsInRates.contains(podcastId))
+                System.out.println("Podcast not yet rated");
+            else
+                break;
+        }
+        return Optional.of(podcastId);
+    }
+
     public PaymentReportInput getPaymentReportInputForArtist(Connection connection, Scanner sc) throws SQLException, ParseException {
         long artistId = getArtistIdInput(connection, sc);
         System.out.println("Enter the start date (mm/dd/yyyy):");

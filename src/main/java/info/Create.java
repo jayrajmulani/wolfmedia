@@ -445,6 +445,28 @@ public class Create {
         return 0L;
     }
 
+    public double getAvgRating(Connection connection, long podcastId) throws SQLException {
+        String query = "Select avg(rating) rating from RATES where podcast_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastId);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()){
+                return rs.getDouble("rating");
+            }
+            return 0D;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
+
+
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, name);

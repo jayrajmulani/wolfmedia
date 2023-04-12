@@ -208,6 +208,23 @@ public class Read {
         }
         return podcasts;
     }
+
+    public List<Rates> getAllRates(Connection connection) throws SQLException {
+        String query = "SELECT * from RATES";
+        List<Rates> rates = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            rates.add(new Rates(
+                            resultSet.getLong("user_id"),
+                            resultSet.getLong("podcast_id"),
+                            resultSet.getDouble("rating"),
+                            resultSet.getDate("updated_at")
+                    )
+            );
+        }
+        return rates;
+    }
     public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
         String query = "SELECT * from EPISODE WHERE podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
