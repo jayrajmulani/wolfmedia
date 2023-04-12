@@ -1,0 +1,12 @@
+DELETE FROM PODCAST_SUBSCRIPTION where 1=1;
+ALTER TABLE PODCAST_SUBSCRIPTION AUTO_INCREMENT = 1;
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8001);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8002);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8003);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8004);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8005);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8006);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8007);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8008);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8009);
+insert into PODCAST_SUBSCRIPTION (podcast_id, user_id) values (5001, 8010);
