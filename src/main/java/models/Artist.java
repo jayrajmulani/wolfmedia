@@ -14,7 +14,6 @@ public class Artist {
     private long id;
     private String name;
     private String country;
-
     private ArtistStatus status;
 
     public Artist(long id) {
