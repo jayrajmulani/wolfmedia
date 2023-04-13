@@ -95,6 +95,44 @@ public class Read {
         }
     }
 
+    public Optional<Album> getAlbum(long id, Connection connection) throws SQLException {
+        String query = "SELECT * FROM ALBUM WHERE ALBUM.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+//            List<Genre> genres = new ArrayList<>();
+//            while (resultSet.next()) {
+//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
+//            }
+//            resultSet.beforeFirst();
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Album(id));
+            }
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Artist> getArtist(Connection connection, long id) throws SQLException {
+        String query = "SELECT * FROM ARTIST WHERE ARTIST.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+//            List<Genre> genres = new ArrayList<>();
+//            while (resultSet.next()) {
+//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
+//            }
+//            resultSet.beforeFirst();
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Artist(id));
+            }
+            return Optional.empty();
+        }
+    }
+
     public Optional<Guest> getGuest(long id, Connection connection) throws SQLException {
         String query = "SELECT id, name FROM GUEST WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
