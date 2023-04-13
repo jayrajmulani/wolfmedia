@@ -283,11 +283,17 @@ public class CLI {
                                             System.out.println("User created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //TODO: Get User
-                                            break;
+                                            System.out.println("Enter the id of the User:");
+                                            long id = sc.nextLong();
+                                            Optional<User> resultUser = read.getUserById(connection, id);
+                                            resultUser.ifPresentOrElse(System.out::println, () -> System.out.println("Guest not found!"));
                                         }
                                         case 3 -> {
-                                            //TODO: Update User
+                                            long id = inputData.getUserIdInput(connection, sc);
+                                            User user = inputData.getUserInput(sc);
+                                            user.setId(id);
+                                            update.updateUser(connection, user);
+                                            System.out.println("User updated successfully" );
                                         }
                                         case 4 -> {
                                             delete.deleteUser(connection, inputData.getUserIdInput(connection, sc));
