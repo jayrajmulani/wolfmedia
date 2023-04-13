@@ -43,10 +43,7 @@ public class CLI {
                         int infoChoice = sc.nextInt();
                         switch (infoChoice) {
                             case -1 -> quit = true;
-                            case 0 -> {
-                                menu.displayMainMenu();
-                                goBack = true;
-                            }
+                            case 0 -> goBack = true;
                             case 1 -> {
                                 // Song Menu
                                 quit = false;
@@ -55,15 +52,10 @@ public class CLI {
                                     menu.displayCrudMenu();
                                     crudChoice = sc.nextInt();
                                     switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
+                                        case -1 -> quit = true;
+                                        case 0 -> goBackInner = true;
                                         case 1 -> {
                                             // Create Song
-                                            ;
                                             long id = create.createSong(connection, inputData.getSongInput(sc));
                                             System.out.println("Song created successfully with id " + id);
                                         }
@@ -91,12 +83,8 @@ public class CLI {
                                     menu.displayCrudMenu();
                                     crudChoice = sc.nextInt();
                                     switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
+                                        case -1 -> quit = true;
+                                        case 0 -> goBackInner = true;
                                         case 1 -> {
                                             long id = create.createGuest(connection, inputData.getGuestInput(sc));
                                             System.out.println("Guest created successfully with id " + id);
@@ -124,12 +112,8 @@ public class CLI {
                                     menu.displayCrudMenu();
                                     crudChoice = sc.nextInt();
                                     switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
+                                        case -1 -> quit = true;
+                                        case 0 -> goBackInner = true;
                                         case 1 -> {
                                             long id = create.createPodcast(connection, inputData.getPodcastInput(sc));
                                             System.out.println("Podcast created successfully with id " + id);
@@ -236,7 +220,6 @@ public class CLI {
                                             System.out.println("Record Label created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //TODO for Record Label
                                             System.out.println("Enter the id of the Record Label:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -270,7 +253,6 @@ public class CLI {
                                             System.out.println("Service created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //TODO for Service
                                             System.out.println("Enter the id of the Service:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -304,7 +286,6 @@ public class CLI {
                                             System.out.println("Artist created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //TODO for Artist
                                             System.out.println("Enter the id of the Artist:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -338,7 +319,6 @@ public class CLI {
                                             System.out.println("Album created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            //TODO for Album
                                             System.out.println("Enter the id of the Album:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -419,9 +399,14 @@ public class CLI {
                                         case 2 -> {
                                             //Read
                                             long podcastID = inputData.getPodcastIdInput(connection, sc);
-                                            long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
-                                            Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum);
-                                            relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
+                                            Optional<Long> episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
+                                            if(episodeNum.isPresent()){
+                                                Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum.get());
+                                                relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
+                                            }
+                                            else{
+                                                System.out.println("Podcast doesn't have any episodes");
+                                            }
                                         }
                                         //TODO
 //                                        case 3 ->{
@@ -459,7 +444,6 @@ public class CLI {
                                             System.out.println("Above selected Song is assigned to selected Artist");
                                         }
                                         case 2 -> {
-                                            //TODO for Song_Listen
                                             System.out.println("Enter the id of the SongListen table:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -626,7 +610,6 @@ public class CLI {
                 }
                 case 2 -> {
                     // Maintaining metadata and records
-                    int crudChoice;
                     while (true) {
                         quit = false;
                         menu.displayMetaDataAndRecordsMenu();
@@ -634,10 +617,7 @@ public class CLI {
                         int infoChoice = sc.nextInt();
                         switch (infoChoice) {
                             case -1 -> quit = true;
-                            case 0 -> {
-                                menu.displayMainMenu();
-                                goBack = true;
-                            }
+                            case 0 -> goBack = true;
                             case 1 -> {
                                 // Increase Playcount of a Song
                                 inputData.increaseSongPlayCount(connection, sc);
@@ -709,7 +689,6 @@ public class CLI {
                         switch (paymentChoice){
                             case -1 -> quit = true;
                             case 0 -> goBack = true;
-
                             case 1 -> {
                                 // Make Royalty Payment for a song for the current month
                                 long songId = inputData.getSongIdInput(connection, sc);
@@ -771,8 +750,12 @@ public class CLI {
                             case 5 -> {
                                 // Make Payment to Podcast Host for current month
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
-                                long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId);
-                                PaymentInfo hostPayInfo = podcastPayments.calculateHostPayAmount(connection, podcastId, episodeNum).orElseThrow();
+                                Optional<Long> episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId);
+                                if(episodeNum.isEmpty()){
+                                    System.out.println("This Podcast has no Episodes");
+                                    break;
+                                }
+                                PaymentInfo hostPayInfo = podcastPayments.calculateHostPayAmount(connection, podcastId, episodeNum.get()).orElseThrow();
                                 System.out.println("Are you sure you want to pay " + hostPayInfo.getAmount()
                                         + " to host with ID " + hostPayInfo.getReceiverId() + "? [0/1]");
                                 int ch = sc.nextInt();

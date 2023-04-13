@@ -116,131 +116,137 @@ public class InputData {
     }
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
         List<Artist> artists = read.getAllArtists(connection);
+        List<Long> artistIds = artists.stream().map(Artist::getId).toList();
         artists.forEach(System.out::println);
         System.out.println("Enter Artist ID:");
         long artistId = sc.nextLong();
-        if(!artists.stream().anyMatch(artist -> artist.getId() == artistId)){
-            throw new IllegalArgumentException("Invalid Artist ID");
+        while (!artistIds.contains(artistId)){
+            System.out.println("Please Enter Valid Artist ID:");
+            artistId = sc.nextLong();
         }
         return artistId;
     }
     public long getRecordLabelIdInput(Connection connection, Scanner sc) throws SQLException {
         List<RecordLabel> recordLabels = read.getAllRecordLabels(connection);
+        List<Long> recordLabelIds = recordLabels.stream().map(RecordLabel::getId).toList();
         recordLabels.forEach(System.out::println);
         long recordLabelId = sc.nextLong();
-        if(!recordLabels.stream().anyMatch(recordLabel -> recordLabel.getId() == recordLabelId)){
-            throw new IllegalArgumentException("Invalid Host ID");
+        while(!recordLabelIds.contains(recordLabelId)){
+            System.out.println("Please Enter Valid Record Label ID:");
+            recordLabelId = sc.nextLong();
         }
         return recordLabelId;
     }
     public long getHostIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Host> hosts = read.getAllHosts(connection);
+        List<Long> hostIds = hosts.stream().map(Host::getId).toList();
         hosts.forEach(System.out::println);
         System.out.println("Enter Host ID:");
         long hostId = sc.nextLong();
-        if(!hosts.stream().anyMatch(host -> host.getId() == hostId)){
-            throw new IllegalArgumentException("Invalid Host ID");
+        while(!hostIds.contains(hostId)){
+            System.out.println("Please Enter Valid Host ID:");
+            hostId = sc.nextLong();
         }
         return hostId;
     }
     public long getServiceIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Service> services = read.getAllServices(connection);
+        List<Long> serviceIds = services.stream().map(Service::getId).toList();
         services.forEach(System.out::println);
         System.out.println("Enter Service ID:");
         long serviceId = sc.nextLong();
-        if(!services.stream().anyMatch(service -> service.getId() == serviceId)){
-            throw new IllegalArgumentException("Invalid Service ID");
+        while(!serviceIds.contains(serviceId)){
+            System.out.println("Please Enter Valid Service ID:");
+            serviceId = sc.nextLong();
         }
         return serviceId;
     }
     public long getUserIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<User> users = read.getAllUsers(connection);
+        List<Long> userIds = users.stream().map(User::getId).toList();
         users.forEach(System.out::println);
         System.out.println("Enter User ID:");
         long userId = sc.nextLong();
-        if(!users.stream().anyMatch(user -> user.getId() == userId)){
-            throw new IllegalArgumentException("Invalid User ID");
+        while(!userIds.contains(userId)){
+            System.out.println("Please Valid Service ID:");
+            userId = sc.nextLong();
         }
         return userId;
     }
     public long getSongIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Song> songs = read.getAllSongs(connection);
+        List<Long> songIds = songs.stream().map(Song::getId).toList();
         songs.forEach(System.out::println);
         System.out.println("Enter Song ID:");
-        final long songId = sc.nextLong();
-        if(!songs.stream().anyMatch(host -> host.getId() == songId)){
-            throw  new IllegalArgumentException("Please enter a valid Song ID.");
+        long songId = sc.nextLong();
+        while(!songIds.contains(songId)){
+            System.out.println("Please Valid Song ID:");
+            songId = sc.nextLong();
         }
         return songId;
     }
     public long getAlbumIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Album> albums = read.getAllAlbums(connection);
+        List<Long> albumIds = albums.stream().map(Album::getId).toList();
         albums.forEach(System.out::println);
-        System.out.println("Enter Song ID:");
-        final long albumId = sc.nextLong();
-        if(!albums.stream().anyMatch(album -> album.getId() == albumId)){
-            throw  new IllegalArgumentException("Please enter a valid Song ID.");
+        System.out.println("Enter Album ID:");
+        long albumId = sc.nextLong();
+        while(!albumIds.contains(albumId)){
+            System.out.println("Please Valid Album ID:");
+            albumId = sc.nextLong();
         }
         return albumId;
     }
     public long getPodcastIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Podcast> podcasts = read.getAllPodcasts(connection);
+        List<Long> podcastIds = podcasts.stream().map(Podcast::getId).toList();
         podcasts.forEach(System.out::println);
         System.out.println("Enter Podcast ID:");
-        final long podcastId = sc.nextLong();
-        if(!podcasts.stream().anyMatch(podcast -> podcast.getId() == podcastId)){
-            throw  new IllegalArgumentException("Please enter a valid Podcast ID.");
+        long podcastId = sc.nextLong();
+        while(!podcastIds.contains(podcastId)){
+            System.out.println("Please Valid Podcast ID:");
+            podcastId = sc.nextLong();
         }
         return podcastId;
     }
-    public long getEpisodeNumberInput(Connection connection, Scanner sc, long podcastId) throws SQLException {
+    public Optional<Long> getEpisodeNumberInput(Connection connection, Scanner sc, long podcastId) throws SQLException {
         List<Episode> episodes = read.getAllPodcastEpisodes(connection, podcastId);
-        if(episodes.size() == 0){
-            throw new IllegalArgumentException("No episodes found for this podcast");
+        if (episodes.size() == 0) {
+            return Optional.empty();
         }
         episodes.forEach(System.out::println);
         System.out.println("Enter Episode Number:");
-        final long episodeNum = sc.nextLong();
-        while(!episodes.stream().anyMatch(host -> host.getEpisodeNum() == episodeNum)){
-            throw  new IllegalArgumentException("Please enter a valid Episode Number.");
+        List<Long> episodeNumbers = episodes.stream().map(Episode::getEpisodeNum).toList();
+
+        long episodeNum = sc.nextLong();
+        while(!episodeNumbers.contains(episodeNum)){
+            System.out.println("Please Valid Episode Number:");
+            episodeNum = sc.nextLong();
         }
-        return episodeNum;
+        return Optional.of(episodeNum);
     }
-    //FIXME: Remove myObj and use the passed sc Scanner object
     public Guest getGuestInput(Scanner sc){
-
         Scanner myObj = new Scanner(System.in);
-
         System.out.println("Enter the Guest name: ");
         String name = myObj.nextLine();
-
         return new Guest(name);
     }
     public Sponsor getSponsorInput(Scanner sc){
-
         Scanner myObj = new Scanner(System.in);
-
         System.out.println("Enter the Sponsor name: ");
         String name = myObj.nextLine();
-
         return new Sponsor(name);
     }
     public Service getServiceInput (Scanner sc) {
-
         Scanner myObj = new Scanner(System.in);
-
         System.out.println("Enter the Service name: ");
         String name = myObj.nextLine();
-
         System.out.println("Enter the current balance of the Service: ");
         double balance = myObj.nextDouble();
-
         return new Service(name, balance);
     }
     public User getUserInput (Scanner sc) throws ParseException {
-
         Scanner myObj = new Scanner(System.in);
-
         System.out.println("Enter the first name of the User: ");
         String fName = myObj.nextLine();
 
@@ -538,31 +544,16 @@ public class InputData {
         return new PodcastEpListen(podcastId, userId, episodeId);
     }
 
-    public void getRates(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Podcasts");
-        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
-        allPodcasts.forEach(System.out::println);
-
-        System.out.println("Enter Podcast ID:");
-        long podcastId = sc.nextLong();
-
-        System.out.println("Here is the List of all Users");
-        List<User> allUsers = read.getAllUsers(connection);
-        allUsers.forEach(System.out::println);
-
-        System.out.println("Enter User ID:");
-        long userId = sc.nextLong();
-
+    public void getRates(Connection connection, Scanner sc) throws SQLException {
+        long podcastId = this.getPodcastIdInput(connection, sc);
+        long userId = this.getUserIdInput(connection, sc);
         System.out.println("Enter the rating");
         double rating = sc.nextDouble();
         Date updated_at = new java.sql.Date(System.currentTimeMillis());
         Optional<Double> currentRating = read.getRatingByPodcastIdUserId(connection, userId, podcastId);
-        if (!currentRating.isEmpty())
-        {
+        if (!currentRating.isEmpty()) {
             create.deleteRates(connection, new Rates(userId, podcastId, rating, updated_at));
         }
-
         create.createRates(connection, new Rates(userId, podcastId, rating, updated_at));
     }
 
@@ -626,17 +617,9 @@ public class InputData {
     }
 
     public void increasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Podcasts");
-        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
-        allPodcasts.forEach(System.out::println);
-
-        System.out.println("Enter Podcast ID:");
-        long podcastId = sc.nextLong();
-
+        long podcastId = this.getPodcastIdInput(connection, sc);
         System.out.println("By how many counts do you want to increase the subscriptions");
         int subs = sc.nextInt();
-
         List<User> allUsers = read.getAllUsers(connection);
         final long[] maxId = {0};
         allUsers.forEach(user -> {
@@ -644,43 +627,33 @@ public class InputData {
                 maxId[0] = user.getId();
             }
         });
-        for(int i = 1; i <= subs; i++)
-        {
+        for(int i = 1; i <= subs; i++) {
             long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
             create.createPodcastSubscription(connection, new PodcastSubscription(podcastId, id, new Timestamp(System.currentTimeMillis()), 0));
         }
     }
     public void decreasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        long podcastId = getPodcastIdInput(connection,sc);
-
+        long podcastId = this.getPodcastIdInput(connection,sc);
         System.out.println("By how many counts do you want to increase the subscriptions");
         int subs = sc.nextInt();
-
         create.deletePodcastSubscription(connection, podcastId, subs);
     }
     public Optional<Long> getAverageRating(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Podcasts (That have atleast 1 Rating)");
+        System.out.println("Here is the List of all Podcasts (That have latest 1 Rating)");
         List<Podcast> allPodcasts = read.getAllPodcasts(connection);
-
         List<Rates> allRates = read.getAllRates(connection);
         Set<Long> podcastsInRates = new HashSet<>();
         allRates.forEach(allRate -> podcastsInRates.add(allRate.getPodcastId()));
-        if(podcastsInRates.size()==0)
-        {
+        if(podcastsInRates.size()==0) {
             System.out.println("No Podcast has a Rating, Pls add a rating to any podcast");
             return Optional.empty();
         }
-
         allPodcasts.forEach(allPodcast -> {
             if (podcastsInRates.contains(allPodcast.getId()))
                 System.out.println(allPodcast);
         });
-
         long podcastId;
-        while(true)
-        {
+        while(true) {
             System.out.println("Enter Podcast ID:");
             podcastId = sc.nextLong();
             if(!podcastsInRates.contains(podcastId))

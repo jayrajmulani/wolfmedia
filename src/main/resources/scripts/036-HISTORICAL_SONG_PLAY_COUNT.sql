@@ -1,0 +1,13 @@
+DELETE FROM HISTORICAL_SONG_PLAY_COUNT WHERE 1=1;
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1001, 1, 2023, 10);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1001, 2, 2023, 20);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1001, 3, 2023, 30);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1002, 1, 2023, 100);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1002, 2, 2023, 200);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1002, 3, 2023, 300);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1003, 1, 2023, 1000);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1003, 2, 2023, 2000);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1003, 3, 2023, 3000);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1004, 1, 2023, 10000);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1004, 2, 2023, 20000);
+insert into HISTORICAL_SONG_PLAY_COUNT(song_id, month, year, play_count) values (1004, 3, 2023, 30000);

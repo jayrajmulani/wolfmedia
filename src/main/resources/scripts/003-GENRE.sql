@@ -1,0 +1,17 @@
+DELETE FROM GENRE WHERE 1=1;
+ALTER TABLE GENRE AUTO_INCREMENT = 1;
+insert into GENRE (name) values ('RAP');
+insert into GENRE (name) values ('LOVE');
+insert into GENRE (name) values ('ROCK');
+insert into GENRE (name) values ('METAL');
+insert into GENRE (name) values ('POP');
+insert into GENRE (name) values ('SUFI');
+insert into GENRE (name) values ('HAPPY');
+insert into GENRE (name) values ('SAD');
+insert into GENRE (name) values ('MERRY');
+insert into GENRE (name) values ('JOYFUL');
+insert into GENRE (name) values ('SELF-HELP');
+insert into GENRE (name) values ('HISTORY');
+insert into GENRE (name) values ('SUSPENSE');
+insert into GENRE (name) values ('FINANCE');
+insert into GENRE (name) values ('EDUCATION');
