@@ -356,7 +356,7 @@ public class InputData {
         return new RecordLabel(name);
     }
 
-    public Artist getArtistInput(Scanner sc) {
+    public Artist getArtistInput(Scanner sc, Connection connection) throws SQLException, ParseException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -366,11 +366,20 @@ public class InputData {
         System.out.println("Enter the country of the Artist: ");
         String country = myObj.nextLine();
 
-        System.out.println("Enter the status of the Artist: ");
+        System.out.println("Enter the status of the Artist (ACTIVE/RETIRED): ");
         Artist.ArtistStatus status = Artist.ArtistStatus.valueOf(myObj.nextLine());
 
+        System.out.println("Enter list of types for this artist (Separate multiple values by |):");
+        System.out.println("E.g. COMPOSER | BAND");
+        String typesPipeSeparated = myObj.nextLine();
+        List<ArtistType> types = Arrays.stream(typesPipeSeparated.split("\\|")).map(type -> new ArtistType(type.strip())).toList();
 
-        return new Artist(name, country, status);
+        System.out.println("Enter the primary genre for this artist");
+        String genre = myObj.nextLine();
+
+        Signs s = this.getArtisttoRecordLabelInput(connection, myObj, 0);
+
+        return new Artist(name, country, status, types, new Genre(genre), new RecordLabel(s.getRecordLabelId()));
     }
 
     public Album getAlbumInput(Scanner sc) throws ParseException {
@@ -467,14 +476,7 @@ public class InputData {
         return new Compiles(artistId, albumId);
     }
 
-    public Signs getArtisttoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Artists");
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-
-        System.out.println("Enter Artist ID:");
-        long artistId = sc.nextLong();
+    public Signs getArtisttoRecordLabelInput(Connection connection, Scanner sc, long artistId) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Record Labels");
         List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
