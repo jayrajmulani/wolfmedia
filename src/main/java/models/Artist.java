@@ -29,6 +29,15 @@ public class Artist {
         this.name = name;
     }
 
+    public Artist(String name, String country, ArtistStatus status, List<ArtistType> types, Genre primaryGenre, RecordLabel recordLabel) {
+        this.name = name;
+        this.country = country;
+        this.status = status;
+        this.types = types;
+        this.primaryGenre = primaryGenre;
+        this.recordLabel = recordLabel;
+    }
+
     public enum ArtistStatus {
 
         RETIRED("RETIRED"),

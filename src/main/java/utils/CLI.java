@@ -145,7 +145,7 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            long id = create.createArtist(connection, inputData.getArtistInput(sc));
+                                            long id = create.createArtist(connection, inputData.getArtistInput(sc, connection));
                                             System.out.println("Artist created successfully with id " + id);
                                         }
                                         case 2 -> {
@@ -515,7 +515,8 @@ public class CLI {
                             }
                             // Assign Artist to Record Label
                             case 14 -> {
-                                create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
+                                long artistId = inputData.getArtistIdInput(connection, sc);
+                                create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc, artistId));
                                 System.out.println("Above selected Artist is assigned to selected Record Label");
                             }
                             // Assign Song to Album
