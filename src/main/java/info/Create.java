@@ -9,7 +9,11 @@ import java.util.Optional;
 public class Create {
     private static Read read = new Read();
 
-    public long createSong(Connection connection, Song song) throws SQLException {
+    public long createSong(Connection connection, SongAlbum songAlbum) throws SQLException {
+        // Start a Transaction
+        connection.setAutoCommit(false);
+        Song song = songAlbum.getSong();
+
         String query = "insert into SONG (title, release_country, language, duration, royalty_rate, release_date, royalty_paid) " +
                 "values (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -25,6 +29,19 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 songId = rs.getLong(1);
+                if (songAlbum.getAlbum() != null) {
+                    String mapSongAlbumQuery = "INSERT INTO SONG_ALBUM(song_id, album_id, track_num) values (?,?,?)";
+
+                    try {
+                        PreparedStatement mapSongAlbumStatement = connection.prepareStatement(mapSongAlbumQuery);
+                        mapSongAlbumStatement.setLong(1, songId);
+                        mapSongAlbumStatement.setLong(2, songAlbum.getAlbum().getId());
+                        mapSongAlbumStatement.setLong(3, songAlbum.getTrackNum());
+                        mapSongAlbumStatement.executeQuery();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 song.getGenres().forEach(inputGenre -> {
                     try {
                         Optional<Genre> genre = read.getGenreByName(connection, inputGenre.getName());
@@ -38,6 +55,34 @@ public class Create {
                         throw new RuntimeException(e);
                     }
                 });
+                song.getArtists().forEach(artist -> {
+                    try {
+                        String mapSongArtistQuery = "INSERT INTO CREATES(song_id, artist_id) values (?,?)";
+                        PreparedStatement mapSongArtistStatement = connection.prepareStatement(mapSongArtistQuery);
+                        mapSongArtistStatement.setLong(1, songId);
+                        mapSongArtistStatement.setLong(2, artist.getId());
+                        mapSongArtistStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                song.getCollaborators().forEach(artist -> {
+                    try {
+                        String mapSongArtistQuery = "INSERT INTO CREATES(song_id, artist_id, is_collaborator) values (?,?,1)";
+                        PreparedStatement mapSongArtistStatement = connection.prepareStatement(mapSongArtistQuery);
+                        mapSongArtistStatement.setLong(1, songId);
+                        mapSongArtistStatement.setLong(2, artist.getId());
+                        mapSongArtistStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                String mapSongRLQuery = "INSERT INTO OWNS(song_id, record_label_id) VALUES (?,?)";
+                PreparedStatement mapSongRLStatement = connection.prepareStatement(mapSongRLQuery);
+                mapSongRLStatement.setLong(1, songId);
+                mapSongRLStatement.setLong(2, song.getRecordLabel().getId());
+                mapSongRLStatement.executeUpdate();
+                connection.commit();
             } else {
                 songId = 0L;
             }
@@ -45,6 +90,8 @@ public class Create {
         } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
+        } finally {
+            connection.setAutoCommit(true);
         }
         return 0L;
     }
@@ -264,11 +311,10 @@ public class Create {
             statement.setLong(2, creates.getArtistId());
             statement.setBoolean(3, creates.getIsCollabarator());
             statement.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -286,16 +332,14 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 signsId = rs.getInt(1);
-            }
-            else {
+            } else {
                 signsId = 0L;
             }
             return signsId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -308,11 +352,10 @@ public class Create {
             statement.setLong(1, compiles.getArtistId());
             statement.setLong(2, compiles.getAlbumId());
             statement.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -325,11 +368,10 @@ public class Create {
             statement.setLong(1, owns.getRecordLabelId());
             statement.setLong(2, owns.getSongId());
             statement.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -338,16 +380,15 @@ public class Create {
     public void createAssignSongtoAlbum(Connection connection, SongAlbum songAlbum) throws SQLException {
         String query = "insert into SONG_ALBUM (song_id, album_id, track_num) values (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, songAlbum.getSongId());
-            statement.setLong(2, songAlbum.getAlbumId());
+            statement.setLong(1, songAlbum.getSong().getId());
+            statement.setLong(2, songAlbum.getAlbum().getId());
             statement.setLong(3, songAlbum.getTrackNum());
 
             statement.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -364,16 +405,14 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 songListenId = rs.getInt(1);
-            }
-            else {
+            } else {
                 songListenId = 0L;
             }
             return songListenId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
@@ -392,21 +431,20 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 podcastEpListenId = rs.getInt(1);
-            }
-            else {
+            } else {
                 podcastEpListenId = 0L;
             }
             return podcastEpListenId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }
         return 0L;
     }
+
     public long createRates(Connection connection, PodcastEpListen podcastEpListen) throws SQLException {
         String query = "insert into PODCAST_EP_LISTEN (user_id, podcast_id, episode_num) values (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -419,16 +457,14 @@ public class Create {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 podcastEpListenId = rs.getInt(1);
-            }
-            else {
+            } else {
                 podcastEpListenId = 0L;
             }
             return podcastEpListenId;
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
         }

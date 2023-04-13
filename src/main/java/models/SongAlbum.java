@@ -9,7 +9,13 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class SongAlbum {
-    private long songId;
-    private long albumId;
+    private Song song;
+    private Album album;
     private long trackNum;
+
+    public SongAlbum(Song song) {
+        this.song = song;
+    }
 }
+
+

@@ -17,6 +17,9 @@ public class Artist {
 
     private ArtistStatus status;
 
+    public Artist(long id) {
+        this.id = id;
+    }
     public Artist(long id, String name) {
         this.id = id;
         this.name = name;

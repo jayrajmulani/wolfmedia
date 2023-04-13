@@ -12,7 +12,8 @@ import java.util.*;
 
 public class InputData {
     private static final Read read = new Read();
-    public Song getSongInput(Scanner sc) throws ParseException {
+
+    public SongAlbum getSongInput(Scanner sc, Connection connection, boolean isCreateOp) throws ParseException, SQLException, IllegalArgumentException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -33,8 +34,45 @@ public class InputData {
         System.out.println("E.g. LOVE | ROCK");
         String genresPipeSeparated = sc.nextLine();
         List<Genre> genres = Arrays.stream(genresPipeSeparated.split("\\|")).map(genre -> new Genre(genre.strip())).toList();
-        return new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate, false, genres);
+
+        List<Artist> allArtists = read.getAllArtists(connection);
+        allArtists.forEach(System.out::println);
+        System.out.println("Enter list of artist IDs for this song (Separate multiple values by |):");
+        System.out.println("E.g. 1 | 4");
+        String artistsPipeSeparated = sc.nextLine();
+        List<Artist> artists = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID.trim()))).toList();
+        System.out.println("Enter list of collaborator IDs for this song (Separate multiple values by |):");
+        System.out.println("E.g. 5 | 2");
+        String collaboratorsPipeSeparated = sc.nextLine();
+        List<Artist> collaborators = new ArrayList<>();
+        if (!collaboratorsPipeSeparated.isEmpty()) {
+            collaborators = Arrays.stream(collaboratorsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID))).toList();
+        }
+
+        if (!Collections.disjoint(artists, collaborators)) {
+            throw new IllegalArgumentException("Artists and Collaborators have some common elements");
+        }
+
+        long recordLabelID = this.getRecordLabelIdInput(connection, sc);
+        RecordLabel recordLabel = new RecordLabel(recordLabelID);
+
+        System.out.println("Do you want to assign this song to an album (y/n)");
+        boolean doAddAlbum = myObj.nextLine().equalsIgnoreCase("y");
+        if (doAddAlbum) {
+            long albumID = this.getAlbumIdInput(connection, sc);
+            Album album = new Album(albumID);
+            System.out.println("Enter the track number of the song");
+            long trackNum = myObj.nextLong();
+            Song s = new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate,
+                    false, genres, album, artists, collaborators, recordLabel);
+
+            return new SongAlbum(s, album, trackNum);
+        }
+
+        return new SongAlbum(new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate,
+                false, genres, artists, collaborators, recordLabel));
     }
+
     public Host getHostInput(Scanner sc) {
         System.out.println("Enter the first name of the host:");
         String firstName = sc.nextLine();
@@ -93,6 +131,7 @@ public class InputData {
 
         return new Podcast(name, language, country, flatFee, hosts);
     }
+
     public Episode getEpisodeInput(Scanner sc, long podcastID) throws ParseException {
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter the number of the episode:");
@@ -100,7 +139,7 @@ public class InputData {
         myObj.nextLine();
         System.out.println("Enter the title of the episode:");
         String title = myObj.nextLine();
-        System.out.println("Enter the release date of the episode:");
+        System.out.println("Enter the release date (mm/dd/yyyy) of the episode:");
         Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(myObj.next()).getTime());
         System.out.println("Enter the duration of the episode in seconds:");
         double duration = myObj.nextDouble();
@@ -111,100 +150,110 @@ public class InputData {
 
         return new Episode(podcastID, episodeNum, title, releaseDate, duration, advCount, bonusRate);
     }
+
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
         List<Artist> artists = read.getAllArtists(connection);
         artists.forEach(System.out::println);
         System.out.println("Enter Artist ID:");
         long artistId = sc.nextLong();
-        if(!artists.stream().anyMatch(artist -> artist.getId() == artistId)){
+        if (!artists.stream().anyMatch(artist -> artist.getId() == artistId)) {
             throw new IllegalArgumentException("Invalid Artist ID");
         }
         return artistId;
     }
+
     public long getRecordLabelIdInput(Connection connection, Scanner sc) throws SQLException {
         List<RecordLabel> recordLabels = read.getAllRecordLabels(connection);
         recordLabels.forEach(System.out::println);
         long recordLabelId = sc.nextLong();
-        if(!recordLabels.stream().anyMatch(recordLabel -> recordLabel.getId() == recordLabelId)){
-            throw new IllegalArgumentException("Invalid Host ID");
+        if (!recordLabels.stream().anyMatch(recordLabel -> recordLabel.getId() == recordLabelId)) {
+            throw new IllegalArgumentException("Invalid Record Label ID");
         }
         return recordLabelId;
     }
+
     public long getHostIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Host> hosts = read.getAllHosts(connection);
         hosts.forEach(System.out::println);
         System.out.println("Enter Host ID:");
         long hostId = sc.nextLong();
-        if(!hosts.stream().anyMatch(host -> host.getId() == hostId)){
+        if (!hosts.stream().anyMatch(host -> host.getId() == hostId)) {
             throw new IllegalArgumentException("Invalid Host ID");
         }
         return hostId;
     }
+
     public long getServiceIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Service> services = read.getAllServices(connection);
         services.forEach(System.out::println);
         System.out.println("Enter Service ID:");
         long serviceId = sc.nextLong();
-        if(!services.stream().anyMatch(service -> service.getId() == serviceId)){
+        if (!services.stream().anyMatch(service -> service.getId() == serviceId)) {
             throw new IllegalArgumentException("Invalid Service ID");
         }
         return serviceId;
     }
+
     public long getUserIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<User> users = read.getAllUsers(connection);
         users.forEach(System.out::println);
         System.out.println("Enter User ID:");
         long userId = sc.nextLong();
-        if(!users.stream().anyMatch(user -> user.getId() == userId)){
+        if (!users.stream().anyMatch(user -> user.getId() == userId)) {
             throw new IllegalArgumentException("Invalid User ID");
         }
         return userId;
     }
+
     public long getSongIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Song> songs = read.getAllSongs(connection);
         songs.forEach(System.out::println);
         System.out.println("Enter Song ID:");
         final long songId = sc.nextLong();
-        if(!songs.stream().anyMatch(host -> host.getId() == songId)){
-            throw  new IllegalArgumentException("Please enter a valid Song ID.");
+        if (!songs.stream().anyMatch(host -> host.getId() == songId)) {
+            throw new IllegalArgumentException("Please enter a valid Song ID.");
         }
         return songId;
     }
+
     public long getAlbumIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Album> albums = read.getAllAlbums(connection);
         albums.forEach(System.out::println);
-        System.out.println("Enter Song ID:");
+        System.out.println("Enter Album ID:");
         final long albumId = sc.nextLong();
-        if(!albums.stream().anyMatch(album -> album.getId() == albumId)){
-            throw  new IllegalArgumentException("Please enter a valid Song ID.");
+        if (!albums.stream().anyMatch(album -> album.getId() == albumId)) {
+            throw new IllegalArgumentException("Please enter a valid Song ID.");
         }
         return albumId;
     }
+
     public long getPodcastIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Podcast> podcasts = read.getAllPodcasts(connection);
         podcasts.forEach(System.out::println);
         System.out.println("Enter Podcast ID:");
         final long podcastId = sc.nextLong();
-        if(!podcasts.stream().anyMatch(podcast -> podcast.getId() == podcastId)){
-            throw  new IllegalArgumentException("Please enter a valid Podcast ID.");
+        if (!podcasts.stream().anyMatch(podcast -> podcast.getId() == podcastId)) {
+            throw new IllegalArgumentException("Please enter a valid Podcast ID.");
         }
         return podcastId;
     }
+
     public long getEpisodeNumberInput(Connection connection, Scanner sc, long podcastId) throws SQLException {
         List<Episode> episodes = read.getAllPodcastEpisodes(connection, podcastId);
-        if(episodes.size() == 0){
+        if (episodes.size() == 0) {
             throw new IllegalArgumentException("No episodes found for this podcast");
         }
         episodes.forEach(System.out::println);
         System.out.println("Enter Episode Number:");
         final long episodeNum = sc.nextLong();
-        while(!episodes.stream().anyMatch(host -> host.getEpisodeNum() == episodeNum)){
-            throw  new IllegalArgumentException("Please enter a valid Episode Number.");
+        while (!episodes.stream().anyMatch(host -> host.getEpisodeNum() == episodeNum)) {
+            throw new IllegalArgumentException("Please enter a valid Episode Number.");
         }
         return episodeNum;
     }
+
     //FIXME: Remove myObj and use the passed sc Scanner object
-    public Guest getGuestInput(Scanner sc){
+    public Guest getGuestInput(Scanner sc) {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -213,7 +262,8 @@ public class InputData {
 
         return new Guest(name);
     }
-    public Sponsor getSponsorInput(Scanner sc){
+
+    public Sponsor getSponsorInput(Scanner sc) {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -222,7 +272,8 @@ public class InputData {
 
         return new Sponsor(name);
     }
-    public Service getServiceInput (Scanner sc) {
+
+    public Service getServiceInput(Scanner sc) {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -234,7 +285,8 @@ public class InputData {
 
         return new Service(name, balance);
     }
-    public User getUserInput (Scanner sc) throws ParseException {
+
+    public User getUserInput(Scanner sc) throws ParseException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -248,7 +300,7 @@ public class InputData {
         Date regDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
 
         System.out.println("Enter the phone number of the User: ");
-        String phone  = myObj.nextLine();
+        String phone = myObj.nextLine();
 
         System.out.println("Enter the email id of the User: ");
         String email = myObj.nextLine();
@@ -262,7 +314,7 @@ public class InputData {
         return new User(fName, lName, regDate, phone, email, premiumStatus, premiumMonthlyStatus);
     }
 
-    public RecordLabel getRecordLabelInput (Scanner sc) {
+    public RecordLabel getRecordLabelInput(Scanner sc) {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -288,7 +340,8 @@ public class InputData {
 
         return new Artist(name, country, status);
     }
-    public Album getAlbumInput(Scanner sc) throws ParseException{
+
+    public Album getAlbumInput(Scanner sc) throws ParseException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -334,9 +387,8 @@ public class InputData {
 
         List<Owns> allOwns = read.getAllOwns(connection);
         Set<Long> songsInOwns = new HashSet<>();
-                allOwns.forEach(allOwn -> songsInOwns.add(allOwn.getSongId()));
-        if(songsInOwns.size()==allSongs.size())
-        {
+        allOwns.forEach(allOwn -> songsInOwns.add(allOwn.getSongId()));
+        if (songsInOwns.size() == allSongs.size()) {
             System.out.println("All Songs already assigned to Record Label, Insert a song first");
             return Optional.empty();
         }
@@ -347,11 +399,10 @@ public class InputData {
         });
 
         long songId;
-        while(true)
-        {
+        while (true) {
             System.out.println("Enter Song ID:");
             songId = sc.nextLong();
-            if(songsInOwns.contains(songId))
+            if (songsInOwns.contains(songId))
                 System.out.println("Song already in owns");
             else
                 break;
@@ -363,7 +414,7 @@ public class InputData {
         System.out.println("Enter Record Label ID:");
         long recordLabelId = sc.nextLong();
 
-        return Optional.of( new Owns(recordLabelId, songId));
+        return Optional.of(new Owns(recordLabelId, songId));
     }
 
     public Compiles getArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
@@ -415,9 +466,8 @@ public class InputData {
 
         List<SongAlbum> allSongAlbums = read.getAllSongAlbum(connection);
         Set<Long> songsInSongAlbum = new HashSet<>();
-        allSongAlbums.forEach(allSongAlbum -> songsInSongAlbum.add(allSongAlbum.getSongId()));
-        if(songsInSongAlbum.size()==allSongs.size())
-        {
+        allSongAlbums.forEach(allSongAlbum -> songsInSongAlbum.add(allSongAlbum.getSong().getId()));
+        if (songsInSongAlbum.size() == allSongs.size()) {
             System.out.println("All Songs already assigned to Album, Insert a song first");
             return Optional.empty();
         }
@@ -428,11 +478,10 @@ public class InputData {
         });
 
         long songId;
-        while(true)
-        {
+        while (true) {
             System.out.println("Enter Song ID:");
             songId = sc.nextLong();
-            if(songsInSongAlbum.contains(songId))
+            if (songsInSongAlbum.contains(songId))
                 System.out.println("Song already in SongAlbum");
             else
                 break;
@@ -447,37 +496,36 @@ public class InputData {
 
         Set<Long> allTracksinGivenRL = new HashSet<>();
         allSongAlbums.forEach(allSongAlbum -> {
-            if(allSongAlbum.getAlbumId() == albumId)
-            {
+            if (allSongAlbum.getAlbum().getId() == albumId) {
                 allTracksinGivenRL.add(allSongAlbum.getTrackNum());
             }
         });
         long trackNum;
-        while(true)
-        {
+        while (true) {
             System.out.println("Enter track number within Album: ");
             trackNum = sc.nextLong();
-            if(allTracksinGivenRL.contains(trackNum))
+            if (allTracksinGivenRL.contains(trackNum))
                 System.out.println("Song already in TrackNum");
             else
                 break;
         }
-        return Optional.of(new SongAlbum(songId, albumId, trackNum));
+        return Optional.of(new SongAlbum(new Song(songId), new Album(albumId), trackNum));
     }
+
     public PaymentReportInput getPaymentReportInputForHost(Connection connection, Scanner sc) throws SQLException, ParseException {
         long hostId = getHostIdInput(connection, sc);
         System.out.println("Enter the start date (mm/dd/yyyy):");
         Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         System.out.println("Enter the end date (mm/dd/yyyy):");
         Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
-        while(startDate.after(endDate)){
+        while (startDate.after(endDate)) {
             System.out.println("Start date must be before end date.");
             System.out.println("Enter the start date (mm/dd/yyyy):");
             startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
             System.out.println("Enter the end date (mm/dd/yyyy):");
             endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         }
-        return  new PaymentReportInput(startDate, endDate, hostId, PaymentUtils.Stakeholder.PODCAST_HOST);
+        return new PaymentReportInput(startDate, endDate, hostId, PaymentUtils.Stakeholder.PODCAST_HOST);
     }
 
     public SongListen getSongListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
@@ -521,12 +569,11 @@ public class InputData {
 
         long episodeId;
 
-        while(true)
-        {
+        while (true) {
             System.out.println("Enter Episode ID:");
             episodeId = sc.nextLong();
 
-            if(!allPodcastEpisodes.contains(episodeId))
+            if (!allPodcastEpisodes.contains(episodeId))
                 System.out.println("The Episode ID does not exist with the above selected podcast");
             else
                 break;
@@ -574,14 +621,14 @@ public class InputData {
         Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         System.out.println("Enter the end date (mm/dd/yyyy):");
         Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
-        while(startDate.after(endDate)){
+        while (startDate.after(endDate)) {
             System.out.println("Start date must be before end date.");
             System.out.println("Enter the start date (mm/dd/yyyy):");
             startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
             System.out.println("Enter the end date (mm/dd/yyyy):");
             endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         }
-        return  new PaymentReportInput(startDate, endDate, artistId, PaymentUtils.Stakeholder.ARTIST);
+        return new PaymentReportInput(startDate, endDate, artistId, PaymentUtils.Stakeholder.ARTIST);
     }
 
     public PaymentReportInput getPaymentReportInputForRecordLabel(Connection connection, Scanner sc) throws SQLException, ParseException {
@@ -590,13 +637,13 @@ public class InputData {
         Date startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         System.out.println("Enter the end date (mm/dd/yyyy):");
         Date endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
-        while(startDate.after(endDate)){
+        while (startDate.after(endDate)) {
             System.out.println("Start date must be before end date.");
             System.out.println("Enter the start date (mm/dd/yyyy):");
             startDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
             System.out.println("Enter the end date (mm/dd/yyyy):");
             endDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
         }
-        return  new PaymentReportInput(startDate, endDate, rlId, PaymentUtils.Stakeholder.RECORD_LABEL);
+        return new PaymentReportInput(startDate, endDate, rlId, PaymentUtils.Stakeholder.RECORD_LABEL);
     }
 }

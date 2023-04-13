@@ -14,6 +14,9 @@ import java.util.List;
 public class RecordLabel {
     long id;
     String name;
+    public RecordLabel(long id) {
+        this.id = id;
+    }
     public RecordLabel(String name) {
         this.name = name;
     }
