@@ -3,6 +3,7 @@ package models;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,36 +16,45 @@ public class Artist {
     private String name;
     private String country;
     private ArtistStatus status;
+    private List<ArtistType> types;
+    private Genre primaryGenre;
+    private RecordLabel recordLabel;
 
     public Artist(long id) {
         this.id = id;
     }
+
     public Artist(long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public enum ArtistStatus{
+    public enum ArtistStatus {
 
-        RETIRED ("RETIRED"),
-        ACTIVE ("ACTIVE");
+        RETIRED("RETIRED"),
+        ACTIVE("ACTIVE");
 
         private String status;
 
-        ArtistStatus(String status)
-        {
+        ArtistStatus(String status) {
             this.status = status;
         }
 
-        public String getStatus()
-        {
+        public String getStatus() {
             return status;
         }
     }
+
     public Artist(String name, String country, ArtistStatus status) {
         this.name = name;
         this.country = country;
         this.status = status;
     }
 
+    public Artist(long id, String name, String country, ArtistStatus status) {
+        this.id = id;
+        this.name = name;
+        this.country = country;
+        this.status = status;
+    }
 }
