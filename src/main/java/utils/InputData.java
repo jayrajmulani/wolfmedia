@@ -540,7 +540,6 @@ public class InputData {
             else
                 break;
         }
-
         return new PodcastEpListen(podcastId, userId, episodeId);
     }
 
@@ -564,17 +563,8 @@ public class InputData {
         System.out.println("By how many counts do you want to increase the playcounts");
         int subs = sc.nextInt();
 
-        List<User> allUsers = read.getAllUsers(connection);
-        final long[] maxId = {0};
-        allUsers.forEach(user -> {
-            if(user.getId()>= maxId[0]) {
-                maxId[0] = user.getId();
-            }
-        });
-        for(int i = 1; i <= subs; i++)
-        {
-            long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
-            create.createSongListen(connection, new SongListen(songId, id));
+        for(int i = 1; i <= subs; i++) {
+            create.createSongListen(connection, new SongListen(songId, 1));
         }
     }
     public void decreaseSongPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
@@ -589,44 +579,29 @@ public class InputData {
     public void increasePodcastPlayCount(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         long podcastId = getPodcastIdInput(connection, sc);
-
+        long episodeNum = getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
         System.out.println("By how many counts do you want to increase the playcounts");
         int subs = sc.nextInt();
-
-        List<User> allUsers = read.getAllUsers(connection);
-        final long[] maxId = {0};
-        allUsers.forEach(user -> {
-            if(user.getId()>= maxId[0]) {
-                maxId[0] = user.getId();
-            }
-        });
-        for(int i = 1; i <= subs; i++)
-        {
-            long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
-            create.createPodcastListen(connection, new PodcastEpListen(podcastId, id, 1));
+        for(int i = 1; i <= subs; i++) {
+            create.createPodcastListen(connection, new PodcastEpListen(podcastId, 1, episodeNum));
         }
     }
     public void decreasePodcastPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         long podcastId = getPodcastIdInput(connection, sc);
+        long episodeNum = getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
 
         System.out.println("By how many counts do you want to decrease the playcount of the song");
         int subs = sc.nextInt();
 
-        create.deleteSongListen(connection, podcastId, subs);
+        create.deletePodcastListen(connection, podcastId, episodeNum, subs);
     }
 
     public void increasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
         long podcastId = this.getPodcastIdInput(connection, sc);
         System.out.println("By how many counts do you want to increase the subscriptions");
         int subs = sc.nextInt();
-        List<User> allUsers = read.getAllUsers(connection);
-        final long[] maxId = {0};
-        allUsers.forEach(user -> {
-            if(user.getId()>= maxId[0]) {
-                maxId[0] = user.getId();
-            }
-        });
+
         for(int i = 1; i <= subs; i++) {
             long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
             create.createPodcastSubscription(connection, new PodcastSubscription(podcastId, id, new Timestamp(System.currentTimeMillis()), 0));
