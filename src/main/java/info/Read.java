@@ -427,6 +427,20 @@ public class Read {
         }
         return services;
     }
+    public List<Guest> getAllGuests(Connection connection) throws SQLException {
+        String query = "SELECT id,name from GUEST";
+        List<Guest> guests = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()) {
+            guests.add(new Guest(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name")
+                    )
+            );
+        }
+        return guests;
+    }
 
     public List<Owns> getAllOwns(Connection connection) throws SQLException {
         String query = "SELECT record_label_id, song_id from OWNS";
@@ -507,6 +521,62 @@ public class Read {
             return Optional.of(resultSet.getDouble("rating"));
         }
         return Optional.empty();
+    }
+    public void displayRecordLabelById(Connection connection, long id) throws SQLException {
+        String query = "SELECT ID,NAME FROM RECORD_LABEL WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, id);
+        ResultSet rs = statement.executeQuery();
+        if(!rs.next()){
+            System.out.println("Record Label Not Found");
+        }
+        RecordLabel recordLabel = new RecordLabel(rs.getLong("id"), rs.getString("name"));
+        System.out.println("Record Label Details:");
+        System.out.println(recordLabel);
+
+        String ownsQuery = "SELECT S.id, S.title FROM SONG S, OWNS O WHERE S.id = O.song_id and O.record_label_id = ?";
+        List<Song> ownedSongs = new ArrayList<>();
+        PreparedStatement ownsStatement = connection.prepareStatement(ownsQuery);
+        ownsStatement.setLong(1, id);
+        ResultSet ownsRs = ownsStatement.executeQuery();
+        while(ownsRs.next()){
+            ownedSongs.add(
+                    new Song(ownsRs.getLong("id"), ownsRs.getString("title"))
+            );
+        }
+        System.out.println("Songs Owned:");
+        ownedSongs.forEach(System.out::println);
+
+        String signedArtistQuery = "SELECT A.id, A.name FROM ARTIST A, SIGNS S WHERE S.artist_id = A.id and S.record_label_id = ?";
+        List<Artist> signedArtists = new ArrayList<>();
+        PreparedStatement signsStatement = connection.prepareStatement(signedArtistQuery);
+        signsStatement.setLong(1, id);
+        ResultSet signsRs = signsStatement.executeQuery();
+        while(signsRs.next()){
+            signedArtists.add(
+                    new Artist(ownsRs.getLong("id"), ownsRs.getString("name"))
+            );
+        }
+        System.out.println("Artists Signed:");
+        signedArtists.forEach(System.out::println);
+
+        statement.close();
+        ownsStatement.close();
+        signsStatement.close();
+    }
+    public List<Sponsor> getAllSponsors(Connection connection) throws SQLException {
+        String query = "SELECT id,name from SPONSOR";
+        List<Sponsor> sponsors = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()) {
+            sponsors.add(new Sponsor(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name")
+                    )
+            );
+        }
+        return sponsors;
     }
 
 }
