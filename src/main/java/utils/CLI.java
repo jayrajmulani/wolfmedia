@@ -498,7 +498,7 @@ public class CLI {
                                 System.out.println("Above selected Artist is assigned to selected Album");
                             }
                             // Assign Artist to Record Label
-                           case 14 -> {
+                           case 13 -> {
                                 long artistId = inputData.getArtistIdInput(connection, sc);
                                 create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc, artistId));
                                 System.out.println("Above selected Artist is assigned to selected Record Label");
