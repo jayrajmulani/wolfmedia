@@ -136,7 +136,7 @@ public class InputData {
     public Episode getEpisodeInput(Scanner sc, long podcastID) throws ParseException {
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter the number of the episode:");
-        Long episodeNum = myObj.nextLong();
+        long episodeNum = myObj.nextLong();
         myObj.nextLine();
         System.out.println("Enter the title of the episode:");
         String title = myObj.nextLine();
@@ -361,7 +361,6 @@ public class InputData {
         System.out.println("Enter the edition of the Album: ");
         int edition = myObj.nextInt();
 
-
         return new Album(name, release_date, edition);
     }
 
@@ -437,7 +436,7 @@ public class InputData {
         List<Album> allAlbums = read.getAllAlbums(connection);
         allAlbums.forEach(System.out::println);
 
-        System.out.println("Enter Artist ID:");
+        System.out.println("Enter Album ID:");
         long albumId = sc.nextLong();
 
         return new Compiles(artistId, albumId);
