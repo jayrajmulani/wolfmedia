@@ -2,6 +2,7 @@ package utils;
 
 import info.Create;
 import info.Read;
+import info.Update;
 import models.*;
 import payments.PodcastPayments;
 import payments.SongPayments;
@@ -17,15 +18,17 @@ public class CLI {
     private static final Menu menu = new Menu();
     private static final Create create = new Create();
     private static final Read read = new Read();
+    private static final Update update = new Update();
     private static final InputData inputData = new InputData();
     private static final SongPayments songPayments = new SongPayments();
     private static final PodcastPayments podcastPayments = new PodcastPayments();
     private static final PaymentUtils paymentUtils = new PaymentUtils();
     private static final Constants constants = new Constants();
     private static final ReportUtils reportUtils = new ReportUtils();
+
     public void run() throws SQLException, ClassNotFoundException, ParseException, IllegalArgumentException {
         Scanner sc = new Scanner(System.in);
-        Connection connection  = DB.getConnection();
+        Connection connection = DB.getConnection();
         int choice;
         while (true) {
             boolean quit = false;
@@ -56,8 +59,12 @@ public class CLI {
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
                                             // Create Song
-                                            long id = create.createSong(connection, inputData.getSongInput(sc));
-                                            System.out.println("Song created successfully with id " + id);
+                                            long id = create.createSong(connection, inputData.getSongInput(sc, connection, true));
+                                            if (id == 0) {
+                                                System.out.println("Could not create song");
+                                            } else {
+                                                System.out.println("Song created successfully with id " + id);
+                                            }
                                         }
                                         case 2 -> {
                                             // Get Song
@@ -65,6 +72,11 @@ public class CLI {
                                             Long id = sc.nextLong();
                                             Optional<Song> resultSong = read.getSong(id, connection);
                                             resultSong.ifPresentOrElse(System.out::println, () -> System.out.println("Song not found!"));
+                                        }
+                                        case 3 -> {
+                                            // Update Song
+                                            long songID = inputData.getSongIdInput(connection, sc);
+                                            update.updateSong(connection, inputData.getSongInput(sc, connection, false), songID);
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -124,7 +136,12 @@ public class CLI {
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
                                             resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
                                         }
-//                                        TODO Update and Delete
+                                        case 3 -> {
+                                            System.out.println("Enter the id of the podcast:");
+                                            Long id = sc.nextLong();
+                                            Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
+                                            resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
+                                        }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
                                             continue;
@@ -220,6 +237,7 @@ public class CLI {
                                             System.out.println("Record Label created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //TODO for Record Label
                                             System.out.println("Enter the id of the Record Label:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -253,6 +271,7 @@ public class CLI {
                                             System.out.println("Service created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //TODO for Service
                                             System.out.println("Enter the id of the Service:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -286,6 +305,7 @@ public class CLI {
                                             System.out.println("Artist created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //TODO for Artist
                                             System.out.println("Enter the id of the Artist:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -319,6 +339,7 @@ public class CLI {
                                             System.out.println("Album created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //TODO for Album
                                             System.out.println("Enter the id of the Album:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -542,7 +563,7 @@ public class CLI {
                                         }
                                         case 1 -> {
                                             long id = create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
-                                            System.out.println("Above selected Artist is assigned to selected Record Label with id: "+ id);
+                                            System.out.println("Above selected Artist is assigned to selected Record Label with id: " + id);
                                         }
                                         case 2 -> {
                                             //TODO for Signs
@@ -689,11 +710,11 @@ public class CLI {
                 case 3 -> {
                     // Maintain Payments Menu
                     int paymentChoice;
-                    while(true){
+                    while (true) {
                         menu.displayPaymentsMenu();
                         paymentChoice = sc.nextInt();
                         boolean goBack = false;
-                        switch (paymentChoice){
+                        switch (paymentChoice) {
                             case -1 -> quit = true;
                             case 0 -> goBack = true;
                             case 1 -> {
@@ -703,21 +724,20 @@ public class CLI {
                                 System.out.println("Are you sure you want to pay " + royaltyInfo.getAmount()
                                         + " to record label with ID " + royaltyInfo.getReceiverId() + "? [0/1]");
                                 int ch = sc.nextInt();
-                                while(ch > 1 || ch < 0){
+                                while (ch > 1 || ch < 0) {
                                     System.out.println("Please enter 0 or 1");
                                     ch = sc.nextInt();
                                 }
-                                if(ch == 0){
+                                if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
-                                }
-                                else{
+                                } else {
                                     paymentUtils.processPayment(connection, royaltyInfo);
                                     System.out.println("Payment Recorded Successfully");
                                 }
                             }
                             case 2 -> {
                                 // Get Record Label's Payment History
-                                long recordLabelId= inputData.getRecordLabelIdInput(connection, sc);
+                                long recordLabelId = inputData.getRecordLabelIdInput(connection, sc);
                                 List<PaymentHistoryItem> paymentHistory = songPayments.getRecordLabelPaymentHistory(connection, recordLabelId);
                                 paymentHistory.forEach(System.out::println);
                             }
@@ -730,14 +750,13 @@ public class CLI {
                                 System.out.println("Are you sure you want to pay " + royaltyInfo.getAmount() * constants.ARTIST_ROYALTY_SHARE
                                         + " to artists ? [0/1]");
                                 int ch = sc.nextInt();
-                                while(ch > 1 || ch < 0){
+                                while (ch > 1 || ch < 0) {
                                     System.out.println("Please enter 0 or 1");
                                     ch = sc.nextInt();
                                 }
-                                if(ch == 0){
+                                if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
-                                }
-                                else{
+                                } else {
                                     royaltyInfoForArtists.forEach(paymentInfo -> {
                                         try {
                                             paymentUtils.processPayment(connection, paymentInfo);
@@ -766,21 +785,20 @@ public class CLI {
                                 System.out.println("Are you sure you want to pay " + hostPayInfo.getAmount()
                                         + " to host with ID " + hostPayInfo.getReceiverId() + "? [0/1]");
                                 int ch = sc.nextInt();
-                                while(ch > 1 || ch < 0){
+                                while (ch > 1 || ch < 0) {
                                     System.out.println("Please enter 0 or 1");
                                     ch = sc.nextInt();
                                 }
-                                if(ch == 0){
+                                if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
-                                }
-                                else{
+                                } else {
                                     paymentUtils.processPayment(connection, hostPayInfo);
                                     System.out.println("Payment Recorded Successfully");
                                 }
                             }
                             case 6 -> {
                                 // Get Payments History for Podcast Host
-                                long hostId= inputData.getHostIdInput(connection, sc);
+                                long hostId = inputData.getHostIdInput(connection, sc);
                                 List<PaymentHistoryItem> paymentHistory = podcastPayments.getHostPaymentHistory(connection, hostId);
                                 paymentHistory.forEach(System.out::println);
                             }
@@ -789,7 +807,7 @@ public class CLI {
                                 long userId = inputData.getUserIdInput(connection, sc);
                                 long serviceId = inputData.getServiceIdInput(connection, sc);
                                 User user = read.getUserById(connection, userId).orElseThrow();
-                                if(!user.getPremiumStatus()){
+                                if (!user.getPremiumStatus()) {
                                     System.out.println("This user is not a premium member. Can't process payment");
                                     break;
                                 }
@@ -803,14 +821,13 @@ public class CLI {
                                 System.out.println("Are you sure you want to process " + user.getMonthlyPremiumFees()
                                         + " from user " + user.getId() + "? [0/1]");
                                 int ch = sc.nextInt();
-                                while(ch > 1 || ch < 0){
+                                while (ch > 1 || ch < 0) {
                                     System.out.println("Please enter 0 or 1");
                                     ch = sc.nextInt();
                                 }
-                                if(ch == 0){
+                                if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
-                                }
-                                else{
+                                } else {
                                     paymentUtils.processPayment(connection, paymentInfo);
                                     System.out.println("Payment Recorded Successfully");
                                 }
@@ -832,11 +849,11 @@ public class CLI {
                 }
                 case 4 -> {
                     int reportsChoice;
-                    while (true){
+                    while (true) {
                         boolean goBack = false;
                         menu.displayReportsMenu();
                         reportsChoice = sc.nextInt();
-                        switch (reportsChoice){
+                        switch (reportsChoice) {
                             case -1 -> quit = true;
                             case 0 -> goBack = true;
                             case 1 -> {
@@ -861,19 +878,19 @@ public class CLI {
                                 // Total Payments Made to Host
                                 PaymentReportInput input = inputData.getPaymentReportInputForHost(connection, sc);
                                 double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
-                                System.out.println("Host with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
+                                System.out.println("Host with ID " + input.getId() + " was paid  $" + amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 5 -> {
                                 //  Total Payments Made to Artist
                                 PaymentReportInput input = inputData.getPaymentReportInputForArtist(connection, sc);
                                 double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
-                                System.out.println("Artist with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
+                                System.out.println("Artist with ID " + input.getId() + " was paid  $" + amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 6 -> {
                                 // Total Payments Made to Record Label
                                 PaymentReportInput input = inputData.getPaymentReportInputForRecordLabel(connection, sc);
                                 double amount = reportUtils.generatePaymentReport(connection, input).orElseThrow();
-                                System.out.println("Record Label with ID " + input.getId() + " was paid  $"+ amount + " from " + input.getStartDate() + " to " + input.getEndDate());
+                                System.out.println("Record Label with ID " + input.getId() + " was paid  $" + amount + " from " + input.getStartDate() + " to " + input.getEndDate());
                             }
                             case 7 -> {
                                 // Monthly Revenue for Service
