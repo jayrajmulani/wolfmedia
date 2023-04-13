@@ -241,6 +241,30 @@ public class InputData {
         }
         return albumId;
     }
+    public long getGuestIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<Guest> guests = read.getAllGuests(connection);
+        List<Long> ids = guests.stream().map(Guest::getId).toList();
+        guests.forEach(System.out::println);
+        System.out.println("Enter Guest ID:");
+        long id = sc.nextLong();
+        while (!ids.contains(id)) {
+            System.out.println("Please Valid Guest ID:");
+            id = sc.nextLong();
+        }
+        return id;
+    }
+    public long getSponsorIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
+        List<Sponsor> sponsors = read.getAllSponsors(connection);
+        List<Long> ids = sponsors.stream().map(Sponsor::getId).toList();
+        sponsors.forEach(System.out::println);
+        System.out.println("Enter Sponsor ID:");
+        long id = sc.nextLong();
+        while (!ids.contains(id)) {
+            System.out.println("Please Valid Sponsor ID:");
+            id = sc.nextLong();
+        }
+        return id;
+    }
 
     public long getPodcastIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
         List<Podcast> podcasts = read.getAllPodcasts(connection);
@@ -272,7 +296,7 @@ public class InputData {
         return Optional.of(episodeNum);
     }
 
-    public Guest getGuestInput(Scanner sc) {
+    public Guest getGuestInput() {
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter the Guest name: ");
         String name = myObj.nextLine();
