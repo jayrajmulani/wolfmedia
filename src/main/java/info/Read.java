@@ -1,32 +1,133 @@
 package info;
 
 import models.*;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 public class Read {
     public Optional<Song> getSong(long id, Connection connection) throws SQLException {
-        String query = "SELECT SONG.id, title, release_country, language, duration, royalty_rate, royalty_paid, release_date, GENRE.name genre, GENRE.id genre_id " +
-                "FROM SONG, SONG_GENRE, GENRE WHERE SONG.id = ? AND SONG.id = SONG_GENRE.song_id AND SONG_GENRE.genre_id = GENRE.id";
+        String query = "SELECT S.id, title, release_country, language, duration, " +
+                "royalty_rate, royalty_paid, S.release_date,  " +
+                "G.name genre, G.id AS genre_id " +
+                "FROM SONG S " +
+                "JOIN SONG_GENRE SG on S.id = SG.song_id " +
+                "JOIN GENRE G on G.id = SG.genre_id " +
+                "WHERE S.id = ? ";
+
+        String artistQuery = "SELECT S.id, " +
+                "C.artist_id, A.name artist_name, C.is_collaborator " +
+                "FROM SONG S " +
+                "JOIN CREATES C on S.id = C.song_id " +
+                "JOIN ARTIST A on A.id = C.artist_id " +
+                "WHERE S.id = ? ";
+        String rlQuery = "SELECT record_label_id, RL.name rl_name " +
+                "FROM OWNS " +
+                "JOIN RECORD_LABEL RL on RL.id = OWNS.record_label_id " +
+                "WHERE song_id = ?";
+        String albumQuery = "SELECT SA.album_id, A.name album_name " +
+                "FROM SONG_ALBUM SA " +
+                "JOIN ALBUM A on A.id = SA.album_id " +
+                "WHERE song_id = ?";
+
         try (PreparedStatement statement = connection.prepareStatement(query)) {
+            PreparedStatement artistStatement = connection.prepareStatement(artistQuery);
+            PreparedStatement rlStatement = connection.prepareStatement(rlQuery);
+            PreparedStatement albumStatement = connection.prepareStatement(albumQuery);
+
             statement.setLong(1, id);
+            artistStatement.setLong(1, id);
+            rlStatement.setLong(1, id);
+            albumStatement.setLong(1, id);
             statement.executeQuery();
+            artistStatement.executeQuery();
+            rlStatement.executeQuery();
+            albumStatement.executeQuery();
             ResultSet resultSet = statement.getResultSet();
-            List<Genre> genres = new ArrayList<>();
+            ResultSet artistResultSet = artistStatement.getResultSet();
+            ResultSet rlResultSet = rlStatement.getResultSet();
+            ResultSet albumResultSet = albumStatement.getResultSet();
+            HashSet<Genre> genres = new HashSet<>();
+            HashSet<Artist> artists = new HashSet<>();
+            HashSet<Artist> collaborators = new HashSet<>();
+
+
             while (resultSet.next()) {
                 genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
             }
+            while (artistResultSet.next()) {
+                Artist tmpArtist = new Artist(artistResultSet.getLong("artist_id"),
+                        artistResultSet.getString("artist_name"));
+                if (artistResultSet.getBoolean("is_collaborator")) {
+                    collaborators.add(tmpArtist);
+                } else {
+                    artists.add(tmpArtist);
+                }
+            }
             resultSet.beforeFirst();
+            artistResultSet.beforeFirst();
             if (resultSet.next()) {
+                artistResultSet.next();
+                rlResultSet.next();
+                Album album = new Album();
+                if (albumResultSet.next()) {
+                    album = new Album(albumResultSet.getLong("album_id"),
+                            albumResultSet.getString("album_name"));
+                }
                 return Optional.of(
                         new Song(resultSet.getLong("id"), resultSet.getString("title"),
                                 resultSet.getString("release_country"), resultSet.getString("language"),
                                 resultSet.getFloat("duration"), resultSet.getFloat("royalty_rate"),
                                 resultSet.getDate("release_date"), resultSet.getBoolean("royalty_paid"),
-                                genres
+                                0,
+                                genres.stream().toList(),
+                                album,
+                                artists.stream().toList(),
+                                collaborators.stream().toList(),
+                                new RecordLabel(rlResultSet.getLong("record_label_id"), rlResultSet.getString("rl_name"))
+
                         ));
+            }
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Album> getAlbum(long id, Connection connection) throws SQLException {
+        String query = "SELECT * FROM ALBUM WHERE ALBUM.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+//            List<Genre> genres = new ArrayList<>();
+//            while (resultSet.next()) {
+//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
+//            }
+//            resultSet.beforeFirst();
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Album(id));
+            }
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Artist> getArtist(Connection connection, long id) throws SQLException {
+        String query = "SELECT * FROM ARTIST WHERE ARTIST.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+//            List<Genre> genres = new ArrayList<>();
+//            while (resultSet.next()) {
+//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
+//            }
+//            resultSet.beforeFirst();
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Artist(id));
             }
             return Optional.empty();
         }
@@ -124,12 +225,14 @@ public class Read {
                                 0, // TODO sub count
                                 hosts,
                                 new ArrayList<Sponsor>(), // TODO sponsor
-                                new ArrayList<Genre>() // TODO
+                                new ArrayList<Genre>(), // TODO
+                                new ArrayList<Episode>() // TODO
                         ));
             }
             return Optional.empty();
         }
     }
+
     public Optional<Episode> getEpisode(Connection connection, Long podcastID, Long episodeNum) throws SQLException {
         String query = "SELECT * from EPISODE WHERE podcast_id=? AND episode_num=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -153,27 +256,29 @@ public class Read {
             return Optional.empty();
         }
     }
+
     public List<Host> getAllHosts(Connection connection) throws SQLException {
         String query = "SELECT id, first_name, last_name from HOST";
         List<Host> hosts = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             hosts.add(new Host(
-                    resultSet.getLong("id"),
-                    resultSet.getString("first_name"),
-                    resultSet.getString("last_name")
-                )
+                            resultSet.getLong("id"),
+                            resultSet.getString("first_name"),
+                            resultSet.getString("last_name")
+                    )
             );
         }
         return hosts;
     }
+
     public List<Song> getAllSongs(Connection connection) throws SQLException {
         String query = "SELECT * from SONG";
         List<Song> songs = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             songs.add(new Song(
                             resultSet.getLong("id"),
                             resultSet.getString("title"),
@@ -189,12 +294,13 @@ public class Read {
         }
         return songs;
     }
+
     public List<Podcast> getAllPodcasts(Connection connection) throws SQLException {
         String query = "SELECT * from PODCAST";
         List<Podcast> podcasts = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             podcasts.add(new Podcast(
                             resultSet.getLong("id"),
                             resultSet.getString("name"),
@@ -212,7 +318,7 @@ public class Read {
         List<Rates> rates = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             rates.add(new Rates(
                             resultSet.getLong("user_id"),
                             resultSet.getLong("podcast_id"),
@@ -223,13 +329,14 @@ public class Read {
         }
         return rates;
     }
+
     public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
         String query = "SELECT * from EPISODE WHERE podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, podcastId);
         List<Episode> episodes = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
-        while(resultSet.next()){
+        while (resultSet.next()) {
             episodes.add(new Episode(
                             resultSet.getLong("podcast_id"),
                             resultSet.getLong("episode_num"),
@@ -243,12 +350,13 @@ public class Read {
         }
         return episodes;
     }
+
     public List<RecordLabel> getAllRecordLabels(Connection connection) throws SQLException {
         String query = "SELECT * from RECORD_LABEL";
         List<RecordLabel> recordLabels = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             recordLabels.add(new RecordLabel(
                             resultSet.getLong("id"),
                             resultSet.getString("name")
@@ -257,12 +365,13 @@ public class Read {
         }
         return recordLabels;
     }
+
     public List<Artist> getAllArtists(Connection connection) throws SQLException {
         String query = "SELECT id,name, country, status from ARTIST";
         List<Artist> artists = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             artists.add(new Artist(
                             resultSet.getLong("id"),
                             resultSet.getString("name"),
@@ -273,12 +382,13 @@ public class Read {
         }
         return artists;
     }
+
     public List<Album> getAllAlbums(Connection connection) throws SQLException {
         String query = "SELECT id,name,release_date,edition from ALBUM";
         List<Album> albums = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             albums.add(new Album(
                             resultSet.getLong("id"),
                             resultSet.getString("name"),
@@ -289,12 +399,13 @@ public class Read {
         }
         return albums;
     }
+
     public List<Service> getAllServices(Connection connection) throws SQLException {
         String query = "SELECT id,name from SERVICE";
         List<Service> services = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             services.add(new Service(
                             resultSet.getLong("id"),
                             resultSet.getString("name")
@@ -303,12 +414,13 @@ public class Read {
         }
         return services;
     }
+
     public List<Owns> getAllOwns(Connection connection) throws SQLException {
         String query = "SELECT record_label_id, song_id from OWNS";
         List<Owns> owns = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             owns.add(new Owns(
                             resultSet.getLong("record_label_id"),
                             resultSet.getLong("song_id")
@@ -317,27 +429,29 @@ public class Read {
         }
         return owns;
     }
+
     public List<SongAlbum> getAllSongAlbum(Connection connection) throws SQLException {
         String query = "SELECT song_id, album_id, track_num from SONG_ALBUM";
         List<SongAlbum> songAlbum = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             songAlbum.add(new SongAlbum(
-                            resultSet.getLong("song_id"),
-                            resultSet.getLong("album_id"),
+                            new Song(resultSet.getLong("song_id")),
+                            new Album(resultSet.getLong("album_id")),
                             resultSet.getLong("track_num")
-                        )
-                    );
+                    )
+            );
         }
         return songAlbum;
     }
+
     public List<User> getAllUsers(Connection connection) throws SQLException {
         String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
         List<User> users = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        while(resultSet.next()){
+        while (resultSet.next()) {
             users.add(new User(
                             resultSet.getLong("id"),
                             resultSet.getString("f_name"),
@@ -349,12 +463,13 @@ public class Read {
         }
         return users;
     }
+
     public Optional<User> getUserById(Connection connection, long id) throws SQLException {
         String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees FROM USER WHERE id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, id);
         ResultSet resultSet = statement.executeQuery();
-        if(resultSet.next()){
+        if (resultSet.next()) {
             return Optional.of(
                     new User(
                             resultSet.getLong("id"),
@@ -367,6 +482,7 @@ public class Read {
         }
         return Optional.empty();
     }
+
     public Optional<Double> getRatingByPodcastIdUserId(Connection connection, long user_id, long podcast_id) throws SQLException {
         String query = "SELECT rating From RATES WHERE user_id = ? AND podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -374,7 +490,7 @@ public class Read {
         statement.setLong(2, podcast_id);
 
         ResultSet resultSet = statement.executeQuery();
-        if(resultSet.next()){
+        if (resultSet.next()) {
             return Optional.of(resultSet.getDouble("rating"));
         }
         return Optional.empty();

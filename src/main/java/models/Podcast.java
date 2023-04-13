@@ -22,7 +22,7 @@ public class Podcast {
     List<Host> hosts;
     List<Sponsor> sponsors;
     List<Genre> genres;
-//    List<Episode> episodes;
+    List<Episode> episodes;
     public Podcast(String name, String language, String country, double flatFee, List<Host> hosts) {
         this.name = name;
         this.language = language;

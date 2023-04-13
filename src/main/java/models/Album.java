@@ -26,4 +26,8 @@ public class Album {
         this.id = id;
         this.name = name;
     }
+
+    public Album(long id) {
+        this.id = id;
+    }
 }
