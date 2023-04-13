@@ -80,10 +80,14 @@ public class Create {
                         throw new RuntimeException(e);
                     }
                 });
-                String mapSongRLQuery = "INSERT INTO OWNS(song_id, record_label_id) VALUES (?,?)";
+
+                String mapSongRLQuery = "INSERT INTO OWNS(song_id, record_label_id) " +
+                        "SELECT ? AS song_id, record_label_id " +
+                        "from SIGNS " +
+                        "WHERE artist_id = ?" ;
                 PreparedStatement mapSongRLStatement = connection.prepareStatement(mapSongRLQuery);
                 mapSongRLStatement.setLong(1, songId);
-                mapSongRLStatement.setLong(2, song.getRecordLabel().getId());
+                mapSongRLStatement.setLong(2, song.getArtists().get(0).getId());
                 mapSongRLStatement.executeUpdate();
                 connection.commit();
             } else {
