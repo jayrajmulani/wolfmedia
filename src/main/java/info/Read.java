@@ -460,17 +460,20 @@ public class Read {
     }
 
     public List<User> getAllUsers(Connection connection) throws SQLException {
-        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
+        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees, phone, email, reg_date from USER";
         List<User> users = new ArrayList<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
         while (resultSet.next()) {
             users.add(new User(
-                            resultSet.getLong("id"),
-                            resultSet.getString("f_name"),
-                            resultSet.getString("l_name"),
-                            resultSet.getBoolean("premium_status"),
-                            resultSet.getDouble("monthly_premium_fees")
+                    resultSet.getLong("id"),
+                    resultSet.getString("f_name"),
+                    resultSet.getString("l_name"),
+                    resultSet.getDate("reg_date"),
+                    resultSet.getString("phone"),
+                    resultSet.getString("email"),
+                    resultSet.getBoolean("premium_status"),
+                    resultSet.getDouble("monthly_premium_fees")
                     )
             );
         }
@@ -478,7 +481,7 @@ public class Read {
     }
 
     public Optional<User> getUserById(Connection connection, long id) throws SQLException {
-        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees FROM USER WHERE id = ?";
+        String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees, reg_date, phone, email FROM USER WHERE id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, id);
         ResultSet resultSet = statement.executeQuery();
@@ -488,6 +491,9 @@ public class Read {
                             resultSet.getLong("id"),
                             resultSet.getString("f_name"),
                             resultSet.getString("l_name"),
+                            resultSet.getDate("reg_date"),
+                            resultSet.getString("phone"),
+                            resultSet.getString("email"),
                             resultSet.getBoolean("premium_status"),
                             resultSet.getDouble("monthly_premium_fees")
                     )

@@ -59,4 +59,22 @@ public class Update {
         statement.setLong(6, host.getId());
         statement.executeUpdate();
     }
+
+    public void updateUser(Connection connection, User user) throws SQLException {
+        String query = "UPDATE USER SET " +
+                "f_name = ?,  " +
+                "l_name = ?, " +
+                "reg_date = ?," +
+                "phone = ?," +
+                "email = ? " +
+                "WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, user.getFName());
+        statement.setString(2, user.getLName());
+        statement.setDate(3, (Date) user.getRegDate());
+        statement.setString(4, user.getPhone());
+        statement.setString(5, user.getEmail());
+        statement.setLong(6, user.getId());
+        statement.executeUpdate();
+    }
 }
