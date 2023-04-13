@@ -4,6 +4,7 @@ import models.*;
 import org.checkerframework.checker.units.qual.A;
 import utils.Constants;
 import utils.PaymentUtils;
+import utils.ReportUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,17 +14,16 @@ import java.util.*;
 
 public class SongPayments {
     private final Constants constants = new Constants();
-    public Optional<PaymentInfo> calculateRoyaltyAmount(Connection connection, long songId) {
+    private final ReportUtils reportUtils = new ReportUtils();
+    public Optional<PaymentInfo> calculateRoyaltyAmount(Connection connection, long songId){
         String query =
-                "SELECT O.record_label_id, 1 as service_id, MPC.play_count * S.royalty_rate as amount, CURRENT_TIMESTAMP as timestamp " +
+                "SELECT O.record_label_id, 1 as service_id, ? * S.royalty_rate as amount, CURRENT_TIMESTAMP as timestamp " +
                         "FROM " +
-                        "SONG S, OWNS O, " +
-                        "(SELECT count(*) as play_count FROM SONG_LISTEN SL " +
-                        "WHERE MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP) " +
-                        "AND YEAR(timestamp) = YEAR(CURRENT_TIMESTAMP) " +
-                        "AND song_id = ?) as MPC WHERE O.song_id = ? AND S.id = O.song_id";
+                        "SONG S, OWNS O " +
+                        "WHERE O.song_id = ? AND S.id = O.song_id";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, songId);
+            long playCount = reportUtils.getSongPlayCountForCurrentMonth(connection, songId);
+            statement.setLong(1, playCount);
             statement.setLong(2, songId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -68,18 +68,10 @@ public class SongPayments {
         List<PaymentInfo> paymentInfo = new ArrayList<>();
         String query = """
                 select C.artist_id, O.record_label_id,
-                    (MPC.play_count * S.royalty_rate * ? / CC.artist_count) as amount,
+                    (? * S.royalty_rate * ? / CC.artist_count) as amount,
                     CURRENT_TIMESTAMP as timestamp
                 from
                     SONG S, OWNS O, CREATES C,
-                    (select
-                         count(*) as play_count
-                     from
-                         SONG_LISTEN SL
-                     where
-                             MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP)
-                       AND YEAR(timestamp) = YEAR(CURRENT_TIMESTAMP)
-                       and song_id = 1) as MPC,
                     (select
                          count(C2.artist_id) as artist_count
                      from CREATES C2
@@ -89,9 +81,10 @@ public class SongPayments {
                   AND S.id = C.song_id
                   AND C.song_id = ?;
                 """;
+        long playCount = reportUtils.getSongPlayCountForCurrentMonth(connection, songId);
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setDouble(1, constants.ARTIST_ROYALTY_SHARE);
-        statement.setLong(2, songId);
+        statement.setLong(1, playCount);
+        statement.setDouble(2, constants.ARTIST_ROYALTY_SHARE);
         statement.setLong(3, songId);
         ResultSet resultSet = statement.executeQuery();
         while(resultSet.next()){
