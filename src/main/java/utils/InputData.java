@@ -303,19 +303,6 @@ public class InputData {
         return new Guest(name);
     }
 
-    public long getGuestIdInput(Connection connection, Scanner sc) throws SQLException, IllegalArgumentException {
-        List<Guest> guests = read.getAllGuests(connection);
-        List<Long> ids = guests.stream().map(Guest::getId).toList();
-        guests.forEach(System.out::println);
-        System.out.println("Enter Album ID:");
-        long id = sc.nextLong();
-        while (!ids.contains(id)) {
-            System.out.println("Please Valid Guest ID:");
-            id = sc.nextLong();
-        }
-        return id;
-    }
-
     public Sponsor getSponsorInput(Scanner sc) {
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter the Sponsor name: ");

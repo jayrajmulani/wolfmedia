@@ -145,20 +145,6 @@ public class Read {
         }
     }
 
-    public List<Guest> getAllGuests(Connection connection) throws SQLException {
-        String query = "SELECT id,name from GUEST";
-        List<Guest> guests = new ArrayList<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        while (resultSet.next()) {
-            guests.add(new Guest(
-                            resultSet.getLong("id"),
-                            resultSet.getString("name")
-                    )
-            );
-        }
-        return guests;
-    }
     public Optional<Sponsor> getSponsor(long id, Connection connection) throws SQLException {
         String query = "SELECT id, name FROM SPONSOR WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
