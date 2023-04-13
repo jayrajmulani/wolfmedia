@@ -74,7 +74,8 @@ public class InputData {
                 false, genres, artists, collaborators, null));
     }
 
-    public Host getHostInput(Scanner sc) {
+    public Host getHostInput() {
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter the first name of the host:");
         String firstName = sc.nextLine();
         System.out.println("Enter the last name of the host:");
@@ -122,7 +123,7 @@ public class InputData {
                     hosts.add(new Host(hostID));
                 }
                 case 2 -> {
-                    hosts.add(getHostInput(sc));
+                    hosts.add(getHostInput());
                 }
                 default -> {
                     System.out.println("Please choose a value between 1 and 2...");

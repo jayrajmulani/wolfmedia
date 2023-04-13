@@ -230,17 +230,25 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            long id = create.createHost(connection, inputData.getHostInput(sc));
+                                            long id = create.createHost(connection, inputData.getHostInput());
                                             System.out.println("Host created successfully with id " + id);
                                         }
                                         case 2 -> {
                                             System.out.println("Enter the id of the host:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
+                                            if(resultHost.isPresent()){
+                                                System.out.println(resultHost.get());
+                                                System.out.println("Podcasts by this host:");
+                                                read.getPodcastsByHostId(connection, id).forEach(System.out::println);
+                                            }
                                         }
                                         case 3 -> {
-                                            // TODO: Update Host
+                                            long id = inputData.getHostIdInput(connection, sc);
+                                            Host host = inputData.getHostInput();
+                                            host.setId(id);
+                                            update.updateHost(connection, host);
+                                            System.out.println("Host updated successfully" );
                                         }
                                         case 4 -> {
                                             delete.deleteHost(connection, inputData.getHostIdInput(connection, sc));

@@ -36,10 +36,27 @@ public class Update {
         // TODO
     }
     public void updateRecordLabel(Connection connection, RecordLabel recordLabel) throws SQLException {
-        String query = "UPDATE manand.RECORD_LABEL SET NAME = ? WHERE ID = ?";
+        String query = "UPDATE RECORD_LABEL SET NAME = ? WHERE ID = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setString(1, recordLabel.getName());
         statement.setLong(2, recordLabel.getId());
+        statement.executeUpdate();
+    }
+    public void updateHost(Connection connection, Host host) throws SQLException {
+        String query = "UPDATE HOST SET " +
+                "first_name = ?,  " +
+                "last_name = ?, " +
+                "city = ?," +
+                "email = ?," +
+                "phone = ? " +
+                "WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, host.getFirstName());
+        statement.setString(2, host.getLastName());
+        statement.setString(3, host.getCity());
+        statement.setString(4, host.getEmail());
+        statement.setString(5, host.getPhone());
+        statement.setLong(6, host.getId());
         statement.executeUpdate();
     }
 }

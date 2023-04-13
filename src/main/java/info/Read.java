@@ -540,7 +540,7 @@ public class Read {
         ResultSet signsRs = signsStatement.executeQuery();
         while(signsRs.next()){
             signedArtists.add(
-                    new Artist(ownsRs.getLong("id"), ownsRs.getString("name"))
+                    new Artist(signsRs.getLong("id"), signsRs.getString("name"))
             );
         }
         System.out.println("Artists Signed:");
@@ -563,6 +563,19 @@ public class Read {
             );
         }
         return sponsors;
+    }
+    public List<Podcast> getPodcastsByHostId(Connection connection, long hostId) throws SQLException {
+        List<Podcast> podcasts = new ArrayList<>();
+        String query = "SELECT P.id, P.name from PODCAST P, PODCAST_HOST PH WHERE P.id = PH.podcast_id AND PH.host_id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, hostId);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()){
+            podcasts.add(
+                    new Podcast(rs.getLong("id"), rs.getString("name"))
+            );
+        }
+        return podcasts;
     }
 
 }
