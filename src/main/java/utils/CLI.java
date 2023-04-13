@@ -1,6 +1,7 @@
 package utils;
 
 import info.Create;
+import info.Delete;
 import info.Read;
 import info.Update;
 import models.*;
@@ -19,6 +20,7 @@ public class CLI {
     private static final Create create = new Create();
     private static final Read read = new Read();
     private static final Update update = new Update();
+    private static final Delete delete = new Delete();
     private static final InputData inputData = new InputData();
     private static final SongPayments songPayments = new SongPayments();
     private static final PodcastPayments podcastPayments = new PodcastPayments();
@@ -79,7 +81,9 @@ public class CLI {
                                             update.updateSong(connection, inputData.getSongInput(connection, false), songID);
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Song
+                                            System.out.println("FYI, Deleting a Song will delete all the records of the song where SongId is a foreign key");
+                                            delete.deleteSong(connection, inputData.getSongIdInput(connection, sc));
+                                            System.out.println("Song successfully deleted");
                                             break;
                                         }
                                         default -> {
@@ -117,7 +121,8 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Guest
+                                            delete.deleteGuest(connection, inputData.getGuestIdInput(connection, sc));
+                                            System.out.println("Song successfully deleted");
                                             break;
                                         }
                                         default -> {
@@ -157,7 +162,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Artist
+                                            delete.deleteArtist(connection, inputData.getArtistIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -195,7 +200,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Podcast
+                                            delete.deletePodcast(connection, inputData.getPodcastIdInput(connection, sc));
                                             break;
                                         }
 
@@ -238,7 +243,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Host
+                                            delete.deleteHost(connection, inputData.getHostIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -278,7 +283,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete User
+                                            delete.deleteUser(connection, inputData.getUserIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -318,7 +323,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Record Label
+                                            delete.deleteRecordLabel(connection, inputData.getRecordLabelIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -358,7 +363,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Service
+                                            delete.deleteService(connection, inputData.getServiceIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -398,7 +403,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Album
+                                            delete.deleteAlbum(connection, inputData.getAlbumIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -441,7 +446,7 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Sponsor
+                                            delete.deleteSponsor(connection, inputData.getSponsorIdInput(connection, sc));
                                             break;
                                         }
                                         default -> {
@@ -490,7 +495,9 @@ public class CLI {
                                             break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Episode
+                                            long podcastId =  inputData.getPodcastIdInput(connection, sc);
+                                            long episode_num = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
+                                            delete.deleteEpisode(connection, podcastId, episode_num);
                                             break;
                                         }
                                         default -> {
