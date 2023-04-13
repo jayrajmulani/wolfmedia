@@ -504,183 +504,24 @@ public class CLI {
                                 }
                             }
                             // Assign Song to Artist
-                            // TODO: Refactor -> Do we need a CRUD Menu?
                             case 12 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            create.createAssignSongtoArtist(connection, inputData.getSongToArtistInput(connection, sc));
-                                            System.out.println("Above selected Song is assigned to selected Artist");
-                                        }
-                                        case 2 -> {
-                                            System.out.println("Enter the id of the SongListen table:");
-                                            Long id = sc.nextLong();
-                                            Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
+                                create.createAssignSongtoArtist(connection, inputData.getSongToArtistInput(connection, sc));
+                                System.out.println("Above selected Song is assigned to selected Artist");
                             }
                             // Assign Artist to Album
-                            // TODO: Refactor -> Do we need a CRUD Menu?
                             case 13 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            create.createAssignArtisttoAlbum(connection, inputData.getArtisttoAlbumInput(connection, sc));
-                                            System.out.println("Above selected Artist is assigned to selected Album");
-                                        }
-                                        case 2 -> {
-                                            //TODO for Song_Listen
-                                            System.out.println("Enter the id of the SongListen table:");
-                                            Long id = sc.nextLong();
-                                            Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
-                            }
-                                // Assign Song to Record Label
-                            // TODO: We dont really need this operation at all. It should happen automatically
-                            case 14 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            create.createAssignSongtoRecordLabel(connection, inputData.getSongtoRecordLabelInput(connection, sc).orElseThrow());
-                                            System.out.println("Above selected Song is assigned to selected Record Label");
-                                        }
-                                        case 2 -> {
-                                            //TODO for Owns
-                                            System.out.println("Enter the id of the SongListen table:");
-                                            Long id = sc.nextLong();
-                                            Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
+                                create.createAssignArtisttoAlbum(connection, inputData.getArtisttoAlbumInput(connection, sc));
+                                System.out.println("Above selected Artist is assigned to selected Album");
                             }
                             // Assign Artist to Record Label
-                            // TODO: Refactor -> Do we need a CRUD Menu?
-                            case 15 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            long id = create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
-                                            System.out.println("Above selected Artist is assigned to selected Record Label with id: " + id);
-                                        }
-                                        case 2 -> {
-                                            //TODO for Signs
-                                            System.out.println("Enter the id of the SongListen table:");
-                                            Long id = sc.nextLong();
-                                            Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
+                            case 14 -> {
+                                long id = create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
+                                System.out.println("Above selected Artist is assigned to selected Record Label");
                             }
                             // Assign Song to Album
-                            // TODO: Refactor -> Do we need a CRUD Menu?
-                            case 16 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            create.createAssignSongtoAlbum(connection, inputData.getSongtoAlbumInput(connection, sc).orElseThrow());
-                                            System.out.println("Above selected Song is assigned to selected Record Label");
-                                        }
-                                        case 2 -> {
-                                            //TODO for Signs
-                                            System.out.println("Enter the id of the SongListen table:");
-                                            Long id = sc.nextLong();
-                                            Optional<Host> resultHost = read.getHost(id, connection);
-                                            resultHost.ifPresentOrElse(System.out::println, () -> System.out.println("Host not found!"));
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
+                            case 15 -> {
+                                create.createAssignSongtoAlbum(connection, inputData.getSongtoAlbumInput(connection, sc).orElseThrow());
+                                System.out.println("Above selected Song is assigned to selected Album");
                             }
                             // Handle Invalid Input
                             default -> {
