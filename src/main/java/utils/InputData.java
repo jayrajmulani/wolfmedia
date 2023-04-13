@@ -7,6 +7,7 @@ import models.*;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -565,6 +566,41 @@ public class InputData {
         create.createRates(connection, new Rates(userId, podcastId, rating, updated_at));
     }
 
+    public void increasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        System.out.println("Here is the List of all Podcasts");
+        List<Podcast> allPodcasts = read.getAllPodcasts(connection);
+        allPodcasts.forEach(System.out::println);
+
+        System.out.println("Enter Podcast ID:");
+        long podcastId = sc.nextLong();
+
+        System.out.println("By how many counts do you want to increase the subscriptions");
+        int subs = sc.nextInt();
+
+        List<User> allUsers = read.getAllUsers(connection);
+        final long[] maxId = {0};
+        allUsers.forEach(user -> {
+            if(user.getId()>= maxId[0]) {
+                maxId[0] = user.getId();
+            }
+        });
+        for(int i = 1; i <= subs; i++)
+        {
+            long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
+            create.createPodcastSubscription(connection, new PodcastSubscription(podcastId, id, new Timestamp(System.currentTimeMillis()), 0));
+        }
+    }
+
+    public void decreasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        long podcastId = getPodcastIdInput(connection,sc);
+
+        System.out.println("By how many counts do you want to increase the subscriptions");
+        int subs = sc.nextInt();
+
+            create.deletePodcastSubscription(connection, podcastId, subs);
+    }
     public Optional<Long> getAverageRating(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Podcasts (That have atleast 1 Rating)");
