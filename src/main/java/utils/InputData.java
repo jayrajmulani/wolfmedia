@@ -16,7 +16,7 @@ public class InputData {
     private static final Read read = new Read();
     private static final Create create = new Create();
 
-    public SongAlbum getSongInput(Scanner sc, Connection connection, boolean isCreateOp) throws ParseException, SQLException, IllegalArgumentException {
+    public SongAlbum getSongInput(Connection connection, boolean isCreateOp) throws ParseException, SQLException, IllegalArgumentException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -31,22 +31,23 @@ public class InputData {
         System.out.println("Enter the royalty rate of the song:");
         double royaltyRate = myObj.nextDouble();
         System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
-        Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
-        sc.nextLine();
+        Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(myObj.next()).getTime());
+        myObj.nextLine();
         System.out.println("Enter list of genres for this song (Separate multiple values by |):");
         System.out.println("E.g. LOVE | ROCK");
-        String genresPipeSeparated = sc.nextLine();
+        String genresPipeSeparated = myObj.nextLine();
         List<Genre> genres = Arrays.stream(genresPipeSeparated.split("\\|")).map(genre -> new Genre(genre.strip())).toList();
 
         List<Artist> allArtists = read.getAllArtists(connection);
         allArtists.forEach(System.out::println);
         System.out.println("Enter list of artist IDs for this song (Separate multiple values by |):");
+        System.out.println("The first artist would be considered as Primary Artist and song would be owned by its record label.");
         System.out.println("E.g. 1 | 4");
-        String artistsPipeSeparated = sc.nextLine();
+        String artistsPipeSeparated = myObj.nextLine();
         List<Artist> artists = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID.trim()))).toList();
         System.out.println("Enter list of collaborator IDs for this song (Separate multiple values by |):");
         System.out.println("E.g. 5 | 2");
-        String collaboratorsPipeSeparated = sc.nextLine();
+        String collaboratorsPipeSeparated = myObj.nextLine();
         List<Artist> collaborators = new ArrayList<>();
         if (!collaboratorsPipeSeparated.isEmpty()) {
             collaborators = Arrays.stream(collaboratorsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID))).toList();
@@ -56,24 +57,21 @@ public class InputData {
             throw new IllegalArgumentException("Artists and Collaborators have some common elements");
         }
 
-        long recordLabelID = this.getRecordLabelIdInput(connection, sc);
-        RecordLabel recordLabel = new RecordLabel(recordLabelID);
-
-        System.out.println("Do you want to assign this song to an album (y/n)");
+        System.out.println("Do you want to assign this song to an album ? (y/n)");
         boolean doAddAlbum = myObj.nextLine().equalsIgnoreCase("y");
+
         if (doAddAlbum) {
-            long albumID = this.getAlbumIdInput(connection, sc);
+            long albumID = this.getAlbumIdInput(connection, myObj);
             Album album = new Album(albumID);
             System.out.println("Enter the track number of the song");
             long trackNum = myObj.nextLong();
             Song s = new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate,
-                    false, genres, album, artists, collaborators, recordLabel);
+                    false, genres, album, artists, collaborators, null);
 
             return new SongAlbum(s, album, trackNum);
         }
-
         return new SongAlbum(new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate,
-                false, genres, artists, collaborators, recordLabel));
+                false, genres, artists, collaborators, null));
     }
 
     public Host getHostInput(Scanner sc) {

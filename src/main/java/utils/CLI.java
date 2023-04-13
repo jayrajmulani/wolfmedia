@@ -59,7 +59,7 @@ public class CLI {
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
                                             // Create Song
-                                            long id = create.createSong(connection, inputData.getSongInput(sc, connection, true));
+                                            long id = create.createSong(connection, inputData.getSongInput(connection, true));
                                             if (id == 0) {
                                                 System.out.println("Could not create song");
                                             } else {
@@ -76,7 +76,7 @@ public class CLI {
                                         case 3 -> {
                                             // Update Song
                                             long songID = inputData.getSongIdInput(connection, sc);
-                                            update.updateSong(connection, inputData.getSongInput(sc, connection, false), songID);
+                                            update.updateSong(connection, inputData.getSongInput(connection, false), songID);
                                         }
                                         case 4 -> {
                                             // TODO: Delete Song
