@@ -515,7 +515,7 @@ public class CLI {
                             }
                             // Assign Artist to Record Label
                             case 14 -> {
-                                long id = create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
+                                create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
                                 System.out.println("Above selected Artist is assigned to selected Record Label");
                             }
                             // Assign Song to Album
