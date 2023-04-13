@@ -103,18 +103,21 @@ public class CLI {
                                         case -1 -> quit = true;
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
-                                            long id = create.createGuest(connection, inputData.getGuestInput(sc));
+                                            long id = create.createGuest(connection, inputData.getGuestInput());
                                             System.out.println("Guest created successfully with id " + id);
                                         }
                                         case 2 -> {
                                             System.out.println("Enter the id of the guest:");
-                                            Long id = sc.nextLong();
+                                            long id = sc.nextLong();
                                             Optional<Guest> resultGuest = read.getGuest(id, connection);
                                             resultGuest.ifPresentOrElse(System.out::println, () -> System.out.println("Guest not found!"));
                                         }
                                         case 3 -> {
-                                            // TODO: Update Guest
-                                            break;
+                                            long id = inputData.getGuestIdInput(connection, sc);
+                                            Guest guest = inputData.getGuestInput();
+                                            guest.setId(id);
+                                            update.updateGuest(connection, guest);
+                                            System.out.println("Guest updated successfully" );
                                         }
                                         case 4 -> {
                                             // TODO: Delete Guest
@@ -310,12 +313,15 @@ public class CLI {
                                             System.out.println("Record Label created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            // TODO: Read Record Label
-                                            break;
+                                            long id = inputData.getRecordLabelIdInput(connection, sc);
+                                            read.displayRecordLabelById(connection, id);
                                         }
                                         case 3 -> {
-                                            //TODO: Update Record Label
-                                            break;
+                                            long id = inputData.getRecordLabelIdInput(connection, sc);
+                                            RecordLabel recordLabel = inputData.getRecordLabelInput(sc);
+                                            recordLabel.setId(id);
+                                            update.updateRecordLabel(connection, recordLabel);
+                                            System.out.println("Record Label updated successfully" );
                                         }
                                         case 4 -> {
                                             //TODO: Delete Record Label
@@ -350,12 +356,15 @@ public class CLI {
                                             System.out.println("Service created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            // TODO: Read Service
-                                            break;
+                                            long id = inputData.getServiceIdInput(connection, sc);
+                                            read.getAllServices(connection).stream().filter(service -> service.getId() == id).forEach(System.out::println);
                                         }
                                         case 3 -> {
-                                            //TODO: Update Service
-                                            break;
+                                            long id = inputData.getServiceIdInput(connection, sc);
+                                            Service service = inputData.getServiceInput(sc);
+                                            service.setId(id);
+                                            update.updateService(connection, service);
+                                            System.out.println("Service updated successfully" );
                                         }
                                         case 4 -> {
                                             //TODO: Delete Service
@@ -437,8 +446,11 @@ public class CLI {
                                             relationSponsor.ifPresentOrElse(System.out::println, () -> System.out.println("Sponsor not found!"));
                                         }
                                         case 3 -> {
-                                            //TODO: Update Sponsor
-                                            break;
+                                            long id = inputData.getSponsorIdInput(connection, sc);
+                                            Sponsor sponsor = inputData.getSponsorInput(sc);
+                                            sponsor.setId(id);
+                                            System.out.println(sponsor);
+                                            update.updateSponsor(connection,sponsor);
                                         }
                                         case 4 -> {
                                             //TODO: Delete Sponsor
