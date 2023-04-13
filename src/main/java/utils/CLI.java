@@ -1,6 +1,7 @@
 package utils;
 
 import info.Create;
+import info.Delete;
 import info.Read;
 import info.Update;
 import models.*;
@@ -19,6 +20,7 @@ public class CLI {
     private static final Create create = new Create();
     private static final Read read = new Read();
     private static final Update update = new Update();
+    private static final Delete delete = new Delete();
     private static final InputData inputData = new InputData();
     private static final SongPayments songPayments = new SongPayments();
     private static final PodcastPayments podcastPayments = new PodcastPayments();
@@ -79,7 +81,9 @@ public class CLI {
                                             update.updateSong(connection, inputData.getSongInput(connection, false), songID);
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Song
+                                            System.out.println("FYI, Deleting a Song will delete all the records of the song where SongId is a foreign key");
+                                            delete.deleteSong(connection, inputData.getSongIdInput(connection, sc));
+                                            System.out.println("Song successfully deleted");
                                             break;
                                         }
                                         default -> {
@@ -120,7 +124,8 @@ public class CLI {
                                             System.out.println("Guest updated successfully" );
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Guest
+                                            delete.deleteGuest(connection, inputData.getGuestIdInput(connection, sc));
+                                            System.out.println("Guest successfully deleted");
                                             break;
                                         }
                                         default -> {
@@ -157,11 +162,10 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             // TODO: Update Artist
-                                            break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Artist
-                                            break;
+                                            delete.deleteArtist(connection, inputData.getArtistIdInput(connection, sc));
+                                            System.out.println("Artist successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -195,11 +199,10 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             // TODO: Update Podcast
-                                            break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Podcast
-                                            break;
+                                            delete.deletePodcast(connection, inputData.getPodcastIdInput(connection, sc));
+                                            System.out.println("Podcast successfully deleted");
                                         }
 
                                         default -> {
@@ -238,11 +241,10 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             // TODO: Update Host
-                                            break;
                                         }
                                         case 4 -> {
-                                            // TODO: Delete Host
-                                            break;
+                                            delete.deleteHost(connection, inputData.getHostIdInput(connection, sc));
+                                            System.out.println("Podcast Host successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -278,11 +280,10 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             //TODO: Update User
-                                            break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete User
-                                            break;
+                                            delete.deleteUser(connection, inputData.getUserIdInput(connection, sc));
+                                            System.out.println("User successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -324,51 +325,8 @@ public class CLI {
                                             System.out.println("Record Label updated successfully" );
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Record Label
-                                            break;
-                                        }
-                                        default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
-                                            continue;
-                                        }
-                                    }
-                                    if (goBackInner || quit) {
-                                        break;
-                                    }
-                                }
-                            }
-                            // Service
-                            case 8 -> {
-                                quit = false;
-                                while (true) {
-                                    boolean goBackInner = false;
-                                    menu.displayCrudMenu();
-                                    crudChoice = sc.nextInt();
-                                    switch (crudChoice) {
-                                        case -1 -> {
-                                            quit = true;
-                                        }
-                                        case 0 -> {
-                                            goBackInner = true;
-                                        }
-                                        case 1 -> {
-                                            long id = create.createService(connection, inputData.getServiceInput(sc));
-                                            System.out.println("Service created successfully with id " + id);
-                                        }
-                                        case 2 -> {
-                                            long id = inputData.getServiceIdInput(connection, sc);
-                                            read.getAllServices(connection).stream().filter(service -> service.getId() == id).forEach(System.out::println);
-                                        }
-                                        case 3 -> {
-                                            long id = inputData.getServiceIdInput(connection, sc);
-                                            Service service = inputData.getServiceInput(sc);
-                                            service.setId(id);
-                                            update.updateService(connection, service);
-                                            System.out.println("Service updated successfully" );
-                                        }
-                                        case 4 -> {
-                                            //TODO: Delete Service
-                                            break;
+                                            delete.deleteRecordLabel(connection, inputData.getRecordLabelIdInput(connection, sc));
+                                            System.out.println("Record Label successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -381,7 +339,7 @@ public class CLI {
                                 }
                             }
                             // Album
-                            case 9 -> {
+                            case 8 -> {
                                 quit = false;
                                 while (true) {
                                     boolean goBackInner = false;
@@ -404,11 +362,10 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             //TODO: Update Album
-                                            break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Album
-                                            break;
+                                            delete.deleteAlbum(connection, inputData.getAlbumIdInput(connection, sc));
+                                            System.out.println("Album successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -421,7 +378,7 @@ public class CLI {
                                 }
                             }
                             // Sponsor
-                            case 10 -> {
+                            case 9 -> {
                                 while (true) {
                                     boolean goBackInner = false;
                                     menu.displayCrudMenu();
@@ -453,8 +410,8 @@ public class CLI {
                                             update.updateSponsor(connection,sponsor);
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Sponsor
-                                            break;
+                                            delete.deleteSponsor(connection, inputData.getSponsorIdInput(connection, sc));
+                                            System.out.println("Podcast Sponsor successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -467,7 +424,7 @@ public class CLI {
                                 }
                             }
                             // Episode
-                            case 11 -> {
+                            case 10 -> {
                                 while (true) {
                                     boolean goBackInner = false;
                                     menu.displayCrudMenu();
@@ -499,11 +456,12 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             //TODO: Update Episode
-                                            break;
                                         }
                                         case 4 -> {
-                                            //TODO: Delete Episode
-                                            break;
+                                            long podcastId =  inputData.getPodcastIdInput(connection, sc);
+                                            long episode_num = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
+                                            delete.deleteEpisode(connection, podcastId, episode_num);
+                                            System.out.println("Episode successfully deleted");
                                         }
                                         default -> {
                                             System.out.println("Please choose a value between 0 and 4...");
@@ -516,22 +474,22 @@ public class CLI {
                                 }
                             }
                             // Assign Song to Artist
-                            case 12 -> {
+                            case 11 -> {
                                 create.createAssignSongtoArtist(connection, inputData.getSongToArtistInput(connection, sc));
                                 System.out.println("Above selected Song is assigned to selected Artist");
                             }
                             // Assign Artist to Album
-                            case 13 -> {
+                            case 12 -> {
                                 create.createAssignArtisttoAlbum(connection, inputData.getArtisttoAlbumInput(connection, sc));
                                 System.out.println("Above selected Artist is assigned to selected Album");
                             }
                             // Assign Artist to Record Label
-                            case 14 -> {
+                            case 13 -> {
                                 create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc));
                                 System.out.println("Above selected Artist is assigned to selected Record Label");
                             }
                             // Assign Song to Album
-                            case 15 -> {
+                            case 14 -> {
                                 create.createAssignSongtoAlbum(connection, inputData.getSongtoAlbumInput(connection, sc).orElseThrow());
                                 System.out.println("Above selected Song is assigned to selected Album");
                             }
