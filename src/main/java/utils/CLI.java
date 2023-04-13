@@ -619,35 +619,58 @@ public class CLI {
                             case -1 -> quit = true;
                             case 0 -> goBack = true;
                             case 1 -> {
-                                long id = create.createSongListen(connection, inputData.getSongListenInput(connection, sc));
-                                System.out.println("Song created successfully with id " + id);
+                                // Increase Playcount of a Song
+                                inputData.increaseSongPlayCount(connection, sc);
+                                System.out.println("Song Playcount increased");
                             }
                             case 2 -> {
-                                // Create Record in PodcastListen Table
-                                long id = create.createPodcastListen(connection, inputData.getPodcastEpListenInput(connection, sc));
-                                System.out.println("PodcastListen record created successfully with id " + id);
+                                // Decrease Playcount of a Song
+                                inputData.decreaseSongPlaycount(connection, sc);
+                                System.out.println("Song Playcount decreased");
                             }
                             case 3 -> {
+                                // Get Playcount of a Song
+                                long count = create.getSongPlayCountById(connection, inputData.getSongIdInput(connection, sc));
+                                System.out.println("The Playcount for the song is: " + count);
+                            }
+                            case 4 -> {
+                                // Increase playcount of a Podcast
+                                inputData.increasePodcastPlayCount(connection, sc);
+                                System.out.println("Podcast Playcount increased");
+                            }
+                            case 5 -> {
+                                // Decrease playcount of a Podcast
+                                inputData.decreasePodcastPlaycount(connection, sc);
+                                System.out.println("Podcast Playcount decreased");
+                            }
+                            case 6 -> {
+                                // // Get Playcount of a Podcast
+                                long podcastId = inputData.getPodcastIdInput(connection, sc);
+                                long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
+                                long count = create.getPodcastPlayCountById(connection, podcastId, episodeNum);
+                                System.out.println("The Playcount for the Podcast is: " + count);
+                            }
+                            case 7 -> {
                                 // Create/Update Record in Ratings Table
                                 inputData.getRates(connection, sc);
                                 System.out.println("Rating successfully added/updated");
                             }
-                            case 4 -> {
+                            case 8 -> {
                                 // Get Average Rating for a Podcast
                                 double rating = create.getAvgRating(connection, inputData.getAverageRating(connection, sc).orElseThrow());
                                 System.out.println("Average Rating is: " + rating);
                             }
-                            case 5 -> {
+                            case 9 -> {
                                 // Create Record in PodcastListen Table
                                 inputData.increasePodcastSubscription(connection, sc);
                                 System.out.println("Successfully Subscribed to the Podcast");
                             }
-                            case 6 -> {
+                            case 10 -> {
                                 // Delete Podcast subscriptions count
                                 inputData.decreasePodcastSubscription(connection, sc);
                                 System.out.println("Podcast Subscription Decreased");
                             }
-                            case 7 -> {
+                            case 11 -> {
                                 // Get Subscribers count for a Podcast
                                 long subsCount = create.getPodcastSubscriptionById(connection, inputData.getPodcastIdInput(connection, sc));
                                 System.out.println("The Subscriber count is: " + subsCount);
