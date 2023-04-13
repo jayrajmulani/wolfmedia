@@ -56,6 +56,10 @@ public class Menu {
         System.out.println("1. Enter Playcount for a Song");
         System.out.println("2. Enter Playcount for Podcast");
         System.out.println("3. Enter Rating for Podcast");
+        System.out.println("4. Average Rating for a Podcast");
+        System.out.println("5. Increase Podcast Subscriptions");
+        System.out.println("6. Decrease Podcast Subscriptions");
+        System.out.println("7. Total Subscribers for a Podcast");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.print("Enter your choice: ");

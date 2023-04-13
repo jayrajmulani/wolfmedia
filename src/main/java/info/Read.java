@@ -208,6 +208,23 @@ public class Read {
         }
         return podcasts;
     }
+
+    public List<Rates> getAllRates(Connection connection) throws SQLException {
+        String query = "SELECT * from RATES";
+        List<Rates> rates = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while(resultSet.next()){
+            rates.add(new Rates(
+                            resultSet.getLong("user_id"),
+                            resultSet.getLong("podcast_id"),
+                            resultSet.getDouble("rating"),
+                            resultSet.getDate("updated_at")
+                    )
+            );
+        }
+        return rates;
+    }
     public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
         String query = "SELECT * from EPISODE WHERE podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -258,7 +275,6 @@ public class Read {
         }
         return artists;
     }
-
     public List<Album> getAllAlbums(Connection connection) throws SQLException {
         String query = "SELECT id,name,release_date,edition from ALBUM";
         List<Album> albums = new ArrayList<>();
@@ -289,7 +305,6 @@ public class Read {
         }
         return services;
     }
-
     public List<Owns> getAllOwns(Connection connection) throws SQLException {
         String query = "SELECT record_label_id, song_id from OWNS";
         List<Owns> owns = new ArrayList<>();
@@ -304,7 +319,6 @@ public class Read {
         }
         return owns;
     }
-
     public List<SongAlbum> getAllSongAlbum(Connection connection) throws SQLException {
         String query = "SELECT song_id, album_id, track_num from SONG_ALBUM";
         List<SongAlbum> songAlbum = new ArrayList<>();
@@ -320,7 +334,6 @@ public class Read {
         }
         return songAlbum;
     }
-
     public List<User> getAllUsers(Connection connection) throws SQLException {
         String query = "SELECT id,f_name, l_name, premium_status, monthly_premium_fees from USER";
         List<User> users = new ArrayList<>();
@@ -356,7 +369,6 @@ public class Read {
         }
         return Optional.empty();
     }
-
     public Optional<Double> getRatingByPodcastIdUserId(Connection connection, long user_id, long podcast_id) throws SQLException {
         String query = "SELECT rating From RATES WHERE user_id = ? AND podcast_id = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -369,4 +381,5 @@ public class Read {
         }
         return Optional.empty();
     }
+
 }

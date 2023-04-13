@@ -445,6 +445,25 @@ public class Create {
         return 0L;
     }
 
+    public double getAvgRating(Connection connection, long podcastId) throws SQLException {
+        String query = "Select avg(rating) rating from RATES where podcast_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastId);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()){
+                return rs.getDouble("rating");
+            }
+            return 0D;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
     private long insertAndGetIdForSingleNameColumnTables(Connection connection, String query, String name) {
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, name);
@@ -459,4 +478,65 @@ public class Create {
         }
         return 0L;
     }
+
+    public void createPodcastSubscription(Connection connection, PodcastSubscription podcastSubscription) {
+
+        String query = "insert into PODCAST_SUBSCRIPTION (podcast_id, user_id, updated_at, subscription_status) values (?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, podcastSubscription.getPodcastId());
+            statement.setLong(2, podcastSubscription.getUserId());
+            statement.setTimestamp(3, podcastSubscription.getUpdated_at());
+            statement.setDouble(4, podcastSubscription.getSubscriptionStatus());
+
+            statement.executeUpdate();
+        }
+        catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+    public void deletePodcastSubscription(Connection connection, long podcastId, int limit) {
+
+        String query = "delete from PODCAST_SUBSCRIPTION where podcast_id = ? order by id desc Limit ?";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, podcastId);
+            statement.setLong(2, limit);
+
+            statement.executeUpdate();
+        }
+        catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+    public long getPodcastSubscriptionById(Connection connection, long podcastId) {
+        String query = "Select count(user_id) as subCount from PODCAST_SUBSCRIPTION where podcast_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastId);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()){
+                return rs.getLong("subCount");
+            }
+            return 0L;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
 }
