@@ -566,6 +566,65 @@ public class InputData {
         create.createRates(connection, new Rates(userId, podcastId, rating, updated_at));
     }
 
+    public void increaseSongPlayCount(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        long songId = getSongIdInput(connection, sc);
+
+        System.out.println("By how many counts do you want to increase the playcounts");
+        int subs = sc.nextInt();
+
+        List<User> allUsers = read.getAllUsers(connection);
+        final long[] maxId = {0};
+        allUsers.forEach(user -> {
+            if(user.getId()>= maxId[0]) {
+                maxId[0] = user.getId();
+            }
+        });
+        for(int i = 1; i <= subs; i++)
+        {
+            long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
+            create.createSongListen(connection, new SongListen(songId, id));
+        }
+    }
+    public void decreaseSongPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        long songId = getSongIdInput(connection, sc);
+
+        System.out.println("By how many counts do you want to decrease the playcount of the song");
+        int subs = sc.nextInt();
+
+        create.deleteSongListen(connection, songId, subs);
+    }
+    public void increasePodcastPlayCount(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        long podcastId = getPodcastIdInput(connection, sc);
+
+        System.out.println("By how many counts do you want to increase the playcounts");
+        int subs = sc.nextInt();
+
+        List<User> allUsers = read.getAllUsers(connection);
+        final long[] maxId = {0};
+        allUsers.forEach(user -> {
+            if(user.getId()>= maxId[0]) {
+                maxId[0] = user.getId();
+            }
+        });
+        for(int i = 1; i <= subs; i++)
+        {
+            long id = create.createUser(connection, new User("","",new java.sql.Date(System.currentTimeMillis()),"","",false,0.0));
+            create.createPodcastListen(connection, new PodcastEpListen(podcastId, id, 1));
+        }
+    }
+    public void decreasePodcastPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
+
+        long podcastId = getPodcastIdInput(connection, sc);
+
+        System.out.println("By how many counts do you want to decrease the playcount of the song");
+        int subs = sc.nextInt();
+
+        create.deleteSongListen(connection, podcastId, subs);
+    }
+
     public void increasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         System.out.println("Here is the List of all Podcasts");
@@ -591,7 +650,6 @@ public class InputData {
             create.createPodcastSubscription(connection, new PodcastSubscription(podcastId, id, new Timestamp(System.currentTimeMillis()), 0));
         }
     }
-
     public void decreasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
 
         long podcastId = getPodcastIdInput(connection,sc);
@@ -599,7 +657,7 @@ public class InputData {
         System.out.println("By how many counts do you want to increase the subscriptions");
         int subs = sc.nextInt();
 
-            create.deletePodcastSubscription(connection, podcastId, subs);
+        create.deletePodcastSubscription(connection, podcastId, subs);
     }
     public Optional<Long> getAverageRating(Connection connection, Scanner sc) throws ParseException, SQLException {
 
@@ -632,7 +690,6 @@ public class InputData {
         }
         return Optional.of(podcastId);
     }
-
     public PaymentReportInput getPaymentReportInputForArtist(Connection connection, Scanner sc) throws SQLException, ParseException {
         long artistId = getArtistIdInput(connection, sc);
         System.out.println("Enter the start date (mm/dd/yyyy):");
@@ -648,7 +705,6 @@ public class InputData {
         }
         return  new PaymentReportInput(startDate, endDate, artistId, PaymentUtils.Stakeholder.ARTIST);
     }
-
     public PaymentReportInput getPaymentReportInputForRecordLabel(Connection connection, Scanner sc) throws SQLException, ParseException {
         long rlId = getRecordLabelIdInput(connection, sc);
         System.out.println("Enter the start date (mm/dd/yyyy):");

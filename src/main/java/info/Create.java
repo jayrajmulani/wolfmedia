@@ -380,6 +380,25 @@ public class Create {
         return 0L;
     }
 
+    public void deleteSongListen(Connection connection, long songId, int limit) {
+
+        String query = "delete from SONG_LISTEN where songId = ? order by id desc Limit ?";
+        try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, songId);
+            statement.setLong(2, limit);
+
+            statement.executeUpdate();
+        }
+        catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
     public long createPodcastListen(Connection connection, PodcastEpListen podcastEpListen) throws SQLException {
         String query = "insert into PODCAST_EP_LISTEN (user_id, podcast_id, episode_num) values (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -521,6 +540,45 @@ public class Create {
 
     public long getPodcastSubscriptionById(Connection connection, long podcastId) {
         String query = "Select count(user_id) as subCount from PODCAST_SUBSCRIPTION where podcast_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastId);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()){
+                return rs.getLong("subCount");
+            }
+            return 0L;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+
+    public long getSongPlayCountById(Connection connection, long songId) {
+        String query = "Select count(user_id) as playCount from SONG_LISTEN where song_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, songId);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()){
+                return rs.getLong("subCount");
+            }
+            return 0L;
+        } catch (SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+        return 0L;
+    }
+    public long getPodcastPlayCountById(Connection connection, long podcastId) {
+        String query = "Select count(user_id) as subCount from PODCAST_EP_LISTEN where podcast_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, podcastId);
             ResultSet rs = statement.executeQuery();
