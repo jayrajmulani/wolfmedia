@@ -11,11 +11,17 @@ import java.sql.Date;
 @ToString
 @EqualsAndHashCode
 public class Episode {
-    private long podcastId;
+    private Podcast podcast;
     private long episodeNum;
     private String title;
     private Date releaseDate;
     private double duration;
     private int advCount;
     private double bonusRate;
+
+    public Episode(Podcast podcast, long episodeNum, String title) {
+        this.podcast = podcast;
+        this.episodeNum = episodeNum;
+        this.title = title;
+    }
 }

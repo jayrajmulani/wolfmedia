@@ -33,11 +33,10 @@ public class Read {
                 "JOIN ALBUM A on A.id = SA.album_id " +
                 "WHERE song_id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = connection.prepareStatement(query);
             PreparedStatement artistStatement = connection.prepareStatement(artistQuery);
             PreparedStatement rlStatement = connection.prepareStatement(rlQuery);
-            PreparedStatement albumStatement = connection.prepareStatement(albumQuery);
-
+            PreparedStatement albumStatement = connection.prepareStatement(albumQuery)) {
             statement.setLong(1, id);
             artistStatement.setLong(1, id);
             rlStatement.setLong(1, id);
@@ -234,7 +233,7 @@ public class Read {
     }
 
     public Optional<Episode> getEpisode(Connection connection, Long podcastID, Long episodeNum) throws SQLException {
-        String query = "SELECT * from EPISODE WHERE podcast_id=? AND episode_num=?";
+        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration, E.adv_count, E.bonus_rate from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=? AND E.episode_num=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, podcastID);
             statement.setLong(2, episodeNum);
@@ -244,7 +243,7 @@ public class Read {
             if (resultSet.next()) {
                 return Optional.of(
                         new Episode(
-                                resultSet.getLong("podcast_id"),
+                                new Podcast(resultSet.getLong("podcast_id"),resultSet.getString("name")),
                                 resultSet.getLong("episode_num"),
                                 resultSet.getString("title"),
                                 resultSet.getDate("release_date"),
@@ -331,14 +330,14 @@ public class Read {
     }
 
     public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
-        String query = "SELECT * from EPISODE WHERE podcast_id = ?";
+        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration,  E.adv_count, E.bonus_rate from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, podcastId);
         List<Episode> episodes = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             episodes.add(new Episode(
-                            resultSet.getLong("podcast_id"),
+                            new Podcast(resultSet.getLong("podcast_id"), resultSet.getString("name")),
                             resultSet.getLong("episode_num"),
                             resultSet.getString("title"),
                             resultSet.getDate("release_date"),

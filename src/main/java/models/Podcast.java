@@ -38,4 +38,12 @@ public class Podcast {
         this.country = country;
         this.flatFee = flatFee;
     }
+
+    public Podcast(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    public Podcast(long id){
+        this.id = id;
+    }
 }

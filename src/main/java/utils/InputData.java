@@ -151,7 +151,7 @@ public class InputData {
         System.out.println("Enter the bonus rate of the episode:");
         double bonusRate = myObj.nextDouble();
 
-        return new Episode(podcastID, episodeNum, title, releaseDate, duration, advCount, bonusRate);
+        return new Episode(new Podcast(podcastID), episodeNum, title, releaseDate, duration, advCount, bonusRate);
     }
 
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {
@@ -604,52 +604,56 @@ public class InputData {
     }
 
     public void increaseSongPlayCount(Connection connection, Scanner sc) throws ParseException, SQLException {
-
         long songId = getSongIdInput(connection, sc);
-
-        System.out.println("By how many counts do you want to increase the playcounts");
+        List<User> users = read.getAllUsers(connection);
+        List<Long> userIds = users.stream().map(User::getId).toList();
+        if(userIds.size() == 0) {
+            System.out.println("There must be at least one user in the system. No users found.");
+        }
+        System.out.println("By how many counts do you want to increase the play count?");
         int subs = sc.nextInt();
-
         for (int i = 1; i <= subs; i++) {
-            create.createSongListen(connection, new SongListen(songId, 1));
+            create.createSongListen(connection, new SongListen(songId, userIds.get(new Random().nextInt(userIds.size()))));
         }
     }
 
-    public void decreaseSongPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
-
+    public void decreaseSongPlayCount(Connection connection, Scanner sc) throws SQLException {
         long songId = getSongIdInput(connection, sc);
-
-        System.out.println("By how many counts do you want to decrease the playcount of the song");
+        System.out.println("By how many counts do you want to decrease the play count of the song?");
         int subs = sc.nextInt();
-
         create.deleteSongListen(connection, songId, subs);
     }
 
     public void increasePodcastPlayCount(Connection connection, Scanner sc) throws ParseException, SQLException {
-
         long podcastId = getPodcastIdInput(connection, sc);
-        long episodeNum = getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
-        System.out.println("By how many counts do you want to increase the playcounts");
+        Optional<Long> episodeNum = getEpisodeNumberInput(connection, sc, podcastId);
+        if(episodeNum.isEmpty()){
+            System.out.println("This podcast doesn't have any episode.");
+            return;
+        }
+        System.out.println("By how many counts do you want to increase the play count?");
         int subs = sc.nextInt();
+        List<User> users = read.getAllUsers(connection);
+        List<Long> userIds = users.stream().map(User::getId).toList();
         for (int i = 1; i <= subs; i++) {
-            create.createPodcastListen(connection, new PodcastEpListen(podcastId, 1, episodeNum));
+            create.createPodcastListen(connection, new PodcastEpListen(podcastId, userIds.get(new Random().nextInt(userIds.size())), episodeNum.get()));
         }
     }
-
-    public void decreasePodcastPlaycount(Connection connection, Scanner sc) throws ParseException, SQLException {
-
+    public void decreasePodcastPlayCount(Connection connection, Scanner sc) throws  SQLException {
         long podcastId = getPodcastIdInput(connection, sc);
-        long episodeNum = getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
-
-        System.out.println("By how many counts do you want to decrease the playcount of the song");
+        Optional<Long> episodeNum = getEpisodeNumberInput(connection, sc, podcastId);
+        if(episodeNum.isEmpty()){
+            System.out.println("This podcast doesn't have any episode.");
+            return;
+        }
+        System.out.println("By how many counts do you want to decrease the play count of the episode?");
         int subs = sc.nextInt();
-
-        create.deletePodcastListen(connection, podcastId, episodeNum, subs);
+        create.deletePodcastListen(connection, podcastId, episodeNum.get(), subs);
     }
 
-    public void increasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public void increasePodcastSubscription(Connection connection, Scanner sc) throws  SQLException {
         long podcastId = this.getPodcastIdInput(connection, sc);
-        System.out.println("By how many counts do you want to increase the subscriptions");
+        System.out.println("By how many counts do you want to increase the subscriptions?");
         int subs = sc.nextInt();
 
         for (int i = 1; i <= subs; i++) {
@@ -660,7 +664,7 @@ public class InputData {
 
     public void decreasePodcastSubscription(Connection connection, Scanner sc) throws ParseException, SQLException {
         long podcastId = this.getPodcastIdInput(connection, sc);
-        System.out.println("By how many counts do you want to increase the subscriptions");
+        System.out.println("By how many counts do you want to increase the subscriptions?");
         int subs = sc.nextInt();
         create.deletePodcastSubscription(connection, podcastId, subs);
     }
