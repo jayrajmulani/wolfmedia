@@ -153,15 +153,19 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            long id = create.createArtist(connection, inputData.getArtistInput(sc, connection));
+                                            long id = create.createArtist(connection, inputData.getArtistInput(connection));
                                             System.out.println("Artist created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            // TODO: Read Artist
-                                            break;
+                                            long id = inputData.getArtistIdInput(connection,sc);
+                                            Artist artist = read.getArtist(connection, id).orElseThrow();
+                                            System.out.println(artist);
                                         }
                                         case 3 -> {
-                                            // TODO: Update Artist
+                                            long id = inputData.getArtistIdInput(connection,sc);
+                                            Artist artist = inputData.getArtistInputForUpdate();
+                                            artist.setId(id);
+                                            update.updateArtist(connection,artist);
                                         }
                                         case 4 -> {
                                             delete.deleteArtist(connection, inputData.getArtistIdInput(connection, sc));

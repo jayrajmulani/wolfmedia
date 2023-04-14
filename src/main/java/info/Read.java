@@ -1,6 +1,7 @@
 package info;
 
 import models.*;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -114,24 +115,38 @@ public class Read {
     }
 
     public Optional<Artist> getArtist(Connection connection, long id) throws SQLException {
-        String query = "SELECT * FROM ARTIST WHERE ARTIST.id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, id);
-            statement.executeQuery();
-            ResultSet resultSet = statement.getResultSet();
-//            List<Genre> genres = new ArrayList<>();
-//            while (resultSet.next()) {
-//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
-//            }
-//            resultSet.beforeFirst();
-            if (resultSet.next()) {
-                return Optional.of(
-                        new Artist(id));
-            }
+        Artist artist = new Artist();
+        String query = "SELECT A.id, A.name, A.country, A.status, PG.genre_id genre_id, G.name genre_name, RL.name record_label_name, RL.id record_label_id " +
+                "FROM ARTIST A , PRIMARY_GENRE PG, GENRE G , RECORD_LABEL RL, SIGNS S " +
+                "WHERE A.id = ?" +
+                " AND G.id = PG.genre_id AND PG.artist_id = A.id " +
+                " AND RL.id = S.record_label_id AND S.artist_id = A.id";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, id);
+        statement.executeQuery();
+        ResultSet resultSet = statement.getResultSet();
+        if (!resultSet.next()) {
             return Optional.empty();
         }
-    }
+        artist.setId(resultSet.getLong("id"));
+        artist.setName(resultSet.getString("name"));
+        artist.setCountry(resultSet.getString("country"));
+        artist.setStatus(Artist.ArtistStatus.valueOf(resultSet.getString("status")));
+        artist.setPrimaryGenre(new Genre( resultSet.getLong("genre_id"), resultSet.getString("genre_name")));
+        artist.setRecordLabel(new RecordLabel(resultSet.getLong("record_label_id"), resultSet.getString("record_label_name")));
 
+        String typeQuery = "SELECT id, name FROM ARTIST_TYPE AT, ARTIST_IS AI" +
+                " WHERE AT.id = AI.artist_type_id AND AI.artist_id = ?" ;
+        PreparedStatement typeStatement = connection.prepareStatement(typeQuery);
+        typeStatement.setLong(1, id);
+        ResultSet typeRs = typeStatement.executeQuery();
+        List<ArtistType> ats = new ArrayList<>();
+        while(typeRs.next()){
+            ats.add(new ArtistType(typeRs.getLong("id"), typeRs.getString("name")));
+        }
+        artist.setTypes(ats);
+        return Optional.of(artist);
+    }
     public Optional<Guest> getGuest(long id, Connection connection) throws SQLException {
         String query = "SELECT id, name FROM GUEST WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {

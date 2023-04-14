@@ -398,64 +398,84 @@ public class ReportUtils {
         }
         return 0L;
     }
-    public void flushEpisodePlayCountForCurrentMonth(Connection connection, long podcastId, long episodeNum) throws SQLException {
-        // Get play count for current month
-        String query = "SELECT COUNT(*) play_count FROM PODCAST_EP_LISTEN WHERE podcast_id = ? AND episode_num = ? " +
-                "AND MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP) " +
-                "AND YEAR(timestamp) = YEAR(CURRENT_TIMESTAMP)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setLong(1, podcastId);
-        statement.setLong(1, episodeNum);
-        ResultSet rs = statement.executeQuery();
-        long playCount = 0;
-        if(rs.next()){
-            playCount = rs.getLong("play_count");
-        }
-        rs.close();
-        if(playCount == 0){
-            System.out.println("Nothing to flush. Play Count is 0.");
-            return;
-        }
-        statement.close();
-        // Push the value to historical play count (update if exists, else insert)
-        query = "SELECT * FROM HISTORICAL_EPISODE_PLAY_COUNT WHERE podcast_id = ? AND episode_num = ? " +
-                "AND month = MONTH(CURRENT_TIMESTAMP)" +
-                "AND year = YEAR(CURRENT_TIMESTAMP)";
-        statement = connection.prepareStatement(query);
-        statement.setLong(1, podcastId);
-        statement.setLong(1, episodeNum);
-        ResultSet hRs = statement.executeQuery();
-        if(hRs.next()){
-            // Data was already present for current month, hence update
-            System.out.println("Found existing data for this month, updating the same");
-            String updateQuery = "UPDATE HISTORICAL_EPISODE_PLAY_COUNT SET play_count = play_count + ? " +
-                    "WHERE podcast_id = ? AND episode_num = ? AND month = month(CURRENT_TIMESTAMP) AND year = year(CURRENT_TIMESTAMP)";
-            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-            updateStatement.setLong(1,playCount);
-            updateStatement.setLong(2, podcastId);
-            updateStatement.setLong(3, episodeNum);
-            updateStatement.executeUpdate();
-            updateStatement.close();
-        }
-        else{
-            // Data was missing, hence insert
-            String insertQuery = "INSERT INTO HISTORICAL_EPISODE_PLAY_COUNT(podcast_id, episode_num, month, year, play_count) " +
-                    " VALUES (? ,?, month(CURRENT_TIMESTAMP), year(CURRENT_TIMESTAMP), ?)";
-            PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-            insertStatement.setLong(1, podcastId);
-            insertStatement.setLong(2, episodeNum);
-            insertStatement.setLong(3, playCount);
-            insertStatement.executeUpdate();
-            insertStatement.close();
-        }
+    public void flushEpisodePlayCountForCurrentMonth
+            (Connection connection, long podcastId, long episodeNum) throws SQLException {
+        // Begin Transaction
+        connection.setAutoCommit(false);
+        try {
+            // Get play count for current month
+            String query = "SELECT COUNT(*) play_count FROM " +
+                    "PODCAST_EP_LISTEN WHERE podcast_id = ? AND episode_num = ? " +
+                    "AND MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP) " +
+                    "AND YEAR(timestamp) = YEAR(CURRENT_TIMESTAMP)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setLong(1, podcastId);
+            statement.setLong(1, episodeNum);
+            ResultSet rs = statement.executeQuery();
+            long playCount = 0;
+            if (rs.next()) {
+                playCount = rs.getLong("play_count");
+            }
+            rs.close();
+            if (playCount == 0) {
+                System.out.println("Nothing to flush. Play Count is 0.");
+                return;
+            }
+            statement.close();
+            // Push the value to historical play count (update if exists, else insert)
+            query = "SELECT * FROM " +
+                    "HISTORICAL_EPISODE_PLAY_COUNT WHERE podcast_id = ? AND " +
+                    "episode_num = ? " +
+                    "AND month = MONTH(CURRENT_TIMESTAMP)" +
+                    "AND year = YEAR(CURRENT_TIMESTAMP)";
+            statement = connection.prepareStatement(query);
+            statement.setLong(1, podcastId);
+            statement.setLong(1, episodeNum);
+            ResultSet hRs = statement.executeQuery();
+            if (hRs.next()) {
+                // Data was already present for current month, hence update
+                System.out.println("Found existing data for this month, updating the same");
+                String updateQuery = "UPDATE HISTORICAL_EPISODE_PLAY_COUNT " +
+                        "SET play_count = play_count + ? " +
+                        "WHERE podcast_id = ? AND episode_num = ? " +
+                        "AND month = month(CURRENT_TIMESTAMP) AND year = year(CURRENT_TIMESTAMP)";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setLong(1, playCount);
+                updateStatement.setLong(2, podcastId);
+                updateStatement.setLong(3, episodeNum);
+                updateStatement.executeUpdate();
+                updateStatement.close();
+            } else {
+                // Data was missing, hence insert
+                String insertQuery = "INSERT INTO " +
+                        "HISTORICAL_EPISODE_PLAY_COUNT" +
+                        "(podcast_id, episode_num, month, year, play_count) " +
+                        " VALUES (? ,?, month(CURRENT_TIMESTAMP), year(CURRENT_TIMESTAMP), ?)";
+                PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                insertStatement.setLong(1, podcastId);
+                insertStatement.setLong(2, episodeNum);
+                insertStatement.setLong(3, playCount);
+                insertStatement.executeUpdate();
+                insertStatement.close();
+            }
+            // Flush the individual listen records
+            String deleteQuery = "DELETE FROM PODCAST_EP_LISTEN " +
+                    "WHERE podcast_id = ? AND episode_num = ?";
+            PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
+            deleteStatement.setLong(1, podcastId);
+            deleteStatement.setLong(1, episodeNum);
+            deleteStatement.executeUpdate();
+            deleteStatement.close();
 
-        // Flush the individual listen records
-        String deleteQuery = "DELETE FROM PODCAST_EP_LISTEN WHERE podcast_id = ? AND episode_num = ?";
-        PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
-        deleteStatement.setLong(1,podcastId);
-        deleteStatement.setLong(1,episodeNum);
-        deleteStatement.executeUpdate();
-        deleteStatement.close();
+            // Commit changes
+            connection.commit();
+        }catch (SQLException e){
+            connection.rollback();
+            e.printStackTrace();
+        }finally {
+            // End Transaction
+            connection.setAutoCommit(true);
+        }
     }
     public List<Stats> getHistoricalEpisodePlayCountByMonth(Connection connection, long podcastId, long episodeNum) throws SQLException {
         List<Stats> stats = new ArrayList<>();

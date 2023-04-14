@@ -32,8 +32,18 @@ public class Update {
         statement.setLong(2, service.getId());
         statement.executeUpdate();
     }
-    public void updateArtist(Connection connection, Artist artist){
-        // TODO
+    public void updateArtist(Connection connection, Artist artist) throws SQLException {
+        String query = "UPDATE ARTIST SET " +
+                "name = ?,  " +
+                "country = ?, " +
+                "status = ? " +
+                "WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, artist.getName());
+        statement.setString(1, artist.getCountry());
+        statement.setString(1, artist.getStatus().getStatus());
+        statement.setLong(1, artist.getId());
+        statement.executeUpdate();
     }
     public void updateRecordLabel(Connection connection, RecordLabel recordLabel) throws SQLException {
         String query = "UPDATE RECORD_LABEL SET NAME = ? WHERE ID = ?";
