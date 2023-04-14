@@ -261,8 +261,6 @@ public class Create {
         // Start a Transaction
         connection.setAutoCommit(false);
 
-//        types, genre, recordlabel
-
         String query = "insert into ARTIST (name, country, status) values (?, ?, ?)";
         String mapArtistGenreQuery = "INSERT INTO PRIMARY_GENRE(artist_id, genre_id) values (?,?)";
         String mapArtistRLQuery = "INSERT INTO SIGNS(artist_id, record_label_id, updated_at) " +
@@ -358,11 +356,10 @@ public class Create {
     }
 
     public void createAssignArtisttoRecordLabel(Connection connection, Signs signs) {
-        String query = "insert into SIGNS (artist_id, record_label_id, updated_at) values (?, ?, ?)";
+        String query = "insert into SIGNS (artist_id, record_label_id, updated_at) values (?, ?, CURRENT_TIMESTAMP)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, signs.getArtistId());
             statement.setLong(2, signs.getRecordLabelId());
-            statement.setDate(3, signs.getUpdatedAt());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

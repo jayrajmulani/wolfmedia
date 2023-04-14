@@ -13,7 +13,9 @@ public class PaymentUtils {
         if (paymentInfo.getSenderType() == Stakeholder.SERVICE) {
             if (paymentInfo.getReceiverType() == Stakeholder.RECORD_LABEL) {
                 // Make an entry in the RL_PAY table
-                String query = "INSERT INTO RL_PAY(service_id, record_label_id, amount) VALUES (?,?,?)";
+                String query = "INSERT INTO" +
+                        " RL_PAY(service_id, record_label_id, amount)" +
+                        " VALUES (?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setLong(1, paymentInfo.getSenderId());
                 statement.setLong(2, paymentInfo.getReceiverId());
@@ -29,7 +31,9 @@ public class PaymentUtils {
 
             } else if (paymentInfo.getReceiverType() == Stakeholder.PODCAST_HOST) {
                 // Make an entry in the HOST_PAY table
-                String query = "INSERT INTO HOST_PAY(service_id, host_id, amount) VALUES (?,?,?)";
+                String query = "INSERT INTO" +
+                        " HOST_PAY(service_id, host_id, amount)" +
+                        " VALUES (?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setLong(1, paymentInfo.getSenderId());
                 statement.setLong(2, paymentInfo.getReceiverId());
@@ -44,13 +48,16 @@ public class PaymentUtils {
                 connection.commit();
             } else {
                 connection.rollback();
+                connection.setAutoCommit(true);
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
                         "Service can only make payments to Record Labels or Podcast Hosts");
             }
         } else if (paymentInfo.getSenderType() == Stakeholder.RECORD_LABEL) {
             if (paymentInfo.getReceiverType() == Stakeholder.ARTIST) {
                 // Make an entry in the ARTIST_PAY table
-                String query = "INSERT INTO ARTIST_PAY(record_label_id, ARTIST_PAY.artist_id, amount) VALUES (?,?,?)";
+                String query = "INSERT INTO" +
+                        " ARTIST_PAY(record_label_id, ARTIST_PAY.artist_id, amount)" +
+                        " VALUES (?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setLong(1, paymentInfo.getSenderId());
                 statement.setLong(2, paymentInfo.getReceiverId());
@@ -59,13 +66,16 @@ public class PaymentUtils {
                 connection.commit();
             } else {
                 connection.rollback();
+                connection.setAutoCommit(true);
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
                         "Record Labels can only make payments to Artists");
             }
         } else if (paymentInfo.getSenderType() == Stakeholder.USER) {
             if (paymentInfo.getReceiverType() == Stakeholder.SERVICE) {
                 // Make an entry in the EARNS table
-                String query = "INSERT INTO EARNS(service_id, user_id, amount) VALUES (?,?,?)";
+                String query = "INSERT INTO " +
+                        "EARNS(service_id, user_id, amount) " +
+                        "VALUES (?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setLong(1, paymentInfo.getSenderId());
                 statement.setLong(2, paymentInfo.getReceiverId());
@@ -80,11 +90,13 @@ public class PaymentUtils {
                 connection.commit();
             } else {
                 connection.rollback();
+                connection.setAutoCommit(true);
                 throw new IllegalArgumentException("Illegal Receiver Type. " +
                         "Users can only make payments to Service");
             }
         } else {
             connection.rollback();
+            connection.setAutoCommit(true);
             throw new IllegalArgumentException("Illegal Sender Type");
         }
         // End Transaction
