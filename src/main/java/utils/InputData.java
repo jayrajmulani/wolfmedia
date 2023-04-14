@@ -3,6 +3,7 @@ package utils;
 import info.Create;
 import info.Read;
 import models.*;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 public class InputData {
@@ -362,7 +364,7 @@ public class InputData {
         return new RecordLabel(name);
     }
 
-    public Artist getArtistInput(Scanner sc, Connection connection) throws SQLException, ParseException {
+    public Artist getArtistInput( Connection connection) throws SQLException, ParseException {
 
         Scanner myObj = new Scanner(System.in);
 
@@ -376,7 +378,8 @@ public class InputData {
         Artist.ArtistStatus status = Artist.ArtistStatus.valueOf(myObj.nextLine());
 
         System.out.println("Enter list of types for this artist (Separate multiple values by |):");
-        System.out.println("E.g. COMPOSER | BAND");
+        System.out.println("E.g. COMPOSER | BAND | MUSICIAN | SINGER | LYRICIST");
+
         String typesPipeSeparated = myObj.nextLine();
         List<ArtistType> types = Arrays.stream(typesPipeSeparated.split("\\|")).map(type -> new ArtistType(type.strip())).toList();
 
@@ -386,6 +389,20 @@ public class InputData {
         Signs s = this.getArtisttoRecordLabelInput(connection, myObj, 0);
 
         return new Artist(name, country, status, types, new Genre(genre), new RecordLabel(s.getRecordLabelId()));
+    }
+    public Artist getArtistInputForUpdate(){
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the name of the Artist: ");
+        String name = myObj.nextLine();
+
+        System.out.println("Enter the country of the Artist: ");
+        String country = myObj.nextLine();
+
+        System.out.println("Enter the status of the Artist (ACTIVE/RETIRED): ");
+        Artist.ArtistStatus status = Artist.ArtistStatus.valueOf(myObj.nextLine());
+
+        return new Artist(name, country, status);
     }
 
     public Album getAlbumInput(Scanner sc) throws ParseException {
@@ -491,11 +508,7 @@ public class InputData {
         System.out.println("Enter Record Label ID:");
         long recordLabelId = sc.nextLong();
 
-        System.out.println("Enter the registration date of the User: ");
-        Date updatedAt = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(sc.next()).getTime());
-
-
-        return new Signs(artistId, recordLabelId, updatedAt);
+        return new Signs(artistId, recordLabelId, null);
     }
 
     public Optional<SongAlbum> getSongtoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
@@ -567,7 +580,7 @@ public class InputData {
         return new PaymentReportInput(startDate, endDate, hostId, PaymentUtils.Stakeholder.PODCAST_HOST);
     }
 
-    public SongListen getSongListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public SongListen getSongListenInput(Connection connection, Scanner sc) throws SQLException {
 
         System.out.println("Here is the List of all Songs");
         List<Song> allSongs = read.getAllSongs(connection);
@@ -586,7 +599,7 @@ public class InputData {
         return new SongListen(songId, userId);
     }
 
-    public PodcastEpListen getPodcastEpListenInput(Connection connection, Scanner sc) throws ParseException, SQLException {
+    public PodcastEpListen getPodcastEpListenInput(Connection connection, Scanner sc) throws SQLException {
 
         System.out.println("Here is the List of all Podcasts");
         List<Podcast> allPodcasts = read.getAllPodcasts(connection);
