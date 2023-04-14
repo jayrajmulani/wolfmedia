@@ -218,7 +218,13 @@ public class CLI {
                                             System.out.println("Enter the id of the podcast:");
                                             Long id = sc.nextLong();
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
-                                            resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
+
+                                            if (resultPodcast.isPresent()){
+                                                System.out.println(resultPodcast.get());
+                                                System.out.println("Episode count:"+resultPodcast.get().getEpisodes().size());
+                                            }else {
+                                                System.out.println("Podcast not found!");
+                                            }
                                         }
                                         case 3 -> {
                                             long id = inputData.getPodcastIdInput(connection,sc);
