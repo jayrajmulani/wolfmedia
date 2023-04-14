@@ -8,7 +8,25 @@ import java.util.Optional;
 
 public class Update {
 
-    public void updateSong(Connection connection, SongAlbum songAlbum, long songID) {
+    public void updateSong(Connection connection, Song song) throws SQLException {
+        String query = "UPDATE SONG SET " +
+                "title = ?,  " +
+                "release_country = ?, " +
+                "language = ?," +
+                "duration = ?," +
+                "royalty_rate = ?, " +
+                "release_date = ? " +
+                "WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, song.getTitle());
+        statement.setString(2, song.getReleaseCountry());
+        statement.setString(3, song.getLanguage());
+        statement.setDouble(4, song.getDuration());
+        statement.setDouble(5, song.getRoyaltyRate());
+        statement.setDate(6, song.getReleaseDate());
+        statement.setLong(7, song.getId());
+
+        statement.executeUpdate();
 
     }
     public void updateGuest(Connection connection, Guest guest) throws SQLException {

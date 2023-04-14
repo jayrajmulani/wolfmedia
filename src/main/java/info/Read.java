@@ -44,14 +44,11 @@ public class Read {
             artistStatement.setLong(1, id);
             rlStatement.setLong(1, id);
             albumStatement.setLong(1, id);
-            statement.executeQuery();
-            artistStatement.executeQuery();
-            rlStatement.executeQuery();
-            albumStatement.executeQuery();
-            ResultSet resultSet = statement.getResultSet();
-            ResultSet artistResultSet = artistStatement.getResultSet();
-            ResultSet rlResultSet = rlStatement.getResultSet();
-            ResultSet albumResultSet = albumStatement.getResultSet();
+
+            ResultSet resultSet = statement.executeQuery();
+            ResultSet artistResultSet = artistStatement.executeQuery();
+            ResultSet rlResultSet = rlStatement.executeQuery();
+            ResultSet albumResultSet = albumStatement.executeQuery();
             HashSet<Genre> genres = new HashSet<>();
             HashSet<Artist> artists = new HashSet<>();
             HashSet<Artist> collaborators = new HashSet<>();

@@ -18,7 +18,26 @@ public class InputData {
     private static final Read read = new Read();
     private static final Create create = new Create();
 
-    public SongAlbum getSongInput(Connection connection, boolean isCreateOp) throws ParseException, SQLException, IllegalArgumentException {
+    public Song getSongInputForUpdate(Connection connection) throws ParseException {
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("Enter the title of the song:");
+        String title = myObj.nextLine();
+        System.out.println("Enter the language of the song:");
+        String language = myObj.nextLine();
+        System.out.println("Enter the release country of the song:");
+        String releaseCountry = myObj.nextLine();
+        System.out.println("Enter the duration of the song:");
+        double duration = myObj.nextDouble();
+        System.out.println("Enter the royalty rate of the song:");
+        double royaltyRate = myObj.nextDouble();
+        System.out.println("Enter the release date (mm/dd/yyyy) of the song:");
+        Date releaseDate = new Date(new SimpleDateFormat("MM/dd/yyyy").parse(myObj.next()).getTime());
+        myObj.nextLine();
+
+        return new Song(title, releaseCountry, language, duration, royaltyRate, releaseDate, false, new ArrayList<>());
+    }
+    public SongAlbum getSongInput(Connection connection) throws ParseException, SQLException, IllegalArgumentException {
 
         Scanner myObj = new Scanner(System.in);
 

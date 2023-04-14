@@ -61,7 +61,7 @@ public class CLI {
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
                                             // Create Song
-                                            long id = create.createSong(connection, inputData.getSongInput(connection, true));
+                                            long id = create.createSong(connection, inputData.getSongInput(connection));
                                             if (id == 0) {
                                                 System.out.println("Could not create song");
                                             } else {
@@ -77,8 +77,12 @@ public class CLI {
                                         }
                                         case 3 -> {
                                             // Update Song
-                                            long songID = inputData.getSongIdInput(connection, sc);
-                                            update.updateSong(connection, inputData.getSongInput(connection, false), songID);
+
+                                            long id = inputData.getSongIdInput(connection, sc);
+                                            Song song = inputData.getSongInputForUpdate(connection);
+                                            song.setId(id);
+                                            update.updateSong(connection, song);
+                                            System.out.println("Song updated successfully" );
                                         }
                                         case 4 -> {
                                             System.out.println("FYI, Deleting a Song will delete all the records of the song where SongId is a foreign key");
