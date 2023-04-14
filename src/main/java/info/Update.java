@@ -109,4 +109,86 @@ public class Update {
         statement.executeUpdate();
     }
 
+    public void updatePodcast(Connection connection, Podcast podcast) throws SQLException {
+        String query = "UPDATE PODCAST SET " +
+                "name = ?," +
+                "country = ?," +
+                "language = ?, " +
+                "flat_fee = ? " +
+                "WHERE id = ?";
+
+        String hostDel = "DELETE FROM PODCAST_HOST WHERE podcast_id=?";
+        String hostAdd = "INSERT INTO PODCAST_HOST(host_id, podcast_id) VALUES (?,?)";
+//        String sponsorDel = "DELETE FROM PODCAST_SPONSOR WHERE podcast_id=?";
+//        String sponsorAdd = "INSERT INTO PODCAST_SPONSOR(podcast_id, sponsor_id) VALUES (?,?)";
+//        String genreDel = "DELETE FROM PODCAST_GENRE WHERE podcast_id=?";
+//        String genreAdd = "INSERT INTO PODCAST_GENRE(podcast_id, genre_id) VALUES (?,?)";
+
+        try {
+
+            connection.setAutoCommit(false);
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement hostDeleteStatement = connection.prepareStatement(hostDel);
+            PreparedStatement hostAddStatement = connection.prepareStatement(hostAdd);
+//            PreparedStatement sponsorDelStatement = connection.prepareStatement(sponsorDel);
+//            PreparedStatement sponsorAddStatement = connection.prepareStatement(sponsorAdd);
+//            PreparedStatement genreDelStatement = connection.prepareStatement(genreDel);
+//            PreparedStatement genreAddStatement = connection.prepareStatement(genreAdd);
+
+            statement.setString(1, podcast.getName());
+            statement.setString(2, podcast.getCountry());
+            statement.setString(3, podcast.getLanguage());
+            statement.setDouble(4, podcast.getFlatFee());
+            statement.setLong(5, podcast.getId());
+
+            statement.executeUpdate();
+
+            hostDeleteStatement.setLong(1, podcast.getId());
+//            sponsorDelStatement.setLong(1, podcast.getId());
+//            genreDelStatement.setLong(1, podcast.getId());
+
+            hostDeleteStatement.executeUpdate();
+//            sponsorDelStatement.executeUpdate();
+//            genreDelStatement.executeUpdate();
+
+            podcast.getHosts().forEach(host -> {
+                try {
+                    hostAddStatement.setLong(1, host.getId());
+                    hostAddStatement.setLong(2, podcast.getId());
+                    hostAddStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    DB.rollBackTransaction(connection);
+                }
+            });
+//            podcast.getSponsors().forEach(sponsor -> {
+//                try {
+//                    sponsorAddStatement.setLong(1, podcast.getId());
+//                    sponsorAddStatement.setLong(2, sponsor.getId());
+//                    sponsorAddStatement.executeUpdate();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                    DB.rollBackTransaction(connection);
+//                }
+//            });
+//            podcast.getGenres().forEach(genre -> {
+//                try {
+//                    sponsorAddStatement.setLong(1, podcast.getId());
+//                    sponsorAddStatement.setLong(2, genre.getId());
+//                    sponsorAddStatement.executeUpdate();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                    DB.rollBackTransaction(connection);
+//                }
+//            });
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }finally {
+            connection.setAutoCommit(true);
+        }
+
+    }
 }

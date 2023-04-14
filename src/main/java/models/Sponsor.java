@@ -11,7 +11,12 @@ import lombok.*;
 public class Sponsor {
     private long id;
     private String name;
+
     public Sponsor(String name) {
         this.name = name;
+    }
+
+    public Sponsor(long id) {
+        this.id = id;
     }
 }

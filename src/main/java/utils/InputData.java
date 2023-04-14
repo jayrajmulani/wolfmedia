@@ -91,7 +91,8 @@ public class InputData {
         return new Host(firstName, lastName, city, email, phone);
     }
 
-    public Podcast getPodcastInput(Scanner sc) {
+    public Podcast getPodcastInput(Scanner sc1, Connection connection) throws SQLException {
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter the name of the podcast:");
         String name = sc.nextLine();
         System.out.println("Enter the language of the podcast:");
@@ -99,40 +100,13 @@ public class InputData {
         System.out.println("Enter the country of the podcast:");
         String country = sc.nextLine();
         System.out.println("Enter the flat fee of the podcast:");
-        double flatFee = sc.nextDouble();
+        double flatFee =Double.parseDouble(sc.nextLine());
 
-        List<Host> hosts = new ArrayList<>();
-        int crudChoice;
-        boolean isFinishedHostInput = false;
-        while (!isFinishedHostInput) {
-            System.out.println("Hosts for Podcast " + name);
-            System.out.println("1. Already present");
-            System.out.println("2. Add new host");
-            System.out.println("-1. Done adding");
-            System.out.print("Enter your choice: ");
-            crudChoice = sc.nextInt();
-            switch (crudChoice) {
-                case -1 -> {
-                    if (hosts.size() == 0) {
-                        System.out.println("Please add at least 1 host");
-                        continue;
-                    }
-                    isFinishedHostInput = true;
-                }
-                case 1 -> {
-                    System.out.println("Please enter the ID of the host");
-                    int hostID = sc.nextInt();
-                    hosts.add(new Host(hostID));
-                }
-                case 2 -> {
-                    hosts.add(getHostInput());
-                }
-                default -> {
-                    System.out.println("Please choose a value between 1 and 2...");
-                }
-            }
-        }
-
+        List<Host> hostList = read.getAllHosts(connection);
+        hostList.forEach(System.out::println);
+        System.out.println("Enter Host IDs like 1 | 2:");
+        String pipeSeparatedHosts = sc.nextLine();
+        List<Host> hosts = Arrays.stream(pipeSeparatedHosts.split("\\|")).map(host -> new Host(Long.parseLong(host.strip()))).toList();
         return new Podcast(name, language, country, flatFee, hosts);
     }
 
