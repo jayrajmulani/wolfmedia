@@ -69,8 +69,16 @@ public class InputData {
             System.out.println("The first artist would be considered as Primary Artist and song would be owned by its record label.");
             System.out.println("E.g. 1 | 4");
             String artistsPipeSeparated = myObj.nextLine();
-            List<Long> artistIds = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> Long.parseLong(artistID.trim())).toList();
             boolean valid = true;
+            if(artistsPipeSeparated.trim().length() == 0){
+                valid = false;
+            }
+            if(!valid){
+                System.out.println("Enter minimum 1 Artist ID");
+                continue;
+            }
+            List<Long> artistIds = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> Long.parseLong(artistID.trim())).toList();
+
             for(long id: artistIds){
                 if(!allArtistIds.contains(id)){
                     valid = false;
@@ -115,6 +123,7 @@ public class InputData {
 
         if (doAddAlbum) {
             long albumID = this.getAlbumIdInput(connection, myObj);
+
             Album album = new Album(albumID);
             System.out.println("Enter the track number of the song");
             long trackNum = myObj.nextLong();
