@@ -423,91 +423,25 @@ public class InputData {
 
     public Creates getSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Songs");
-        List<Song> allSongs = read.getAllSongs(connection);
-        allSongs.forEach(System.out::println);
+        long songId = getSongIdInput(connection, sc);
+        long artistId = getArtistIdInput(connection, sc);
 
-        System.out.println("Enter Song ID:");
-        long songId = sc.nextLong();
-
-        System.out.println("Here is the List of all Artists");
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-
-        System.out.println("Enter Artist ID:");
-        long artistId = sc.nextLong();
-
-        System.out.println("For this song is the artist a collabarator? ");
+        System.out.println("For this song is the artist a collabarator? (True/False)");
         boolean isCollabarator = sc.nextBoolean();
 
         return new Creates(songId, artistId, isCollabarator);
     }
 
-    public Optional<Owns> getSongtoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Songs (Not yet assigned to a Record Label)");
-        List<Song> allSongs = read.getAllSongs(connection);
-
-        List<Owns> allOwns = read.getAllOwns(connection);
-        Set<Long> songsInOwns = new HashSet<>();
-        allOwns.forEach(allOwn -> songsInOwns.add(allOwn.getSongId()));
-        if (songsInOwns.size() == allSongs.size()) {
-            System.out.println("All Songs already assigned to Record Label, Insert a song first");
-            return Optional.empty();
-        }
-
-        allSongs.forEach(allSong -> {
-            if (!songsInOwns.contains(allSong.getId()))
-                System.out.println(allSong);
-        });
-
-        long songId;
-        while (true) {
-            System.out.println("Enter Song ID:");
-            songId = sc.nextLong();
-            if (songsInOwns.contains(songId))
-                System.out.println("Song already in owns");
-            else
-                break;
-        }
-        System.out.println("Here is the List of all Record Labels");
-        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
-        allRecordLabels.forEach(System.out::println);
-
-        System.out.println("Enter Record Label ID:");
-        long recordLabelId = sc.nextLong();
-
-        return Optional.of(new Owns(recordLabelId, songId));
-    }
-
     public Compiles getArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Artists");
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-
-        System.out.println("Enter Artist ID:");
-        long artistId = sc.nextLong();
-
-        System.out.println("Here is the List of all Albums");
-        List<Album> allAlbums = read.getAllAlbums(connection);
-        allAlbums.forEach(System.out::println);
-
-        System.out.println("Enter Album ID:");
-        long albumId = sc.nextLong();
-
+        long artistId = getArtistIdInput(connection, sc);
+        long albumId = getAlbumIdInput(connection, sc);
         return new Compiles(artistId, albumId);
     }
 
     public Signs getArtisttoRecordLabelInput(Connection connection, Scanner sc, long artistId) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Record Labels");
-        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
-        allRecordLabels.forEach(System.out::println);
-
-        System.out.println("Enter Record Label ID:");
-        long recordLabelId = sc.nextLong();
-
+        long recordLabelId = getRecordLabelIdInput(connection, sc);
         return new Signs(artistId, recordLabelId, null);
     }
 
@@ -515,7 +449,8 @@ public class InputData {
 
         System.out.println("Here is the List of all Songs (Not yet assigned to an Album)");
         List<Song> allSongs = read.getAllSongs(connection);
-
+        List <Long> allSongsId = new ArrayList<>();
+        allSongs.forEach(song -> allSongsId.add(song.getId()));
         List<SongAlbum> allSongAlbums = read.getAllSongAlbum(connection);
         Set<Long> songsInSongAlbum = new HashSet<>();
         allSongAlbums.forEach(allSongAlbum -> songsInSongAlbum.add(allSongAlbum.getSong().getId()));
@@ -534,17 +469,14 @@ public class InputData {
             System.out.println("Enter Song ID:");
             songId = sc.nextLong();
             if (songsInSongAlbum.contains(songId))
-                System.out.println("Song already in SongAlbum");
+                System.out.println("Song already assigned to an Album");
+            else if(!allSongsId.contains(songId))
+                System.out.println("Pls enter a songId that exists");
             else
                 break;
         }
 
-        System.out.println("Here is the List of all Albums");
-        List<Album> allAlbums = read.getAllAlbums(connection);
-        allAlbums.forEach(System.out::println);
-
-        System.out.println("Enter Album ID:");
-        long albumId = sc.nextLong();
+        long albumId = getAlbumIdInput(connection, sc);
 
         Set<Long> allTracksinGivenRL = new HashSet<>();
         allSongAlbums.forEach(allSongAlbum -> {
@@ -557,7 +489,7 @@ public class InputData {
             System.out.println("Enter track number within Album: ");
             trackNum = sc.nextLong();
             if (allTracksinGivenRL.contains(trackNum))
-                System.out.println("Song already in TrackNum");
+                System.out.println("TrackNum is already taken, choose another Track number");
             else
                 break;
         }
