@@ -81,12 +81,13 @@ public class CLI {
                                             update.updateSong(connection, inputData.getSongInput(connection, false), songID);
                                         }
                                         case 4 -> {
+                                            // Delete Song
                                             System.out.println("FYI, Deleting a Song will delete all the records of the song where SongId is a foreign key");
                                             delete.deleteSong(connection, inputData.getSongIdInput(connection, sc));
                                             System.out.println("Song successfully deleted");
-                                            break;
                                         }
                                         default -> {
+                                            // Default option if none of the above cases selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -107,16 +108,19 @@ public class CLI {
                                         case -1 -> quit = true;
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
+                                            //Creating Guest
                                             long id = create.createGuest(connection, inputData.getGuestInput());
                                             System.out.println("Guest created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Getting Guest Details by Id
                                             System.out.println("Enter the id of the guest:");
                                             long id = sc.nextLong();
                                             Optional<Guest> resultGuest = read.getGuest(id, connection);
                                             resultGuest.ifPresentOrElse(System.out::println, () -> System.out.println("Guest not found!"));
                                         }
                                         case 3 -> {
+                                            //Updating Guest details
                                             long id = inputData.getGuestIdInput(connection, sc);
                                             Guest guest = inputData.getGuestInput();
                                             guest.setId(id);
@@ -124,11 +128,14 @@ public class CLI {
                                             System.out.println("Guest updated successfully" );
                                         }
                                         case 4 -> {
+                                            // Deleting Guest
+                                            System.out.println("FYI, Deleting a Guest will delete all the records of the guest where guestId is a foreign key");
                                             delete.deleteGuest(connection, inputData.getGuestIdInput(connection, sc));
                                             System.out.println("Guest successfully deleted");
                                             break;
                                         }
                                         default -> {
+                                            // Default option selected, if none of the above options are selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -153,25 +160,31 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create Artist
                                             long id = create.createArtist(connection, inputData.getArtistInput(connection));
                                             System.out.println("Artist created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Get Artist details by Id
                                             long id = inputData.getArtistIdInput(connection,sc);
                                             Artist artist = read.getArtist(connection, id).orElseThrow();
                                             System.out.println(artist);
                                         }
                                         case 3 -> {
+                                            //Update Artist details
                                             long id = inputData.getArtistIdInput(connection,sc);
                                             Artist artist = inputData.getArtistInputForUpdate();
                                             artist.setId(id);
                                             update.updateArtist(connection,artist);
                                         }
                                         case 4 -> {
+                                            //Delete Artist details
+                                            System.out.println("FYI, Deleting an Artist will delete all the records of the artist where artistId is a foreign key");
                                             delete.deleteArtist(connection, inputData.getArtistIdInput(connection, sc));
                                             System.out.println("Artist successfully deleted");
                                         }
                                         default -> {
+                                            //Default option selcted if none of the above options selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -192,10 +205,12 @@ public class CLI {
                                         case -1 -> quit = true;
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
+                                            // Create Podcast
                                             long id = create.createPodcast(connection, inputData.getPodcastInput(sc, connection));
                                             System.out.println("Podcast created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            // Get Podcast details by Id
                                             System.out.println("Enter the id of the podcast:");
                                             Long id = sc.nextLong();
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
@@ -208,6 +223,8 @@ public class CLI {
                                             update.updatePodcast(connection, podcast);
                                         }
                                         case 4 -> {
+                                            // Delete Podcast
+                                            System.out.println("FYI, Deleting a Podcast will delete all the records of the podcast where podcastId is a foreign key");
                                             delete.deletePodcast(connection, inputData.getPodcastIdInput(connection, sc));
                                             System.out.println("Podcast successfully deleted");
                                         }
@@ -237,10 +254,12 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create Host
                                             long id = create.createHost(connection, inputData.getHostInput());
                                             System.out.println("Host created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Get Host details by Id
                                             System.out.println("Enter the id of the host:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
@@ -251,6 +270,7 @@ public class CLI {
                                             }
                                         }
                                         case 3 -> {
+                                            //Uodate Host
                                             long id = inputData.getHostIdInput(connection, sc);
                                             Host host = inputData.getHostInput();
                                             host.setId(id);
@@ -258,6 +278,8 @@ public class CLI {
                                             System.out.println("Host updated successfully" );
                                         }
                                         case 4 -> {
+                                            //Delete Host
+                                            System.out.println("FYI, Deleting a Host will delete all the records of the host where hostId is a foreign key");
                                             delete.deleteHost(connection, inputData.getHostIdInput(connection, sc));
                                             System.out.println("Podcast Host successfully deleted");
                                         }
@@ -286,16 +308,19 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create User
                                             long id = create.createUser(connection, inputData.getUserInput(sc));
                                             System.out.println("User created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Get User details by Id
                                             System.out.println("Enter the id of the User:");
                                             long id = sc.nextLong();
                                             Optional<User> resultUser = read.getUserById(connection, id);
                                             resultUser.ifPresentOrElse(System.out::println, () -> System.out.println("Guest not found!"));
                                         }
                                         case 3 -> {
+                                            //Update User details
                                             long id = inputData.getUserIdInput(connection, sc);
                                             User user = inputData.getUserInput(sc);
                                             user.setId(id);
@@ -303,10 +328,13 @@ public class CLI {
                                             System.out.println("User updated successfully" );
                                         }
                                         case 4 -> {
+                                            //Delete User details
+                                            System.out.println("FYI, Deleting a User will delete all the records of the user where userId is a foreign key");
                                             delete.deleteUser(connection, inputData.getUserIdInput(connection, sc));
                                             System.out.println("User successfully deleted");
                                         }
                                         default -> {
+                                            //Default option choosen if none of the above cases selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -331,14 +359,17 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create Record Label
                                             long id = create.createRecordLabel(connection, inputData.getRecordLabelInput(sc));
                                             System.out.println("Record Label created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Get Record label by Id
                                             long id = inputData.getRecordLabelIdInput(connection, sc);
                                             read.displayRecordLabelById(connection, id);
                                         }
                                         case 3 -> {
+                                            //Update Record Label
                                             long id = inputData.getRecordLabelIdInput(connection, sc);
                                             RecordLabel recordLabel = inputData.getRecordLabelInput(sc);
                                             recordLabel.setId(id);
@@ -346,6 +377,8 @@ public class CLI {
                                             System.out.println("Record Label updated successfully" );
                                         }
                                         case 4 -> {
+                                            //Delete Record Label
+                                            System.out.println("FYI, Deleting a Record Label will delete all the records of the song where recordLabelId is a foreign key");
                                             delete.deleteRecordLabel(connection, inputData.getRecordLabelIdInput(connection, sc));
                                             System.out.println("Record Label successfully deleted");
                                         }
@@ -374,24 +407,30 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
+                                            //Create Album
                                             long id = create.createAlbum(connection, inputData.getAlbumInput(sc));
                                             System.out.println("Album created successfully with id " + id);
                                         }
                                         case 2 -> {
+                                            //Get Album details by Id
                                             long id = inputData.getAlbumIdInput(connection, sc);
                                             read.getAlbum(id, connection);
                                         }
                                         case 3 -> {
+                                            //Update Album details
                                             long id = inputData.getAlbumIdInput(connection, sc);
                                             Album album = inputData.getAlbumInput(sc);
                                             album.setId(id);
                                             update.updateAlbum(connection, album);
                                         }
                                         case 4 -> {
+                                            //Delete Album details
+                                            System.out.println("FYI, Deleting an Album will delete all the records of the album where albumId is a foreign key");
                                             delete.deleteAlbum(connection, inputData.getAlbumIdInput(connection, sc));
                                             System.out.println("Album successfully deleted");
                                         }
                                         default -> {
+                                            //default option choosen if none of the above options are selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -415,18 +454,19 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            // Create
+                                            // Create Sponsor
                                             long id = create.createSponsor(connection, inputData.getSponsorInput(sc));
                                             System.out.println("Sponsor created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            // Read
+                                            // Get Sponsor details by Id
                                             System.out.println("Enter the id of the sponsor:");
                                             Long id = sc.nextLong();
                                             Optional<Sponsor> relationSponsor = read.getSponsor(id, connection);
                                             relationSponsor.ifPresentOrElse(System.out::println, () -> System.out.println("Sponsor not found!"));
                                         }
                                         case 3 -> {
+                                            //Update Sponsor details
                                             long id = inputData.getSponsorIdInput(connection, sc);
                                             Sponsor sponsor = inputData.getSponsorInput(sc);
                                             sponsor.setId(id);
@@ -434,10 +474,13 @@ public class CLI {
                                             update.updateSponsor(connection,sponsor);
                                         }
                                         case 4 -> {
+                                            //Delete Sponsor details
+                                            System.out.println("FYI, Deleting a Sponsor will delete all the records of the sponsor where sponsorId is a foreign key");
                                             delete.deleteSponsor(connection, inputData.getSponsorIdInput(connection, sc));
                                             System.out.println("Podcast Sponsor successfully deleted");
                                         }
                                         default -> {
+                                            //default option choosen if none of the above options are selected
                                             System.out.println("Please choose a valid input...");
                                             continue;
                                         }
@@ -461,14 +504,14 @@ public class CLI {
                                             goBackInner = true;
                                         }
                                         case 1 -> {
-                                            //Create
+                                            //Create Episode
                                             long podcastID = inputData.getPodcastIdInput(connection, sc);
                                             long id = create.createEpisode(connection, inputData.getEpisodeInput(connection, sc, podcastID));
                                             create.createEpisodeGuest(connection, inputData.getEpisodeGuestInput(connection, sc, podcastID, id));
                                             System.out.println("Episode created successfully with number " + id);
                                         }
                                         case 2 -> {
-                                            //Read
+                                            //Get Episode details by Id
                                             long podcastID = inputData.getPodcastIdInput(connection, sc);
                                             Optional<Long> episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
                                             if(episodeNum.isPresent()){
@@ -482,6 +525,7 @@ public class CLI {
                                             }
                                         }
                                         case 3 -> {
+                                            //Update Episode details
                                             long podcastId = inputData.getPodcastIdInput(connection, sc);
                                             long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
                                             Episode episode = inputData.getEpisodeInput(connection, sc, podcastId);
@@ -491,6 +535,7 @@ public class CLI {
 
                                         }
                                         case 4 -> {
+                                            //Delete Episode details
                                             long podcastId =  inputData.getPodcastIdInput(connection, sc);
                                             long episode_num = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
                                             delete.deleteEpisode(connection, podcastId, episode_num);
