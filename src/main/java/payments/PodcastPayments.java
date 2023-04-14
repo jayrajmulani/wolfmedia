@@ -10,7 +10,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class PodcastPayments {
-    public Optional<PaymentInfo> calculateHostPayAmount(Connection connection, long podcastId, long episodeNum) {
+    public List<PaymentInfo> calculateHostPayAmount(Connection connection, long podcastId, long episodeNum) throws SQLException {
+        List<PaymentInfo> paymentInfos = new ArrayList<>();
         String query = "select 1 as service_id, PH.host_id, CURRENT_TIMESTAMP as timestamp, " +
                 " (P.flat_fee + E.adv_count * E.bonus_rate) / HC.host_count as amount " +
                 "from PODCAST P " +
@@ -23,24 +24,21 @@ public class PodcastPayments {
                 "WHERE " +
                 "    P.id= ? " +
                 "    AND E.episode_num = ? ";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, podcastId);
-            statement.setLong(2, episodeNum);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                return Optional.of(new PaymentInfo(
-                        rs.getLong("service_id"),
-                        rs.getLong("host_id"),
-                        rs.getDouble("amount"),
-                        rs.getTimestamp("timestamp"),
-                        PaymentUtils.Stakeholder.SERVICE,
-                        PaymentUtils.Stakeholder.PODCAST_HOST
-                ));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, podcastId);
+        statement.setLong(2, episodeNum);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()) {
+            paymentInfos.add(new PaymentInfo(
+                    rs.getLong("service_id"),
+                    rs.getLong("host_id"),
+                    rs.getDouble("amount"),
+                    rs.getTimestamp("timestamp"),
+                    PaymentUtils.Stakeholder.SERVICE,
+                    PaymentUtils.Stakeholder.PODCAST_HOST
+            ));
         }
-        return Optional.empty();
+        return paymentInfos;
     }
     public List<PaymentHistoryItem> getHostPaymentHistory(Connection connection, long hostId) throws SQLException {
         List<PaymentHistoryItem> paymentHistoryItems = new ArrayList<>();
