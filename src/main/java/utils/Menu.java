@@ -43,7 +43,7 @@ public class Menu {
         System.out.println("14. Assign Song to Album");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
-        System.out.print("Enter your choice: ");
+        System.out.println("Enter your choice: ");
     }
 
     public void displayMetaDataAndRecordsMenu(){
@@ -63,7 +63,7 @@ public class Menu {
         System.out.println("11. Total Subscribers for a Podcast");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
-        System.out.print("Enter your choice: ");
+        System.out.println("Enter your choice: ");
     }
     public void displayCrudMenu(){
         System.out.println("-------------------------");
@@ -75,7 +75,7 @@ public class Menu {
         System.out.println("4. Delete");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
-        System.out.print("Enter your choice: ");
+        System.out.println("Enter your choice: ");
     }
     public void displayPaymentsMenu(){
         System.out.println("-------------------------");
@@ -91,7 +91,7 @@ public class Menu {
         System.out.println("8. Get Balance for Service");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
-        System.out.print("Enter your choice: ");
+        System.out.println("Enter your choice: ");
     }
     public void displayReportsMenu(){
         System.out.println("-------------------------");
@@ -117,6 +117,6 @@ public class Menu {
         System.out.println("18. Flush Play Count for Episode for current month");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
-        System.out.print("Enter your choice: ");
+        System.out.println("Enter your choice: ");
     }
 }

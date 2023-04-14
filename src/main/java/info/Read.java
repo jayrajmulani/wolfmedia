@@ -292,7 +292,7 @@ public class Read {
                 return Optional.of(
                         new Podcast(
                                 resultSet.getLong("PODCAST.id"),
-                                resultSet.getString("name"),
+                                resultSet.getString("PODCAST.name"),
                                 resultSet.getString("language"),
                                 resultSet.getString("country"),
                                 resultSet.getDouble("flat_fee"),

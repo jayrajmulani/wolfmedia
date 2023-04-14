@@ -88,7 +88,7 @@ public class CLI {
                                         }
                                         default -> {
                                             // Default option if none of the above cases selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -136,7 +136,7 @@ public class CLI {
                                         }
                                         default -> {
                                             // Default option selected, if none of the above options are selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -185,7 +185,7 @@ public class CLI {
                                         }
                                         default -> {
                                             //Default option selcted if none of the above options selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -206,7 +206,7 @@ public class CLI {
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
                                             // Create Podcast
-                                            long id = create.createPodcast(connection, inputData.getPodcastInput(sc));
+                                            long id = create.createPodcast(connection, inputData.getPodcastInput(sc, connection));
                                             System.out.println("Podcast created successfully with id " + id);
                                         }
                                         case 2 -> {
@@ -217,7 +217,10 @@ public class CLI {
                                             resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
                                         }
                                         case 3 -> {
-                                            // TODO: Update Podcast
+                                            long id = inputData.getPodcastIdInput(connection,sc);
+                                            Podcast podcast = inputData.getPodcastInput(sc, connection);
+                                            podcast.setId(id);
+                                            update.updatePodcast(connection, podcast);
                                         }
                                         case 4 -> {
                                             // Delete Podcast
@@ -227,7 +230,7 @@ public class CLI {
                                         }
 
                                         default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -281,7 +284,7 @@ public class CLI {
                                             System.out.println("Podcast Host successfully deleted");
                                         }
                                         default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -332,7 +335,7 @@ public class CLI {
                                         }
                                         default -> {
                                             //Default option choosen if none of the above cases selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -380,7 +383,7 @@ public class CLI {
                                             System.out.println("Record Label successfully deleted");
                                         }
                                         default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -428,7 +431,7 @@ public class CLI {
                                         }
                                         default -> {
                                             //default option choosen if none of the above options are selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -478,7 +481,7 @@ public class CLI {
                                         }
                                         default -> {
                                             //default option choosen if none of the above options are selected
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -539,7 +542,7 @@ public class CLI {
                                             System.out.println("Episode successfully deleted");
                                         }
                                         default -> {
-                                            System.out.println("Please choose a value between 0 and 4...");
+                                            System.out.println("Please choose a valid input...");
                                             continue;
                                         }
                                     }
@@ -572,7 +575,6 @@ public class CLI {
                             // Handle Invalid Input
                             default -> {
                                 System.out.println("Please choose a valid input...");
-                                menu.displayInfoProcessingMenu();
                                 continue;
                             }
                         }
@@ -651,7 +653,6 @@ public class CLI {
                             // Handle Invalid input
                             default -> {
                                 System.out.println("Please choose a valid input...");
-                                menu.displayInfoProcessingMenu();
                                 continue;
                             }
                         }
@@ -711,6 +712,7 @@ public class CLI {
                                 if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
                                 } else {
+                                    connection.setAutoCommit(false);
                                     royaltyInfoForArtists.forEach(paymentInfo -> {
                                         try {
                                             paymentUtils.processPayment(connection, paymentInfo);
@@ -735,9 +737,12 @@ public class CLI {
                                     System.out.println("This Podcast has no Episodes");
                                     break;
                                 }
-                                PaymentInfo hostPayInfo = podcastPayments.calculateHostPayAmount(connection, podcastId, episodeNum.get()).orElseThrow();
-                                System.out.println("Are you sure you want to pay " + hostPayInfo.getAmount()
-                                        + " to host with ID " + hostPayInfo.getReceiverId() + "? [0/1]");
+                                List<PaymentInfo> hostPayInfo = podcastPayments.calculateHostPayAmount(connection, podcastId, episodeNum.get());
+                                if(hostPayInfo.size() == 0){
+                                    System.out.println("No Payments to process..");
+                                    break;
+                                }
+                                System.out.println("Are you sure you want to process all payments ?[0/1]");
                                 int ch = sc.nextInt();
                                 while (ch > 1 || ch < 0) {
                                     System.out.println("Please enter 0 or 1");
@@ -746,8 +751,14 @@ public class CLI {
                                 if (ch == 0) {
                                     System.out.println("Okay, cancelling transaction.");
                                 } else {
-                                    paymentUtils.processPayment(connection, hostPayInfo);
-                                    System.out.println("Payment Recorded Successfully");
+                                    hostPayInfo.forEach(paymentInfo -> {
+                                        try {
+                                            paymentUtils.processPayment(connection, paymentInfo);
+                                        } catch (SQLException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
+                                    System.out.println("Payments Recorded Successfully");
                                 }
                             }
                             // Get Payments History for Podcast Host
@@ -943,7 +954,6 @@ public class CLI {
                 // Handle Invalid Inputs
                 default -> {
                     System.out.println("Please choose a valid input...");
-                    menu.displayMainMenu();
                 }
             }
             if (quit) {

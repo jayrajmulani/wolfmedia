@@ -39,24 +39,56 @@ public class InputData {
         System.out.println("E.g. LOVE | ROCK");
         String genresPipeSeparated = myObj.nextLine();
         List<Genre> genres = Arrays.stream(genresPipeSeparated.split("\\|")).map(genre -> new Genre(genre.strip())).toList();
+        List<Artist> artists;
+        List<Artist> collaborators;
+        List<Long> collabIds = new ArrayList<>();
+        while (true){
+            List<Artist> allArtists = read.getAllArtists(connection);
+            List<Long> allArtistIds = allArtists.stream().map(Artist::getId).toList();
+            allArtists.forEach(System.out::println);
+            System.out.println("Enter list of artist IDs for this song (Separate multiple values by |):");
+            System.out.println("The first artist would be considered as Primary Artist and song would be owned by its record label.");
+            System.out.println("E.g. 1 | 4");
+            String artistsPipeSeparated = myObj.nextLine();
+            List<Long> artistIds = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> Long.parseLong(artistID.trim())).toList();
+            boolean valid = true;
+            for(long id: artistIds){
+                if(!allArtistIds.contains(id)){
+                    valid = false;
+                    break;
+                }
+            }
+            if(!valid){
+                System.out.println("One or More artist ids not found in the Database, please enter the values again.");
+                continue;
+            }
+            artists =  artistIds.stream().map(id -> allArtists.stream().filter(artist -> artist.getId() == id).toList().get(0)).toList();
 
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-        System.out.println("Enter list of artist IDs for this song (Separate multiple values by |):");
-        System.out.println("The first artist would be considered as Primary Artist and song would be owned by its record label.");
-        System.out.println("E.g. 1 | 4");
-        String artistsPipeSeparated = myObj.nextLine();
-        List<Artist> artists = Arrays.stream(artistsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID.trim()))).toList();
-        System.out.println("Enter list of collaborator IDs for this song (Separate multiple values by |):");
-        System.out.println("E.g. 5 | 2");
-        String collaboratorsPipeSeparated = myObj.nextLine();
-        List<Artist> collaborators = new ArrayList<>();
-        if (!collaboratorsPipeSeparated.isEmpty()) {
-            collaborators = Arrays.stream(collaboratorsPipeSeparated.split("\\|")).map(artistID -> new Artist(Long.parseLong(artistID))).toList();
-        }
+            System.out.println("Enter list of collaborator IDs for this song (Separate multiple values by |):");
+            System.out.println("E.g. 5 | 2");
+            String collaboratorsPipeSeparated = myObj.nextLine();
 
-        if (!Collections.disjoint(artists, collaborators)) {
-            throw new IllegalArgumentException("Artists and Collaborators have some common elements");
+            if (!collaboratorsPipeSeparated.isEmpty()) {
+                collabIds = Arrays.stream(collaboratorsPipeSeparated.split("\\|")).map(artistID -> Long.parseLong(artistID.trim())).toList();
+                for(long id: collabIds){
+                    if(!allArtistIds.contains(id)){
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            if(!valid){
+                System.out.println("One or More artist ids not found in the Database, please enter the values again.");
+                continue;
+            }
+            collaborators =  collabIds.stream().map(id -> allArtists.stream().filter(artist -> artist.getId() == id).toList().get(0)).toList();
+            if (!Collections.disjoint(artists, collaborators)) {
+                System.out.println("Artists and Collaborators have some common elements");
+                valid = false;
+            }
+            if(valid){
+                break;
+            }
         }
 
         System.out.println("Do you want to assign this song to an album ? (y/n)");
@@ -91,7 +123,8 @@ public class InputData {
         return new Host(firstName, lastName, city, email, phone);
     }
 
-    public Podcast getPodcastInput(Scanner sc) {
+    public Podcast getPodcastInput(Scanner sc1, Connection connection) throws SQLException {
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter the name of the podcast:");
         String name = sc.nextLine();
         System.out.println("Enter the language of the podcast:");
@@ -99,40 +132,13 @@ public class InputData {
         System.out.println("Enter the country of the podcast:");
         String country = sc.nextLine();
         System.out.println("Enter the flat fee of the podcast:");
-        double flatFee = sc.nextDouble();
+        double flatFee =Double.parseDouble(sc.nextLine());
 
-        List<Host> hosts = new ArrayList<>();
-        int crudChoice;
-        boolean isFinishedHostInput = false;
-        while (!isFinishedHostInput) {
-            System.out.println("Hosts for Podcast " + name);
-            System.out.println("1. Already present");
-            System.out.println("2. Add new host");
-            System.out.println("-1. Done adding");
-            System.out.print("Enter your choice: ");
-            crudChoice = sc.nextInt();
-            switch (crudChoice) {
-                case -1 -> {
-                    if (hosts.size() == 0) {
-                        System.out.println("Please add at least 1 host");
-                        continue;
-                    }
-                    isFinishedHostInput = true;
-                }
-                case 1 -> {
-                    System.out.println("Please enter the ID of the host");
-                    int hostID = sc.nextInt();
-                    hosts.add(new Host(hostID));
-                }
-                case 2 -> {
-                    hosts.add(getHostInput());
-                }
-                default -> {
-                    System.out.println("Please choose a value between 1 and 2...");
-                }
-            }
-        }
-
+        List<Host> hostList = read.getAllHosts(connection);
+        hostList.forEach(System.out::println);
+        System.out.println("Enter Host IDs like 1 | 2:");
+        String pipeSeparatedHosts = sc.nextLine();
+        List<Host> hosts = Arrays.stream(pipeSeparatedHosts.split("\\|")).map(host -> new Host(Long.parseLong(host.strip()))).toList();
         return new Podcast(name, language, country, flatFee, hosts);
     }
 
