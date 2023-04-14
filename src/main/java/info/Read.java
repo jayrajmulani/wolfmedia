@@ -1,7 +1,6 @@
 package info;
 
 import models.*;
-import org.checkerframework.checker.units.qual.A;
 import utils.ReportUtils;
 
 import java.sql.*;
@@ -113,6 +112,21 @@ public class Read {
         System.out.println(album);
         System.out.println("Songs in Album: ");
         reportUtils.getSongsByAlbum(connection, id).forEach(System.out::println);
+    }
+
+    public long getArtistMonthlyListener(Connection connection, long artistID) throws SQLException {
+        String query = "SELECT COUNT(DISTINCT user_id) monthly_listeners " +
+                "FROM SONG_LISTEN SL, CREATES C " +
+                "WHERE C.artist_id = ? " +
+                "AND SL.song_id = C.song_id " +
+                "AND MONTH(SL.timestamp) = MONTH(CURRENT_TIMESTAMP) " +
+                "AND YEAR(SL.timestamp) = YEAR(CURRENT_TIMESTAMP) ";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, artistID);
+        statement.executeQuery();
+        ResultSet resultSet = statement.getResultSet();
+        resultSet.next();
+        return resultSet.getLong("monthly_listeners");
     }
 
     public Optional<Artist> getArtist(Connection connection, long id) throws SQLException {

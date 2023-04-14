@@ -115,6 +115,7 @@ public class Menu {
         System.out.println("16. Historical Play Count for Episode");
         System.out.println("17. Play Count for Episode for Current Month");
         System.out.println("18. Flush Play Count for Episode for current month");
+        System.out.println("19. Monthly Listeners for Artist");
         System.out.println("0. Go back!");
         System.out.println("-1. Quit!");
         System.out.println("Enter your choice: ");

@@ -942,6 +942,11 @@ public class CLI {
                                 }
                                 reportUtils.flushEpisodePlayCountForCurrentMonth(connection,podcastId, episodeNumber.get());
                             }
+                            case 19 -> {
+                                long id = inputData.getArtistIdInput(connection,sc);
+                                long count = read.getArtistMonthlyListener(connection, id);
+                                System.out.println("Monthly Listeners for this artist is " + count);
+                            }
                             // Handle Invalid inputs
                             default -> {
                                 System.out.println("Please choose a valid input...");
