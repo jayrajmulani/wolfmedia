@@ -81,7 +81,7 @@ public class Read {
                                 resultSet.getString("release_country"), resultSet.getString("language"),
                                 resultSet.getFloat("duration"), resultSet.getFloat("royalty_rate"),
                                 resultSet.getDate("release_date"), resultSet.getBoolean("royalty_paid"),
-                                0,
+                                reportUtils.getSongPlayCountForCurrentMonth(connection, resultSet.getLong("id")),
                                 genres.stream().toList(),
                                 album,
                                 artists.stream().toList(),
