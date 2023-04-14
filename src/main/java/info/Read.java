@@ -218,17 +218,51 @@ public class Read {
     }
 
     public Optional<Podcast> getPodcast(Long id, Connection connection) throws SQLException {
-        String query = "SELECT PODCAST.id, name, language, country, flat_fee, HOST.id, " +
-                " HOST.first_name, HOST.last_name " +
-                " FROM PODCAST " +
-                " JOIN PODCAST_HOST ON PODCAST.id = PODCAST_HOST.podcast_id" +
-                " JOIN HOST ON HOST.id = PODCAST_HOST.host_id" +
-                " WHERE PODCAST.id = ?";
+        String query = "SELECT PODCAST.id, PODCAST.name, language, country, flat_fee, HOST.id, " +
+                "HOST.first_name, HOST.last_name," +
+                "RATING.rating, " +
+                "SUBS.subCount " +
+                "FROM PODCAST " +
+                "JOIN PODCAST_HOST ON PODCAST.id = PODCAST_HOST.podcast_id " +
+                "JOIN HOST ON HOST.id = PODCAST_HOST.host_id " +
+                "CROSS JOIN (SELECT avg(rating) rating from RATES where podcast_id = ?) as RATING " +
+                "CROSS JOIN (SELECT count(user_id) as subCount from PODCAST_SUBSCRIPTION where podcast_id = ?) AS SUBS " +
+                "WHERE PODCAST.id = ?";
+        String mapPodcastSponsorsQuery = "SELECT PS.sponsor_id, S.name " +
+                "FROM PODCAST P " +
+                "JOIN PODCAST_SPONSOR PS on P.id = PS.podcast_id " +
+                "JOIN SPONSOR S on S.id = PS.sponsor_id " +
+                "WHERE P.id = ?";
+        String mapPodcastEpisodesQuery = "SELECT episode_num, title " +
+                "FROM PODCAST P " +
+                "JOIN EPISODE E on P.id = E.podcast_id " +
+                "WHERE P.id = ?";
+        String mapPodcastGenreQuery = "SELECT G.name genre " +
+                "FROM PODCAST_GENRE " +
+                "JOIN GENRE G on G.id = PODCAST_GENRE.genre_id " +
+                "WHERE podcast_id=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
+            statement.setLong(2, id);
+            statement.setLong(3, id);
             statement.executeQuery();
             ResultSet resultSet = statement.getResultSet();
-            List<Host> hosts = new ArrayList<>();
+            HashSet<Host> hosts = new HashSet<>();
+            HashSet<Genre> genres = new HashSet<>();
+            HashSet<Sponsor> sponsors = new HashSet<>();
+            HashSet<Episode> episodes = new HashSet<>();
+
+            PreparedStatement mapPodcastSponsorsStatement = connection.prepareStatement(mapPodcastSponsorsQuery);
+            PreparedStatement mapPodcastEpisodesStatement = connection.prepareStatement(mapPodcastEpisodesQuery);
+            PreparedStatement mapPodcastGenreStatement = connection.prepareStatement(mapPodcastGenreQuery);
+            mapPodcastSponsorsStatement.setLong(1, id);
+            mapPodcastEpisodesStatement.setLong(1, id);
+            mapPodcastGenreStatement.setLong(1, id);
+
+            ResultSet mapPodcastSponsorsResultSet = mapPodcastSponsorsStatement.executeQuery();
+            ResultSet mapPodcastEpisodesResultSet = mapPodcastEpisodesStatement.executeQuery();
+            ResultSet mapPodcastGenreResultSet = mapPodcastGenreStatement.executeQuery();
+
             while (resultSet.next()) {
                 hosts.add(
                         new Host(
@@ -237,6 +271,17 @@ public class Read {
                                 resultSet.getString("HOST.first_name")
                         )
                 );
+            }
+            while (mapPodcastSponsorsResultSet.next()){
+                sponsors.add(new Sponsor(mapPodcastSponsorsResultSet.getLong("sponsor_id"),
+                        mapPodcastSponsorsResultSet.getString("name")));
+            }
+            while (mapPodcastEpisodesResultSet.next()){
+                episodes.add(new Episode(new Podcast(id), mapPodcastEpisodesResultSet.getLong("episode_num"),
+                        mapPodcastEpisodesResultSet.getString("title")));
+            }
+            while (mapPodcastGenreResultSet.next()){
+                genres.add(new Genre(mapPodcastGenreResultSet.getString("genre")));
             }
             resultSet.beforeFirst();
             if (resultSet.next()) {
@@ -247,12 +292,12 @@ public class Read {
                                 resultSet.getString("language"),
                                 resultSet.getString("country"),
                                 resultSet.getDouble("flat_fee"),
-                                0, // TODO rating
-                                0, // TODO sub count
-                                hosts,
-                                new ArrayList<Sponsor>(), // TODO sponsor
-                                new ArrayList<Genre>(), // TODO
-                                new ArrayList<Episode>() // TODO
+                                resultSet.getDouble("rating"),
+                                resultSet.getLong("subCount"),
+                                hosts.stream().toList(),
+                                sponsors.stream().toList(),
+                                genres.stream().toList(),
+                                episodes.stream().toList()
                         ));
             }
             return Optional.empty();

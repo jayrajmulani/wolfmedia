@@ -17,7 +17,7 @@ public class Podcast {
     String language;
     String country;
     double flatFee;
-    int rating;
+    double rating;
     long subscribers;
     List<Host> hosts;
     List<Sponsor> sponsors;
