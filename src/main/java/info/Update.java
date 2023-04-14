@@ -45,6 +45,19 @@ public class Update {
         statement.setLong(1, artist.getId());
         statement.executeUpdate();
     }
+    public void updateAlbum(Connection connection, Album album) throws SQLException {
+        String query = "UPDATE ALBUM SET " +
+                "name = ?,  " +
+                "release_date = ?, " +
+                "edition = ? " +
+                "WHERE ID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, album.getName());
+        statement.setDate(1, album.getRelease_date());
+        statement.setInt(1, album.getEdition());
+        statement.setLong(1, album.getId());
+        statement.executeUpdate();
+    }
     public void updateRecordLabel(Connection connection, RecordLabel recordLabel) throws SQLException {
         String query = "UPDATE RECORD_LABEL SET NAME = ? WHERE ID = ?";
         PreparedStatement statement = connection.prepareStatement(query);

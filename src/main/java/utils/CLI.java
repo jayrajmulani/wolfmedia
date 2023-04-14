@@ -375,11 +375,14 @@ public class CLI {
                                             System.out.println("Album created successfully with id " + id);
                                         }
                                         case 2 -> {
-                                            // TODO: Read Album
-                                            break;
+                                            long id = inputData.getAlbumIdInput(connection, sc);
+                                            read.getAlbum(id, connection);
                                         }
                                         case 3 -> {
-                                            //TODO: Update Album
+                                            long id = inputData.getAlbumIdInput(connection, sc);
+                                            Album album = inputData.getAlbumInput(sc);
+                                            album.setId(id);
+                                            update.updateAlbum(connection, album);
                                         }
                                         case 4 -> {
                                             delete.deleteAlbum(connection, inputData.getAlbumIdInput(connection, sc));

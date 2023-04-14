@@ -2,6 +2,7 @@ package info;
 
 import models.*;
 import org.checkerframework.checker.units.qual.A;
+import utils.ReportUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class Read {
+    private static final ReportUtils reportUtils = new ReportUtils();
     public Optional<Song> getSong(long id, Connection connection) throws SQLException {
         String query = "SELECT S.id, title, release_country, language, duration, " +
                 "royalty_rate, royalty_paid, S.release_date,  " +
@@ -95,23 +97,25 @@ public class Read {
         }
     }
 
-    public Optional<Album> getAlbum(long id, Connection connection) throws SQLException {
-        String query = "SELECT * FROM ALBUM WHERE ALBUM.id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, id);
-            statement.executeQuery();
-            ResultSet resultSet = statement.getResultSet();
-//            List<Genre> genres = new ArrayList<>();
-//            while (resultSet.next()) {
-//                genres.add(new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre")));
-//            }
-//            resultSet.beforeFirst();
-            if (resultSet.next()) {
-                return Optional.of(
-                        new Album(id));
-            }
-            return Optional.empty();
+    public void  getAlbum(long id, Connection connection) throws SQLException {
+        String query = "SELECT id, name, edition, release_date FROM ALBUM WHERE ALBUM.id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        if (!resultSet.next()) {
+            System.out.println("Album not found.");
+            return;
         }
+        Album album = new Album(
+            resultSet.getLong("id"),
+            resultSet.getString("name"),
+            resultSet.getDate("release_date"),
+            resultSet.getInt("edition")
+        );
+        System.out.println("Album");
+        System.out.println(album);
+        System.out.println("Songs in Album: ");
+        reportUtils.getSongsByAlbum(connection, id).forEach(System.out::println);
     }
 
     public Optional<Artist> getArtist(Connection connection, long id) throws SQLException {
