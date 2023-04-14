@@ -257,6 +257,21 @@ public class Create {
         return 0L;
     }
 
+    public void createEpisodeGuest(Connection connection, EpisodeGuest episodeGuest){
+        String query = "INSERT INTO EPISODE_GUEST(podcast_id, episode_num, guest_id) VALUES (?,?,?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, episodeGuest.getPodcast_id());
+            statement.setLong(2, episodeGuest.getEpisode_num());
+            statement.setLong(3, episodeGuest.getGuest_id());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DB.rollBackTransaction(connection);
+        }
+    }
+
+
     public long createArtist(Connection connection, Artist artist) {
         String query = "insert into ARTIST (name, country, status) values (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {

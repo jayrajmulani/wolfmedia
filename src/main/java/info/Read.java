@@ -233,7 +233,7 @@ public class Read {
     }
 
     public Optional<Episode> getEpisode(Connection connection, Long podcastID, Long episodeNum) throws SQLException {
-        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration, E.adv_count, E.bonus_rate from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=? AND E.episode_num=?";
+        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration, E.adv_count, E.bonus_rate, E.episode_id from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=? AND E.episode_num=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, podcastID);
             statement.setLong(2, episodeNum);
@@ -249,12 +249,33 @@ public class Read {
                                 resultSet.getDate("release_date"),
                                 resultSet.getDouble("duration"),
                                 resultSet.getInt("adv_count"),
-                                resultSet.getDouble("bonus_rate")
+                                resultSet.getDouble("bonus_rate"),
+                                resultSet.getString("episode_id")
                         ));
             }
             return Optional.empty();
         }
     }
+
+    public Optional<Guest> getGuestDetails(Connection connection, Long podcastID, Long episodeNum) throws SQLException {
+        String query = "SELECT * from GUEST g where g.id = (Select EG.guest_id from EPISODE_GUEST EG where EG.podcast_id = ? and EG.episode_num = ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, podcastID);
+            statement.setLong(2, episodeNum);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+
+            if (resultSet.next()) {
+                return Optional.of(
+                        new Guest(
+                                resultSet.getString("name")
+                        ));
+            }
+            return Optional.empty();
+        }
+    }
+
+
 
     public List<Host> getAllHosts(Connection connection) throws SQLException {
         String query = "SELECT id, first_name, last_name from HOST";
@@ -330,7 +351,7 @@ public class Read {
     }
 
     public List<Episode> getAllPodcastEpisodes(Connection connection, long podcastId) throws SQLException {
-        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration,  E.adv_count, E.bonus_rate from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=?";
+        String query = "SELECT E.podcast_id, P.name, E.episode_num, E.title, E.release_date, E.duration,  E.adv_count, E.bonus_rate, E.episode_id from EPISODE E, PODCAST P WHERE E.podcast_id = P.id AND E.podcast_id=?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setLong(1, podcastId);
         List<Episode> episodes = new ArrayList<>();
@@ -343,7 +364,8 @@ public class Read {
                             resultSet.getDate("release_date"),
                             resultSet.getDouble("duration"),
                             resultSet.getInt("adv_count"),
-                            resultSet.getDouble("bonus_rate")
+                            resultSet.getDouble("bonus_rate"),
+                            resultSet.getString("episode_id")
                     )
             );
         }
@@ -514,6 +536,19 @@ public class Read {
         }
         return Optional.empty();
     }
+
+    public Optional<Long> getMaxEpisodeNumForPodcast(Connection connection, long podcastId) throws SQLException {
+        String query = "SELECT max(episode_num) as episodeNum From EPISODE WHERE podcast_id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, podcastId);
+
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return Optional.of((resultSet.getLong("episodeNum")));
+        }
+        return Optional.empty();
+    }
+
     public void displayRecordLabelById(Connection connection, long id) throws SQLException {
         String query = "SELECT ID,NAME FROM RECORD_LABEL WHERE ID = ?";
         PreparedStatement statement = connection.prepareStatement(query);

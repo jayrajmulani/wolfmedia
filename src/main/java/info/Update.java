@@ -77,4 +77,26 @@ public class Update {
         statement.setLong(6, user.getId());
         statement.executeUpdate();
     }
+
+    public void updateEpisode(Connection connection, Episode episode) throws SQLException {
+        String query = "UPDATE EPISODE SET " +
+                "title = ?," +
+                "release_date = ?," +
+                "duration = ?, " +
+                "adv_count = ?, " +
+                "bonus_rate = ?, " +
+                "episode_id = ? " +
+                "WHERE episode_num = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, episode.getTitle());
+        statement.setDate(2, (Date) episode.getReleaseDate());
+        statement.setDouble(3, episode.getDuration());
+        statement.setDouble(4, episode.getAdvCount());
+        statement.setDouble(5, episode.getBonusRate());
+        statement.setString(6, episode.getEpisodeId());
+        statement.setLong(7, episode.getEpisodeNum());
+
+        statement.executeUpdate();
+    }
+
 }
