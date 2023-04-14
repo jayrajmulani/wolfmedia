@@ -271,25 +271,67 @@ public class Create {
         }
     }
 
+    public long createArtist(Connection connection, Artist artist) throws SQLException {
+        // Start a Transaction
+        connection.setAutoCommit(false);
 
-    public long createArtist(Connection connection, Artist artist) {
+//        types, genre, recordlabel
+
         String query = "insert into ARTIST (name, country, status) values (?, ?, ?)";
+        String mapArtistGenreQuery = "INSERT INTO PRIMARY_GENRE(artist_id, genre_id) values (?,?)";
+        String mapArtistRLQuery = "INSERT INTO SIGNS(artist_id, record_label_id, updated_at) " +
+                "VALUES (?,?,CURRENT_TIMESTAMP)";
+        String mapArtistISQuery = "INSERT INTO ARTIST_IS(artist_id, artist_type_id) VALUES (?,?)";
+
+
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, artist.getName());
             statement.setString(2, artist.getCountry());
             statement.setString(3, artist.getStatus().getStatus());
             long artistId;
+
+            Optional<Genre> genre = read.getGenreByName(connection, artist.getPrimaryGenre().getName());
+            long genreId = genre.map(Genre::getId).orElseGet(() -> createGenre(connection, artist.getPrimaryGenre()));
+
             if (statement.executeUpdate() > 0) {
                 ResultSet rs = statement.getGeneratedKeys();
                 rs.next();
                 artistId = rs.getInt(1);
+
+                artist.getTypes().forEach(artistType -> {
+                    try {
+                        Optional<ArtistType> artistTypeOptional = read.getArtistTypeByName(connection, artistType.getName());
+                        long artistTypeID = artistTypeOptional.isPresent() ? artistTypeOptional.get().getId() : createArtistType(connection, artistType);
+                        PreparedStatement mapSongGenreStatement = connection.prepareStatement(mapArtistISQuery);
+                        mapSongGenreStatement.setLong(1, artistId);
+                        mapSongGenreStatement.setLong(2, artistTypeID);
+                        mapSongGenreStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                PreparedStatement mapArtistRLStatement = connection.prepareStatement(mapArtistRLQuery);
+                mapArtistRLStatement.setLong(1, artistId);
+                mapArtistRLStatement.setLong(2, artist.getRecordLabel().getId());
+                mapArtistRLStatement.executeUpdate();
+
+                PreparedStatement mapArtistGenreStatement = connection.prepareStatement(mapArtistGenreQuery);
+                mapArtistGenreStatement.setLong(1, artistId);
+                mapArtistGenreStatement.setLong(2, genreId);
+                mapArtistGenreStatement.executeUpdate();
+
             } else {
                 artistId = 0L;
             }
+            connection.commit();
             return artistId;
         } catch (SQLException e) {
             e.printStackTrace();
             DB.rollBackTransaction(connection);
+        }
+        finally {
+            connection.setAutoCommit(true);
         }
         return 0L;
     }

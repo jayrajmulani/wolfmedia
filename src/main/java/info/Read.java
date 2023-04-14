@@ -170,6 +170,18 @@ public class Read {
             return Optional.empty();
         }
     }
+    public Optional<ArtistType> getArtistTypeByName(Connection connection, String name) throws SQLException {
+        String query = "SELECT id, name FROM ARTIST_TYPE WHERE name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, name);
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+            if (resultSet.next()) {
+                return Optional.of(new ArtistType(resultSet.getLong("id"), resultSet.getString("name")));
+            }
+            return Optional.empty();
+        }
+    }
 
     public Optional<Host> getHost(Long id, Connection connection) throws SQLException {
         String query = "SELECT HOST.id, first_name, last_name, city, email, phone " +
