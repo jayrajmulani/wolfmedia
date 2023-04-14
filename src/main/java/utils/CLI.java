@@ -192,7 +192,7 @@ public class CLI {
                                         case -1 -> quit = true;
                                         case 0 -> goBackInner = true;
                                         case 1 -> {
-                                            long id = create.createPodcast(connection, inputData.getPodcastInput(sc));
+                                            long id = create.createPodcast(connection, inputData.getPodcastInput(sc, connection));
                                             System.out.println("Podcast created successfully with id " + id);
                                         }
                                         case 2 -> {
@@ -202,7 +202,10 @@ public class CLI {
                                             resultPodcast.ifPresentOrElse(System.out::println, () -> System.out.println("Podcast not found!"));
                                         }
                                         case 3 -> {
-                                            // TODO: Update Podcast
+                                            long id = inputData.getPodcastIdInput(connection,sc);
+                                            Podcast podcast = inputData.getPodcastInput(sc, connection);
+                                            podcast.setId(id);
+                                            update.updatePodcast(connection, podcast);
                                         }
                                         case 4 -> {
                                             delete.deletePodcast(connection, inputData.getPodcastIdInput(connection, sc));

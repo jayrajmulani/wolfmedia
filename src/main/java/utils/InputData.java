@@ -123,7 +123,8 @@ public class InputData {
         return new Host(firstName, lastName, city, email, phone);
     }
 
-    public Podcast getPodcastInput(Scanner sc) {
+    public Podcast getPodcastInput(Scanner sc1, Connection connection) throws SQLException {
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter the name of the podcast:");
         String name = sc.nextLine();
         System.out.println("Enter the language of the podcast:");
@@ -131,40 +132,13 @@ public class InputData {
         System.out.println("Enter the country of the podcast:");
         String country = sc.nextLine();
         System.out.println("Enter the flat fee of the podcast:");
-        double flatFee = sc.nextDouble();
+        double flatFee =Double.parseDouble(sc.nextLine());
 
-        List<Host> hosts = new ArrayList<>();
-        int crudChoice;
-        boolean isFinishedHostInput = false;
-        while (!isFinishedHostInput) {
-            System.out.println("Hosts for Podcast " + name);
-            System.out.println("1. Already present");
-            System.out.println("2. Add new host");
-            System.out.println("-1. Done adding");
-            System.out.print("Enter your choice: ");
-            crudChoice = sc.nextInt();
-            switch (crudChoice) {
-                case -1 -> {
-                    if (hosts.size() == 0) {
-                        System.out.println("Please add at least 1 host");
-                        continue;
-                    }
-                    isFinishedHostInput = true;
-                }
-                case 1 -> {
-                    System.out.println("Please enter the ID of the host");
-                    int hostID = sc.nextInt();
-                    hosts.add(new Host(hostID));
-                }
-                case 2 -> {
-                    hosts.add(getHostInput());
-                }
-                default -> {
-                    System.out.println("Please choose a value between 1 and 2...");
-                }
-            }
-        }
-
+        List<Host> hostList = read.getAllHosts(connection);
+        hostList.forEach(System.out::println);
+        System.out.println("Enter Host IDs like 1 | 2:");
+        String pipeSeparatedHosts = sc.nextLine();
+        List<Host> hosts = Arrays.stream(pipeSeparatedHosts.split("\\|")).map(host -> new Host(Long.parseLong(host.strip()))).toList();
         return new Podcast(name, language, country, flatFee, hosts);
     }
 
@@ -455,91 +429,25 @@ public class InputData {
 
     public Creates getSongToArtistInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Songs");
-        List<Song> allSongs = read.getAllSongs(connection);
-        allSongs.forEach(System.out::println);
+        long songId = getSongIdInput(connection, sc);
+        long artistId = getArtistIdInput(connection, sc);
 
-        System.out.println("Enter Song ID:");
-        long songId = sc.nextLong();
-
-        System.out.println("Here is the List of all Artists");
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-
-        System.out.println("Enter Artist ID:");
-        long artistId = sc.nextLong();
-
-        System.out.println("For this song is the artist a collabarator? ");
+        System.out.println("For this song is the artist a collabarator? (True/False)");
         boolean isCollabarator = sc.nextBoolean();
 
         return new Creates(songId, artistId, isCollabarator);
     }
 
-    public Optional<Owns> getSongtoRecordLabelInput(Connection connection, Scanner sc) throws ParseException, SQLException {
-
-        System.out.println("Here is the List of all Songs (Not yet assigned to a Record Label)");
-        List<Song> allSongs = read.getAllSongs(connection);
-
-        List<Owns> allOwns = read.getAllOwns(connection);
-        Set<Long> songsInOwns = new HashSet<>();
-        allOwns.forEach(allOwn -> songsInOwns.add(allOwn.getSongId()));
-        if (songsInOwns.size() == allSongs.size()) {
-            System.out.println("All Songs already assigned to Record Label, Insert a song first");
-            return Optional.empty();
-        }
-
-        allSongs.forEach(allSong -> {
-            if (!songsInOwns.contains(allSong.getId()))
-                System.out.println(allSong);
-        });
-
-        long songId;
-        while (true) {
-            System.out.println("Enter Song ID:");
-            songId = sc.nextLong();
-            if (songsInOwns.contains(songId))
-                System.out.println("Song already in owns");
-            else
-                break;
-        }
-        System.out.println("Here is the List of all Record Labels");
-        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
-        allRecordLabels.forEach(System.out::println);
-
-        System.out.println("Enter Record Label ID:");
-        long recordLabelId = sc.nextLong();
-
-        return Optional.of(new Owns(recordLabelId, songId));
-    }
-
     public Compiles getArtisttoAlbumInput(Connection connection, Scanner sc) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Artists");
-        List<Artist> allArtists = read.getAllArtists(connection);
-        allArtists.forEach(System.out::println);
-
-        System.out.println("Enter Artist ID:");
-        long artistId = sc.nextLong();
-
-        System.out.println("Here is the List of all Albums");
-        List<Album> allAlbums = read.getAllAlbums(connection);
-        allAlbums.forEach(System.out::println);
-
-        System.out.println("Enter Album ID:");
-        long albumId = sc.nextLong();
-
+        long artistId = getArtistIdInput(connection, sc);
+        long albumId = getAlbumIdInput(connection, sc);
         return new Compiles(artistId, albumId);
     }
 
     public Signs getArtisttoRecordLabelInput(Connection connection, Scanner sc, long artistId) throws ParseException, SQLException {
 
-        System.out.println("Here is the List of all Record Labels");
-        List<RecordLabel> allRecordLabels = read.getAllRecordLabels(connection);
-        allRecordLabels.forEach(System.out::println);
-
-        System.out.println("Enter Record Label ID:");
-        long recordLabelId = sc.nextLong();
-
+        long recordLabelId = getRecordLabelIdInput(connection, sc);
         return new Signs(artistId, recordLabelId, null);
     }
 
@@ -547,7 +455,8 @@ public class InputData {
 
         System.out.println("Here is the List of all Songs (Not yet assigned to an Album)");
         List<Song> allSongs = read.getAllSongs(connection);
-
+        List <Long> allSongsId = new ArrayList<>();
+        allSongs.forEach(song -> allSongsId.add(song.getId()));
         List<SongAlbum> allSongAlbums = read.getAllSongAlbum(connection);
         Set<Long> songsInSongAlbum = new HashSet<>();
         allSongAlbums.forEach(allSongAlbum -> songsInSongAlbum.add(allSongAlbum.getSong().getId()));
@@ -566,17 +475,14 @@ public class InputData {
             System.out.println("Enter Song ID:");
             songId = sc.nextLong();
             if (songsInSongAlbum.contains(songId))
-                System.out.println("Song already in SongAlbum");
+                System.out.println("Song already assigned to an Album");
+            else if(!allSongsId.contains(songId))
+                System.out.println("Pls enter a songId that exists");
             else
                 break;
         }
 
-        System.out.println("Here is the List of all Albums");
-        List<Album> allAlbums = read.getAllAlbums(connection);
-        allAlbums.forEach(System.out::println);
-
-        System.out.println("Enter Album ID:");
-        long albumId = sc.nextLong();
+        long albumId = getAlbumIdInput(connection, sc);
 
         Set<Long> allTracksinGivenRL = new HashSet<>();
         allSongAlbums.forEach(allSongAlbum -> {
@@ -589,7 +495,7 @@ public class InputData {
             System.out.println("Enter track number within Album: ");
             trackNum = sc.nextLong();
             if (allTracksinGivenRL.contains(trackNum))
-                System.out.println("Song already in TrackNum");
+                System.out.println("TrackNum is already taken, choose another Track number");
             else
                 break;
         }
