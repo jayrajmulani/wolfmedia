@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReportUtils {
+
     public List<Stats> getHistoricalSongPlayCountByMonth(Connection connection, long songId) throws SQLException {
         List<Stats> stats = new ArrayList<>();
         String query = """ 
@@ -380,7 +381,7 @@ public class ReportUtils {
                     union
                     (
                     select play_count
-                    from manand.HISTORICAL_EPISODE_PLAY_COUNT
+                    from HISTORICAL_EPISODE_PLAY_COUNT
                     where month = month(current_timestamp)
                     and year = year(current_timestamp)
                     and podcast_id = ?

@@ -1,6 +1,7 @@
 package info;
 
 import models.*;
+import org.checkerframework.checker.units.qual.A;
 import utils.ReportUtils;
 
 import java.sql.*;
@@ -10,6 +11,37 @@ import java.util.List;
 import java.util.Optional;
 
 public class Read {
+    public List<Song> getSongsByArtist(Connection connection, long artistId) throws SQLException {
+        List<Song> songs = new ArrayList<>();
+        String query = """
+        SELECT S.id, S.title
+        FROM   CREATES C, SONG S
+        WHERE  S.id = C.song_id AND C.artist_id = ?
+        """;
+        return getSongs(connection, artistId, songs, query);
+    }
+
+    private List<Song> getSongs(Connection connection, long artistId, List<Song> songs, String query) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setLong(1, artistId);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()){
+            songs.add(
+                    getSong(rs.getLong("id"), connection).get()
+            );
+        }
+        return songs;
+    }
+
+    public List<Song> getSongsByAlbum(Connection connection, long albumId) throws SQLException {
+        List<Song> songs = new ArrayList<>();
+        String query = """
+        SELECT S.id, S.title
+        FROM   SONG_ALBUM SA, SONG S
+        WHERE  S.id = SA.song_id AND SA.album_id = ?
+        """;
+        return getSongs(connection, albumId, songs, query);
+    }
     private static final ReportUtils reportUtils = new ReportUtils();
     public Optional<Song> getSong(long id, Connection connection) throws SQLException {
         String query = "SELECT S.id, title, release_country, language, duration, " +
@@ -111,7 +143,7 @@ public class Read {
         System.out.println("Album");
         System.out.println(album);
         System.out.println("Songs in Album: ");
-        reportUtils.getSongsByAlbum(connection, id).forEach(System.out::println);
+        getSongsByAlbum(connection, id).forEach(System.out::println);
     }
 
     public long getArtistMonthlyListener(Connection connection, long artistID) throws SQLException {
