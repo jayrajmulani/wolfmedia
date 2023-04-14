@@ -457,7 +457,8 @@ public class CLI {
                                         case 1 -> {
                                             //Create
                                             long podcastID = inputData.getPodcastIdInput(connection, sc);
-                                            long id = create.createEpisode(connection, inputData.getEpisodeInput(sc, podcastID));
+                                            long id = create.createEpisode(connection, inputData.getEpisodeInput(connection, sc, podcastID));
+                                            create.createEpisodeGuest(connection, inputData.getEpisodeGuestInput(connection, sc, podcastID, id));
                                             System.out.println("Episode created successfully with number " + id);
                                         }
                                         case 2 -> {
@@ -467,13 +468,21 @@ public class CLI {
                                             if(episodeNum.isPresent()){
                                                 Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum.get());
                                                 relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
+                                                Guest guest = read.getGuestDetails(connection, podcastID, episodeNum.get()).orElseThrow();
+                                                System.out.println("The Guest associated with the Song is " + guest.getName());
                                             }
                                             else{
                                                 System.out.println("Podcast doesn't have any episodes");
                                             }
                                         }
                                         case 3 -> {
-                                            //TODO: Update Episode
+                                            long podcastId = inputData.getPodcastIdInput(connection, sc);
+                                            long episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
+                                            Episode episode = inputData.getEpisodeInput(connection, sc, podcastId);
+                                            episode.setEpisodeNum(episodeNum);
+                                            update.updateEpisode(connection, episode);
+                                            System.out.println("Episode updated successfully" );
+
                                         }
                                         case 4 -> {
                                             long podcastId =  inputData.getPodcastIdInput(connection, sc);

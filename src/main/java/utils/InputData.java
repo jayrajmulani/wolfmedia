@@ -136,11 +136,12 @@ public class InputData {
         return new Podcast(name, language, country, flatFee, hosts);
     }
 
-    public Episode getEpisodeInput(Scanner sc, long podcastID) throws ParseException {
+    public Episode getEpisodeInput(Connection connection, Scanner sc, long podcastID) throws ParseException, SQLException {
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Enter the number of the episode:");
-        long episodeNum = myObj.nextLong();
-        myObj.nextLine();
+        long episodeNum = read.getMaxEpisodeNumForPodcast(connection, podcastID).orElseThrow();
+        episodeNum+=1;
+        System.out.println("Enter the id of the Episode");
+        String episodId = myObj.nextLine();
         System.out.println("Enter the title of the episode:");
         String title = myObj.nextLine();
         System.out.println("Enter the release date (mm/dd/yyyy) of the episode:");
@@ -152,7 +153,12 @@ public class InputData {
         System.out.println("Enter the bonus rate of the episode:");
         double bonusRate = myObj.nextDouble();
 
-        return new Episode(new Podcast(podcastID), episodeNum, title, releaseDate, duration, advCount, bonusRate);
+        return new Episode(new Podcast(podcastID), episodeNum, title, releaseDate, duration, advCount, bonusRate, episodId);
+    }
+
+    public EpisodeGuest getEpisodeGuestInput(Connection connection, Scanner sc, long podcastId, long episodeNum) throws SQLException {
+        long guestId = getGuestIdInput(connection, sc);
+        return new EpisodeGuest(podcastId, episodeNum, guestId);
     }
 
     public long getArtistIdInput(Connection connection, Scanner sc) throws SQLException {

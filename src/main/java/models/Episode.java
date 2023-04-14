@@ -18,6 +18,7 @@ public class Episode {
     private double duration;
     private int advCount;
     private double bonusRate;
+    private String episodeId;
 
     public Episode(Podcast podcast, long episodeNum, String title) {
         this.podcast = podcast;
