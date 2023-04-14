@@ -2,6 +2,8 @@ package models;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,8 +17,7 @@ public class Host {
     String city;
     String email;
     String phone;
-//    TODO Link Podcast when ready, to be applied with UPDATE not CREATE
-//    List<Podcast> podcasts;
+    List<Podcast> podcasts;
 
     public Host(long id){
         this.id = id;
