@@ -31,6 +31,16 @@ public class Podcast {
         this.hosts = hosts;
     }
 
+    public Podcast(String name, String language, String country, double flatFee, List<Host> hosts, List<Sponsor> sponsors, List<Genre> genres) {
+        this.name = name;
+        this.language = language;
+        this.country = country;
+        this.flatFee = flatFee;
+        this.hosts = hosts;
+        this.sponsors = sponsors;
+        this.genres = genres;
+    }
+
     public Podcast(long id, String name, String language, String country, double flatFee) {
         this.id = id;
         this.name = name;
