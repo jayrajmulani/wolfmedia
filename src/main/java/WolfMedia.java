@@ -2,6 +2,7 @@ import utils.CLI;
 
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
 public class WolfMedia {
@@ -9,6 +10,9 @@ public class WolfMedia {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, ParseException, IllegalArgumentException {
         try{
             cli.run();
+        }
+        catch (InputMismatchException inputMismatchException){
+            System.out.println("Input Mismatch Exception");
         }
         catch (IllegalArgumentException illegalArgumentException){
             System.out.println(illegalArgumentException.getMessage());
@@ -18,8 +22,8 @@ public class WolfMedia {
             sqlException.printStackTrace();
         }
         catch (NoSuchElementException noElementEx){
-            System.out.println("Some value(s) seem to be missing from the database.");
-            System.out.println(noElementEx.getMessage());
+            System.out.println("Error in inputs");
+            noElementEx.printStackTrace();
         }
         catch (Exception ex){
             System.out.println("Something went wrong!");

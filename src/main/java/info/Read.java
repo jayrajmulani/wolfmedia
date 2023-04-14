@@ -202,15 +202,28 @@ public class Read {
     public Optional<Host> getHost(Long id, Connection connection) throws SQLException {
         String query = "SELECT HOST.id, first_name, last_name, city, email, phone " +
                 "FROM HOST WHERE HOST.id = ?";
+        String hostPodcasts = "SELECT podcast_id, P.name FROM PODCAST_HOST PH " +
+                "JOIN HOST H on H.id = PH.host_id " +
+                "JOIN PODCAST P on P.id = PH.podcast_id " +
+                "WHERE host_id=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
+            PreparedStatement podcastStatement = connection.prepareStatement(hostPodcasts);
+            podcastStatement.setLong(1, id);
             statement.setLong(1, id);
+            podcastStatement.executeQuery();
             statement.executeQuery();
             ResultSet resultSet = statement.getResultSet();
+            ResultSet podcastSet = podcastStatement.getResultSet();
+            List<Podcast> podcasts = new ArrayList<>();
+            while (podcastSet.next()){
+                podcasts.add(new Podcast(podcastSet.getLong("podcast_id"), podcastSet.getString("name")));
+            }
             if (resultSet.next()) {
                 return Optional.of(
                         new Host(resultSet.getLong("id"), resultSet.getString("first_name"),
                                 resultSet.getString("last_name"), resultSet.getString("city"),
-                                resultSet.getString("email"), resultSet.getString("phone")
+                                resultSet.getString("email"), resultSet.getString("phone"),
+                                podcasts
                         ));
             }
             return Optional.empty();
