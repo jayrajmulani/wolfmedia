@@ -82,7 +82,7 @@ public class CLI {
                                             Song song = inputData.getSongInputForUpdate(connection);
                                             song.setId(id);
                                             update.updateSong(connection, song);
-                                            System.out.println("Song updated successfully" );
+                                            System.out.println("Song updated successfully");
                                         }
                                         case 4 -> {
                                             // Delete Song
@@ -129,7 +129,7 @@ public class CLI {
                                             Guest guest = inputData.getGuestInput();
                                             guest.setId(id);
                                             update.updateGuest(connection, guest);
-                                            System.out.println("Guest updated successfully" );
+                                            System.out.println("Guest updated successfully");
                                         }
                                         case 4 -> {
                                             // Deleting Guest
@@ -170,16 +170,16 @@ public class CLI {
                                         }
                                         case 2 -> {
                                             //Get Artist details by Id
-                                            long id = inputData.getArtistIdInput(connection,sc);
+                                            long id = inputData.getArtistIdInput(connection, sc);
                                             Artist artist = read.getArtist(connection, id).orElseThrow();
                                             System.out.println(artist);
                                         }
                                         case 3 -> {
                                             //Update Artist details
-                                            long id = inputData.getArtistIdInput(connection,sc);
+                                            long id = inputData.getArtistIdInput(connection, sc);
                                             Artist artist = inputData.getArtistInputForUpdate();
                                             artist.setId(id);
-                                            update.updateArtist(connection,artist);
+                                            update.updateArtist(connection, artist);
                                         }
                                         case 4 -> {
                                             //Delete Artist details
@@ -219,15 +219,15 @@ public class CLI {
                                             Long id = sc.nextLong();
                                             Optional<Podcast> resultPodcast = read.getPodcast(id, connection);
 
-                                            if (resultPodcast.isPresent()){
+                                            if (resultPodcast.isPresent()) {
                                                 System.out.println(resultPodcast.get());
-                                                System.out.println("Episode count:"+resultPodcast.get().getEpisodes().size());
-                                            }else {
+                                                System.out.println("Episode count:" + resultPodcast.get().getEpisodes().size());
+                                            } else {
                                                 System.out.println("Podcast not found!");
                                             }
                                         }
                                         case 3 -> {
-                                            long id = inputData.getPodcastIdInput(connection,sc);
+                                            long id = inputData.getPodcastIdInput(connection, sc);
                                             Podcast podcast = inputData.getPodcastInput(sc, connection);
                                             podcast.setId(id);
                                             update.updatePodcast(connection, podcast);
@@ -273,7 +273,7 @@ public class CLI {
                                             System.out.println("Enter the id of the host:");
                                             Long id = sc.nextLong();
                                             Optional<Host> resultHost = read.getHost(id, connection);
-                                            if(resultHost.isPresent()){
+                                            if (resultHost.isPresent()) {
                                                 System.out.println(resultHost.get());
                                                 System.out.println("Podcasts by this host:");
                                                 read.getPodcastsByHostId(connection, id).forEach(System.out::println);
@@ -285,7 +285,7 @@ public class CLI {
                                             Host host = inputData.getHostInput();
                                             host.setId(id);
                                             update.updateHost(connection, host);
-                                            System.out.println("Host updated successfully" );
+                                            System.out.println("Host updated successfully");
                                         }
                                         case 4 -> {
                                             //Delete Host
@@ -335,7 +335,7 @@ public class CLI {
                                             User user = inputData.getUserInput(sc);
                                             user.setId(id);
                                             update.updateUser(connection, user);
-                                            System.out.println("User updated successfully" );
+                                            System.out.println("User updated successfully");
                                         }
                                         case 4 -> {
                                             //Delete User details
@@ -384,7 +384,7 @@ public class CLI {
                                             RecordLabel recordLabel = inputData.getRecordLabelInput(sc);
                                             recordLabel.setId(id);
                                             update.updateRecordLabel(connection, recordLabel);
-                                            System.out.println("Record Label updated successfully" );
+                                            System.out.println("Record Label updated successfully");
                                         }
                                         case 4 -> {
                                             //Delete Record Label
@@ -481,7 +481,7 @@ public class CLI {
                                             Sponsor sponsor = inputData.getSponsorInput(sc);
                                             sponsor.setId(id);
                                             System.out.println(sponsor);
-                                            update.updateSponsor(connection,sponsor);
+                                            update.updateSponsor(connection, sponsor);
                                         }
                                         case 4 -> {
                                             //Delete Sponsor details
@@ -524,13 +524,14 @@ public class CLI {
                                             //Get Episode details by Id
                                             long podcastID = inputData.getPodcastIdInput(connection, sc);
                                             Optional<Long> episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastID);
-                                            if(episodeNum.isPresent()){
+                                            if (episodeNum.isPresent()) {
                                                 Optional<Episode> relationEpisode = read.getEpisode(connection, podcastID, episodeNum.get());
                                                 relationEpisode.ifPresentOrElse(System.out::println, () -> System.out.println("Episode not found!"));
-                                                Guest guest = read.getGuestDetails(connection, podcastID, episodeNum.get()).orElseThrow();
-                                                System.out.println("The Guest associated with the Song is " + guest.getName());
-                                            }
-                                            else{
+                                                Optional<Guest> guest = read.getGuestDetails(connection, podcastID, episodeNum.get());
+                                                if (guest.isPresent()) {
+                                                    System.out.println("The Guest associated with the Song is " + guest.get().getName());
+                                                }
+                                            } else {
                                                 System.out.println("Podcast doesn't have any episodes");
                                             }
                                         }
@@ -541,12 +542,12 @@ public class CLI {
                                             Episode episode = inputData.getEpisodeInput(connection, sc, podcastId);
                                             episode.setEpisodeNum(episodeNum);
                                             update.updateEpisode(connection, episode);
-                                            System.out.println("Episode updated successfully" );
+                                            System.out.println("Episode updated successfully");
 
                                         }
                                         case 4 -> {
                                             //Delete Episode details
-                                            long podcastId =  inputData.getPodcastIdInput(connection, sc);
+                                            long podcastId = inputData.getPodcastIdInput(connection, sc);
                                             long episode_num = inputData.getEpisodeNumberInput(connection, sc, podcastId).orElseThrow();
                                             delete.deleteEpisode(connection, podcastId, episode_num);
                                             System.out.println("Episode successfully deleted");
@@ -572,7 +573,7 @@ public class CLI {
                                 System.out.println("Above selected Artist is assigned to selected Album");
                             }
                             // Assign Artist to Record Label
-                           case 13 -> {
+                            case 13 -> {
                                 long artistId = inputData.getArtistIdInput(connection, sc);
                                 create.createAssignArtisttoRecordLabel(connection, inputData.getArtisttoRecordLabelInput(connection, sc, artistId));
                                 System.out.println("Above selected Artist is assigned to selected Record Label");
@@ -743,12 +744,12 @@ public class CLI {
                             case 5 -> {
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
                                 Optional<Long> episodeNum = inputData.getEpisodeNumberInput(connection, sc, podcastId);
-                                if(episodeNum.isEmpty()){
+                                if (episodeNum.isEmpty()) {
                                     System.out.println("This Podcast has no Episodes");
                                     break;
                                 }
                                 List<PaymentInfo> hostPayInfo = podcastPayments.calculateHostPayAmount(connection, podcastId, episodeNum.get());
-                                if(hostPayInfo.size() == 0){
+                                if (hostPayInfo.size() == 0) {
                                     System.out.println("No Payments to process..");
                                     break;
                                 }
@@ -898,14 +899,14 @@ public class CLI {
                             }
                             // Find Songs By Artist
                             case 12 -> {
-                                long artistId = inputData.getArtistIdInput(connection,sc);
-                                List<Song> songs = reportUtils.getSongsByArtist(connection,artistId);
+                                long artistId = inputData.getArtistIdInput(connection, sc);
+                                List<Song> songs = reportUtils.getSongsByArtist(connection, artistId);
                                 songs.forEach(System.out::println);
                             }
                             // Find Songs By Album
                             case 13 -> {
                                 long albumId = inputData.getAlbumIdInput(connection, sc);
-                                List<Song> songs = reportUtils.getSongsByAlbum(connection,albumId);
+                                List<Song> songs = reportUtils.getSongsByAlbum(connection, albumId);
                                 songs.forEach(System.out::println);
                             }
                             // Find Episodes By Podcast
@@ -915,14 +916,14 @@ public class CLI {
                             }
                             // Flush Play Count for Song for current month
                             case 15 -> {
-                                long songId = inputData.getSongIdInput(connection,sc);
-                                reportUtils.flushSongPlayCountForCurrentMonth(connection,songId);
+                                long songId = inputData.getSongIdInput(connection, sc);
+                                reportUtils.flushSongPlayCountForCurrentMonth(connection, songId);
                             }
                             // Historical Play Count for Episode
                             case 16 -> {
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
                                 Optional<Long> episodeNumber = inputData.getEpisodeNumberInput(connection, sc, podcastId);
-                                if(episodeNumber.isEmpty()){
+                                if (episodeNumber.isEmpty()) {
                                     System.out.println("This podcast doesnt have any episodes.");
                                 }
                                 List<Stats> stats = reportUtils.getHistoricalEpisodePlayCountByMonth(connection, podcastId, episodeNumber.get());
@@ -932,7 +933,7 @@ public class CLI {
                             case 17 -> {
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
                                 Optional<Long> episodeNumber = inputData.getEpisodeNumberInput(connection, sc, podcastId);
-                                if(episodeNumber.isEmpty()){
+                                if (episodeNumber.isEmpty()) {
                                     System.out.println("This podcast doesnt have any episodes.");
                                 }
                                 long playCountForCurrentMonth = reportUtils.getEpisodePlayCountForCurrentMonth(connection, podcastId, episodeNumber.get());
@@ -943,13 +944,13 @@ public class CLI {
                             case 18 -> {
                                 long podcastId = inputData.getPodcastIdInput(connection, sc);
                                 Optional<Long> episodeNumber = inputData.getEpisodeNumberInput(connection, sc, podcastId);
-                                if(episodeNumber.isEmpty()){
+                                if (episodeNumber.isEmpty()) {
                                     System.out.println("This podcast doesnt have any episodes.");
                                 }
-                                reportUtils.flushEpisodePlayCountForCurrentMonth(connection,podcastId, episodeNumber.get());
+                                reportUtils.flushEpisodePlayCountForCurrentMonth(connection, podcastId, episodeNumber.get());
                             }
                             case 19 -> {
-                                long id = inputData.getArtistIdInput(connection,sc);
+                                long id = inputData.getArtistIdInput(connection, sc);
                                 long count = read.getArtistMonthlyListener(connection, id);
                                 System.out.println("Monthly Listeners for this artist is " + count);
                             }
