@@ -204,10 +204,14 @@ public class Read {
 
     public Optional<Podcast> getPodcast(Long id, Connection connection) throws SQLException {
         String query = "SELECT PODCAST.id, PODCAST.name, language, country, flat_fee, HOST.id, " +
-                "HOST.first_name, HOST.last_name " +
+                "HOST.first_name, HOST.last_name," +
+                "RATING.rating, " +
+                "SUBS.subCount " +
                 "FROM PODCAST " +
                 "JOIN PODCAST_HOST ON PODCAST.id = PODCAST_HOST.podcast_id " +
                 "JOIN HOST ON HOST.id = PODCAST_HOST.host_id " +
+                "CROSS JOIN (SELECT avg(rating) rating from RATES where podcast_id = ?) as RATING " +
+                "CROSS JOIN (SELECT count(user_id) as subCount from PODCAST_SUBSCRIPTION where podcast_id = ?) AS SUBS " +
                 "WHERE PODCAST.id = ?";
         String mapPodcastSponsorsQuery = "SELECT PS.sponsor_id, S.name " +
                 "FROM PODCAST P " +
@@ -224,6 +228,8 @@ public class Read {
                 "WHERE podcast_id=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
+            statement.setLong(2, id);
+            statement.setLong(3, id);
             statement.executeQuery();
             ResultSet resultSet = statement.getResultSet();
             HashSet<Host> hosts = new HashSet<>();
@@ -271,8 +277,8 @@ public class Read {
                                 resultSet.getString("language"),
                                 resultSet.getString("country"),
                                 resultSet.getDouble("flat_fee"),
-                                0, // TODO rating
-                                0, // TODO sub count
+                                resultSet.getDouble("rating"),
+                                resultSet.getLong("subCount"),
                                 hosts.stream().toList(),
                                 sponsors.stream().toList(),
                                 genres.stream().toList(),
